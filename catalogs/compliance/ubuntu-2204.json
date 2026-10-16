@@ -1,0 +1,107 @@
+{
+  "benchmark_id": "cis-ubuntu-2204",
+  "benchmark_version": "illustrative-v1",
+  "benchmark_title": "Synthetic CIS-inspired Ubuntu 22.04 LTS checks",
+  "os": "Ubuntu 22.04 LTS",
+  "os_family": "linux",
+  "profile": "Level 1 Server",
+  "source_notice": "Independently authored illustrative controls; not official CIS Benchmark text or identifiers.",
+  "controls": [
+    {
+      "id": "LIN-SSH-ROOT",
+      "title": "Disable direct root SSH login",
+      "category": "SSH",
+      "evidence_type": "sshd_config",
+      "evidence_source": "PermitRootLogin",
+      "expected_value": "no",
+      "noncompliant_value": "yes",
+      "roles": [
+        "web",
+        "app",
+        "db",
+        "bastion"
+      ],
+      "scenario": "ssh"
+    },
+    {
+      "id": "LIN-SSH-PASSWORD",
+      "title": "Disable SSH password authentication",
+      "category": "SSH",
+      "evidence_type": "sshd_config",
+      "evidence_source": "PasswordAuthentication",
+      "expected_value": "no",
+      "noncompliant_value": "yes",
+      "roles": [
+        "web",
+        "app",
+        "db",
+        "bastion"
+      ],
+      "scenario": "ssh"
+    },
+    {
+      "id": "LIN-AUDITD",
+      "title": "Ensure auditd service is enabled",
+      "category": "Logging",
+      "evidence_type": "systemd",
+      "evidence_source": "auditd.enabled",
+      "expected_value": "true",
+      "noncompliant_value": "false",
+      "roles": [
+        "web",
+        "app",
+        "db",
+        "bastion"
+      ],
+      "scenario": "logging"
+    },
+    {
+      "id": "LIN-UFW",
+      "title": "Ensure firewall service is enabled",
+      "category": "Firewall",
+      "evidence_type": "systemd",
+      "evidence_source": "ufw.enabled",
+      "expected_value": "true",
+      "noncompliant_value": "false",
+      "roles": [
+        "web",
+        "app",
+        "db",
+        "bastion"
+      ],
+      "scenario": "firewall"
+    },
+    {
+      "id": "LIN-CORE",
+      "title": "Restrict core dumps",
+      "category": "Kernel",
+      "evidence_type": "sysctl",
+      "evidence_source": "fs.suid_dumpable",
+      "expected_value": "0",
+      "noncompliant_value": "1",
+      "roles": [
+        "web",
+        "app",
+        "db",
+        "bastion"
+      ],
+      "scenario": "kernel"
+    },
+    {
+      "id": "LIN-PASS-MIN",
+      "title": "Minimum password length",
+      "category": "Authentication",
+      "evidence_type": "pam",
+      "evidence_source": "minlen",
+      "expected_value": "14",
+      "noncompliant_value": "8",
+      "roles": [
+        "web",
+        "app",
+        "db",
+        "bastion"
+      ],
+      "scenario": "password"
+    }
+  ]
+}

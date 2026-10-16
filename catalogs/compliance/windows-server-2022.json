@@ -1,0 +1,93 @@
+{
+  "benchmark_id": "cis-windows-server-2022",
+  "benchmark_version": "illustrative-v1",
+  "benchmark_title": "Synthetic CIS-inspired Windows Server 2022 checks",
+  "os": "Windows Server 2022",
+  "os_family": "windows",
+  "profile": "Level 1",
+  "source_notice": "Independently authored illustrative controls; not official CIS Benchmark text or identifiers.",
+  "controls": [
+    {
+      "id": "WIN-PASSWORD-LENGTH",
+      "title": "Minimum password length",
+      "category": "Account Policies",
+      "evidence_type": "security_policy",
+      "evidence_source": "MinimumPasswordLength",
+      "expected_value": "14",
+      "noncompliant_value": "8",
+      "roles": [
+        "dc"
+      ],
+      "scenario": "password"
+    },
+    {
+      "id": "WIN-LOCKOUT",
+      "title": "Account lockout threshold",
+      "category": "Account Policies",
+      "evidence_type": "security_policy",
+      "evidence_source": "LockoutBadCount",
+      "expected_value": "5",
+      "noncompliant_value": "0",
+      "roles": [
+        "dc",
+        "win"
+      ],
+      "scenario": "identity"
+    },
+    {
+      "id": "WIN-FIREWALL",
+      "title": "Windows Defender Firewall enabled",
+      "category": "Network",
+      "evidence_type": "registry",
+      "evidence_source": "HKLM\\\\SOFTWARE\\\\Policies\\\\Microsoft\\\\WindowsFirewall\\\\DomainProfile\\\\EnableFirewall",
+      "expected_value": "1",
+      "noncompliant_value": "0",
+      "roles": [
+        "dc",
+        "win"
+      ],
+      "scenario": "firewall"
+    },
+    {
+      "id": "WIN-AUDIT-LOGON",
+      "title": "Logon auditing enabled",
+      "category": "Audit Policy",
+      "evidence_type": "auditpol",
+      "evidence_source": "LogonSuccessFailure",
+      "expected_value": "enabled",
+      "noncompliant_value": "disabled",
+      "roles": [
+        "dc",
+        "win"
+      ],
+      "scenario": "logging"
+    },
+    {
+      "id": "WIN-SMB1",
+      "title": "SMBv1 server disabled",
+      "category": "Network",
+      "evidence_type": "registry",
+      "evidence_source": "HKLM\\\\SYSTEM\\\\CurrentControlSet\\\\Services\\\\LanmanServer\\\\Parameters\\\\SMB1",
+      "expected_value": "0",
+      "noncompliant_value": "1",
+      "roles": [
+        "dc",
+        "win"
+      ],
+      "scenario": "legacy"
+    },
+    {
+      "id": "WIN-RDP-NLA",
+      "title": "Require Network Level Authentication for RDP",
+      "category": "Remote Access",
+      "evidence_type": "registry",
+      "evidence_source": "HKLM\\\\SYSTEM\\\\CurrentControlSet\\\\Control\\\\Terminal Server\\\\WinStations\\\\RDP-Tcp\\\\UserAuthentication",
+      "expected_value": "1",
+      "noncompliant_value": "0",
+      "roles": [
+        "win"
+      ],
+      "scenario": "remote"
+    }
+  ]
+}

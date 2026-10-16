@@ -1,0 +1,20 @@
+name: Synthetic data generator tests
+on:
+  push:
+  pull_request:
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Unit tests
+        run: python -m unittest discover -s tests -v
+      - name: Compliance dry run
+        run: python create_compliance_table.py --dry-run --seed 42
+      - name: Vulnerability dry run compatibility
+        run: python create_vuln_table.py --dry-run --seed 42
