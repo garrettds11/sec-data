@@ -343,7 +343,7 @@ def main():
         return
     path = Path(args.output)
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(items, indent=2, default=str) + "\\n", encoding="utf-8")
+    path.write_text(json.dumps(items, indent=2, default=lambda value: float(value) if isinstance(value, Decimal) else str(value)) + "\\n", encoding="utf-8")
     print(f"Wrote {len(items)} findings to {path.resolve()}")
 
 
