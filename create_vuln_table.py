@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Create a DynamoDB table of synthetic vulnerability-scan findings and load it.
+Generate synthetic vulnerability-scan findings locally; no AWS connection.
 
 Table design (one item = one finding on one asset):
   PK  host_name      FQDN of the scanned asset         (ECS: host.name)
@@ -19,12 +19,7 @@ Data notes:
   * A few findings are deliberately "planted" so test questions have
     known answers. The summary printed at the end reports them.
 
-Usage:
-  python create_vuln_table.py --dry-run                 # no AWS calls
-  python create_vuln_table.py --region us-east-1        # create + load
-  python create_vuln_table.py --region us-east-1 --append
-  python create_vuln_table.py --region us-east-1 --delete
-Requires: boto3 (not needed for --dry-run).
+Usage:\n  python create_vuln_table.py --output output/vuln-findings.json\n  python create_vuln_table.py --dry-run
 """
 import argparse
 import math
@@ -330,99 +325,26 @@ def summarize(items):
     print("  Open Critical count, top hosts      :", ", ".join(f"{h}={n}" for h, n in top.most_common(5)))
 
 
-# --------------------------------------------------------------------------
-# AWS
-# --------------------------------------------------------------------------
+# Local file generation only. DynamoDB uploads are handled by upload_to_aws.py.
 def main():
-    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--table", default=DEFAULT_TABLE)
-    ap.add_argument("--region")
-    ap.add_argument("--profile")
-    ap.add_argument("--project-tag", default="aiwebdemo", help="value for the project=<value> tag")
+    import json
+    from pathlib import Path
+    ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--seed", type=int, default=42)
-    ap.add_argument("--dry-run", action="store_true", help="generate and summarize only; no AWS calls")
-    ap.add_argument("--append", action="store_true", help="load into an existing table (same keys are overwritten)")
-    ap.add_argument("--delete", action="store_true", help="delete the table (asks for confirmation)")
+    ap.add_argument("--output", default="output/vuln-findings.json")
+    ap.add_argument("--dry-run", action="store_true", help="Print summary only; do not create file")
     args = ap.parse_args()
-
-    if args.dry_run:
-        items = build_items(args.seed)
-        summarize(items)
-        print("\nSample item:")
-        for k, v in sorted(items[0].items()):
-            print(f"  {k}: {v}")
-        return
-
-    try:
-        import boto3
-    except ImportError:
-        sys.exit("boto3 is required: pip install boto3")
-
-    session = boto3.Session(profile_name=args.profile, region_name=args.region)
-    if not session.region_name:
-        sys.exit("No region set. Pass --region or configure a default region.")
-    client = session.client("dynamodb")
-    ddb = session.resource("dynamodb")
-    print(f"Account/region: {session.client('sts').get_caller_identity()['Account']} / {session.region_name}")
-
-    exists = True
-    try:
-        client.describe_table(TableName=args.table)
-    except client.exceptions.ResourceNotFoundException:
-        exists = False
-
-    if args.delete:
-        if not exists:
-            sys.exit(f"Table {args.table} does not exist.")
-        if input(f"Type the table name '{args.table}' to confirm deletion: ").strip() != args.table:
-            sys.exit("Aborted.")
-        client.delete_table(TableName=args.table)
-        client.get_waiter("table_not_exists").wait(TableName=args.table)
-        print("Deleted.")
-        return
-
-    if exists and not args.append:
-        sys.exit(f"Table {args.table} already exists. Use --append to load into it, or --delete first.")
-
-    if not exists:
-        print(f"Creating table {args.table} (on-demand)...")
-        client.create_table(
-            TableName=args.table,
-            BillingMode="PAY_PER_REQUEST",
-            AttributeDefinitions=[
-                {"AttributeName": "host_name", "AttributeType": "S"},
-                {"AttributeName": "finding_id", "AttributeType": "S"},
-                {"AttributeName": "vulnerability_severity", "AttributeType": "S"},
-                {"AttributeName": "last_seen", "AttributeType": "S"},
-                {"AttributeName": "vulnerability_id", "AttributeType": "S"},
-            ],
-            KeySchema=[
-                {"AttributeName": "host_name", "KeyType": "HASH"},
-                {"AttributeName": "finding_id", "KeyType": "RANGE"},
-            ],
-            GlobalSecondaryIndexes=[
-                {"IndexName": GSI_SEVERITY,
-                 "KeySchema": [{"AttributeName": "vulnerability_severity", "KeyType": "HASH"},
-                               {"AttributeName": "last_seen", "KeyType": "RANGE"}],
-                 "Projection": {"ProjectionType": "ALL"}},
-                {"IndexName": GSI_VULN,
-                 "KeySchema": [{"AttributeName": "vulnerability_id", "KeyType": "HASH"},
-                               {"AttributeName": "host_name", "KeyType": "RANGE"}],
-                 "Projection": {"ProjectionType": "ALL"}},
-            ],
-            Tags=[{"Key": "project", "Value": args.project_tag}],
-        )
-        client.get_waiter("table_exists").wait(TableName=args.table)
-        print("Table active.")
-
     items = build_items(args.seed)
-    table = ddb.Table(args.table)
-    print(f"Writing {len(items)} items...")
-    with table.batch_writer() as batch:
-        for item in items:
-            batch.put_item(Item=item)
-    print("Done.")
     summarize(items)
+    if args.dry_run:
+        print("\\nSample item:")
+        for key, value in sorted(items[0].items()):
+            print(f"  {key}: {value}")
+        return
+    path = Path(args.output)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(items, indent=2, default=str) + "\\n", encoding="utf-8")
+    print(f"Wrote {len(items)} findings to {path.resolve()}")
 
 
 if __name__ == "__main__":
