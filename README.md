@@ -1,35 +1,41 @@
 # sec-data
 
-Synthetic security datasets for testing security analytics and AI investigation workflows.
+Synthetic security datasets for security analytics and AI investigation tests.
 
-## Generators
+## Separate generation from AWS deployment
 
-- `create_vuln_table.py`: vulnerability scan findings with illustrative statuses.
-- `create_compliance_table.py`: CIS-inspired synthetic configuration assessments, with expected/actual evidence and repeatable seeded outcomes.
+**Generation never contacts AWS.** Both generators write JSON locally by default:
 
-Both generators use `common/assets.py` for the same 23 synthetic hosts. OS versions are selected deterministically per seed. The vulnerability generator's existing seeded RNG behavior is preserved.
-
-## Compliance quick start
-
-```shell
-python create_compliance_table.py --dry-run --seed 42
-python create_compliance_table.py --region us-east-1
-python create_compliance_table.py --region us-east-1 --append
-python -m unittest discover -s tests -v
+```powershell
+python create_vuln_table.py --output output/vuln-findings.json --seed 42
+python create_compliance_table.py --output output/compliance-findings.json --seed 42
 ```
 
-`--dry-run` does not import boto3 or contact AWS. `--as-of` sets the assessment timestamp (default is a fixed UTC timestamp to make output reproducible). AWS loading requires `pip install boto3` and configured credentials.
+Use `--dry-run` on either generator to inspect a summary without writing files. The compliance generator also accepts `--as-of 2026-10-15T12:00:00Z` (defaults to a stable time); vulnerability dates reflect the current UTC time and are not byte-for-byte reproducible across days.
 
-DynamoDB table: `aiwebdemo-compliance-findings`. Partition key `host_name`, sort key `finding_id`; secondary indexes `status-lastseen-index` and `control-host-index`. `--append` upserts latest results with the same keys. This MVP does not preserve assessment history.
+**Uploading is a separate, explicit action**, requiring `boto3`, configured AWS CLI profiles, IAM access to DynamoDB and STS, and a confirmed destination:
 
-## Scope and interpretation
+```powershell
+python -m pip install boto3
+aws configure list-profiles
+python upload_to_aws.py --dataset vuln --input output/vuln-findings.json
+python upload_to_aws.py --dataset compliance --input output/compliance-findings.json
+```
 
-Catalogs are in `catalogs/compliance/`. They contain **independently authored illustrative controls**, not official CIS text, machine-readable benchmark files, recommendation IDs, or claims of CIS conformance. Only matching OS versions and applicable roles receive findings. Non-covered OS versions intentionally receive no assessments.
+When `--profile` is omitted, the uploader lists local AWS CLI profiles and asks which to use. The command resolves the AWS account using STS, displays the account, region, table, and record count, and requires typing `UPLOAD` before any DynamoDB write. An explicit `--profile myprofile --region us-east-1 --yes` supports deliberate unattended execution. Without an interactive terminal, a profile must be supplied. The uploader will create missing on-demand tables or upsert records into matching existing tables. No table deletion is supported.
 
-Findings are **simulations, not observations of real endpoint state**. `assessment_method=simulated` and `synthetic=true` make that explicit. Expected and actual values are coherent with their pass/fail status. Seeded scenario rules create consistent planted failures and relative differences between production and development environments. Because the initial scope includes a limited sample catalog, results must not be interpreted as compliance scores for a full benchmark.
+Default tables: `aiwebdemo-vuln-findings` and `aiwebdemo-compliance-findings`, each with `host_name` / `finding_id` primary keys and their dataset-specific secondary indexes.
 
-The compliance generator uses a fixed default `--as-of` so changing wall-clock time will not change results. Supply another timezone-aware ISO timestamp to label another test run. Only the current posture is retained when upserting to DynamoDB.
+## Catalog and inventory
 
-## Compatibility
+Both generators share `common/assets.py`, retaining the existing 23 host definitions and vulnerability generator's seeded host RNG sequence. The compliance catalog in `catalogs/compliance/` contains independently authored, illustrative Windows Server 2022 and Ubuntu 22.04 controls; these are **not official CIS Benchmark text, control identifiers, or certified scan results**. Only exact matching OS versions and applicable roles receive compliance assessments. Statuses and expected/observed values are simulated, not collected from endpoints.
 
-Shared host extraction preserves original host declarations, vendor list, OS options, MAC generation, IP assignments, and the order of pseudo-random calls. The vulnerability generator's AWS table schema and CLI are unchanged.
+## Testing
+
+```powershell
+python -m unittest discover -s tests -v
+python create_vuln_table.py --dry-run
+python create_compliance_table.py --dry-run
+```
+
+The `output/` directory is gitignored to avoid committing generated test data.
