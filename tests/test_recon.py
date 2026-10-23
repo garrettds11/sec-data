@@ -19,6 +19,8 @@ class ReconTests(unittest.TestCase):
         again, truth_again = recon.generate(42, START, 60, 1)
         self.assertEqual(events, list(again))
         self.assertEqual(truth, truth_again)
+        shifted, _ = recon.generate(42, START.replace(day=23), 60, 1)
+        self.assertNotEqual(events[0]["event_id"], next(shifted)["event_id"])
         self.assertEqual({x["family"] for x in truth["operations"]}, set(recon.FAMILIES))
         ids = [e["event_id"] for e in events]
         by_id = {e["event_id"]: e for e in events}

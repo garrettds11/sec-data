@@ -34,8 +34,10 @@ def stamp(dt):
     return dt.astimezone(timezone.utc).isoformat(timespec="milliseconds").replace("+00:00", "Z")
 
 
-def event_id(seed, sequence):
-    return hashlib.sha256(f"recon-v{VERSION}|{seed}|{sequence}".encode()).hexdigest()[:24]
+def event_id(seed, operation_start, sequence, kind, sensor, fields):
+    identity = json.dumps([VERSION, seed, stamp(operation_start), sequence, kind, sensor, fields],
+                          sort_keys=True, separators=(",", ":"))
+    return hashlib.sha256(identity.encode()).hexdigest()[:24]
 
 
 class Operation:
@@ -54,7 +56,8 @@ class Operation:
         when = self.start + timedelta(seconds=seconds)
         sequence = f"{self.number}:{len(self.events)}"
         record = {
-            "schema_version": VERSION, "event_id": event_id(self.seed, sequence),
+            "schema_version": VERSION,
+            "event_id": event_id(self.seed, self.start, sequence, kind, sensor, fields),
             "timestamp": stamp(when),
             "collected_at": stamp(when + timedelta(milliseconds=self.rng.randint(5, 300))),
             "sensor_id": sensor, "event_type": kind, "synthetic": True,
