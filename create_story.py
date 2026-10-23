@@ -22,6 +22,7 @@ from common.export import export_records, parse_times
 from common.identity import (VERSION as IDENTITY_VERSION, generate as generate_identity,
                              render_windows_xml)
 from common.ingress import VERSION as INGRESS_VERSION, generate as generate_ingress
+from common.response import VERSION as RESPONSE_VERSION, generate as generate_response
 from common.story_validation import validate_bundle
 from common.world import VERSION as WORLD_VERSION, SERVICES, iter_assets, iter_entities, iter_relationships, run_id
 from common.zeek_dns import render_dns
@@ -50,7 +51,8 @@ def recipe_checksums():
         "create_story.py", "create_vuln_table.py", "create_compliance_table.py",
         "create_recon_events.py", "common/assets.py", "common/export.py", "common/world.py",
         "common/zeek_dns.py", "common/story_validation.py", "common/identity.py",
-        "common/endpoint.py", "common/data_access.py", "common/ingress.py")]
+        "common/endpoint.py", "common/data_access.py", "common/ingress.py",
+        "common/response.py")]
     for catalog in ("compliance", "recon", "vulnerability"):
         paths.extend(sorted((root / "catalogs" / catalog).glob("*.json")))
     return {path.relative_to(root).as_posix(): sha256_recipe_text(path) for path in paths}
@@ -276,6 +278,15 @@ def export_story(seed, start, duration_minutes, campaign_count, host_count, outp
         save("state-changes.jsonl", iter(changes))
         for kind in ("vulnerability", "compliance"):
             save(f"{kind}-followup.jsonl", followup_rows(stage, kind, changes, seed, followup_at))
+        response_run = generate_response(seed, list(read_jsonl(stage / "recon.jsonl")),
+                                         list(iter_entities()), identity_run, endpoint_run,
+                                         ingress_run, data_run, changes, followup_at)
+        for name, records in (("detection-rules.jsonl", response_run["rules"]),
+                              ("detection-decisions.jsonl", response_run["decisions"]),
+                              ("alerts.jsonl", response_run["alerts"]),
+                              ("case-actions.jsonl", response_run["case"]),
+                              ("response-firewall.jsonl", response_run["firewall"])):
+            save(name, iter(records))
 
         timeline = [{"kind": "baseline_assessment", "at": assessment_at,
                      "datasets": ["vulnerability.jsonl", "compliance.jsonl"]}]
@@ -300,6 +311,12 @@ def export_story(seed, start, duration_minutes, campaign_count, host_count, outp
         timeline.extend({"kind": "outbound_transfer", "at": event["at"],
                          "transfer_id": event["transfer_id"]}
                         for event in data_run["truth"]["transfers"])
+        timeline.extend({"kind": "alert", "at": event["fired_at"],
+                         "alert_id": event["alert_id"]} for event in response_run["alerts"])
+        timeline.extend({"kind": "case_action", "at": event["time"],
+                         "action_id": event["action_id"]} for event in response_run["case"])
+        timeline.extend({"kind": "response_firewall", "at": event["time"],
+                         "rule": event["rule"]} for event in response_run["firewall"])
         timeline.extend({"kind": "state_change", "at": effective_at,
                          "change_id": change["change_id"], "asset_id": change["asset_id"]}
                         for change in changes)
@@ -331,6 +348,12 @@ def export_story(seed, start, duration_minutes, campaign_count, host_count, outp
         data_truth_path.write_text(json.dumps(data_run["truth"], indent=2, sort_keys=True) + "\n",
                                    encoding="utf-8", newline="\n")
         files[data_truth_path.name] = {"sha256": sha256_file(data_truth_path)}
+        response_run["truth"]["run_id"] = run_identity
+        response_truth_path = stage / "response-truth.json"
+        response_truth_path.write_text(json.dumps(response_run["truth"], indent=2,
+                                                 sort_keys=True) + "\n",
+                                       encoding="utf-8", newline="\n")
+        files[response_truth_path.name] = {"sha256": sha256_file(response_truth_path)}
         validation = validate_bundle(stage, truth)
         manifest = {
             "schema_version": WORLD_VERSION, "run_id": run_identity,
@@ -341,7 +364,7 @@ def export_story(seed, start, duration_minutes, campaign_count, host_count, outp
             "generator_versions": {"world": WORLD_VERSION, "recon": recon.VERSION,
                                    "identity": IDENTITY_VERSION, "endpoint": ENDPOINT_VERSION,
                                    "data_access": DATA_ACCESS_VERSION,
-                                   "ingress": INGRESS_VERSION},
+                                   "ingress": INGRESS_VERSION, "response": RESPONSE_VERSION},
             "recipe_sha256": recipe_hash, "recipe_files": recipe,
             "filtered_vulnerability_findings": skipped_findings,
             "validation": validation,

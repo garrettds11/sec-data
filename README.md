@@ -32,7 +32,7 @@ These commands create `C:\code\vuln-findings.json` and `C:\code\compliance-findi
 | `create_vuln_table.py` | Local vulnerability JSON generator |
 | `create_compliance_table.py` | Local compliance JSON generator |
 | `create_recon_events.py` | Offline, scenario-driven normalized JSONL telemetry generator |
-| `create_story.py` | Linked inventory, finding, recon, DNS, ingress, identity, endpoint, data access, egress, and manifest bundle |
+| `create_story.py` | Linked inventory, finding, recon, DNS, ingress, identity, endpoint, data access, egress, response, and manifest bundle |
 | `upload_to_aws.py` | Optional, separate AWS DynamoDB uploader |
 | `common/assets.py` | Shared synthetic inventory of 23 hosts |
 | `common/export.py` | Streaming JSON and JSONL output |
@@ -48,6 +48,7 @@ These commands create `C:\code\vuln-findings.json` and `C:\code\compliance-findi
 | `docs/endpoint.md` | Linked Sysmon fixture, sensor coverage, and Splunk mapping status |
 | `docs/data-access.md` | File auditing, Zeek HTTP/conn, firewall controls, and CIM mapping status |
 | `docs/ingress.md` | Public NAT, edge and Zeek views, TLS visibility, and Splunk smoke test |
+| `docs/response.md` | Detection rules, analyst case, containment effect, and CIM smoke test |
 
 ## Dataset behavior and limitations
 

@@ -9,6 +9,7 @@ from pathlib import Path
 from common.zeek_dns import render_dns
 from common.identity import render_windows_xml
 from common.data_access import OBJECTS
+from common.response import generate as generate_response
 from common.world import ENTITY_IPS, iter_assets, iter_entities, iter_relationships
 
 
@@ -483,6 +484,66 @@ def validate_ingress_bundle(root, truth, assets, entities):
     return len(firewall), len(conn), len(ssl)
 
 
+def validate_response_bundle(root, truth, entities, followup_at):
+    response_truth = json.loads((root / "response-truth.json").read_text(encoding="utf-8"))
+    require(response_truth["run_id"] == truth["run_id"], "response run ID differs")
+    identity = {"web_events": list(rows(root / "web-auth.jsonl")),
+                "windows_events": list(rows(root / "windows-security.jsonl")),
+                "truth": json.loads((root / "identity-truth.json").read_text(encoding="utf-8"))}
+    endpoint = {"records": list(rows(root / "sysmon.jsonl")),
+                "truth": json.loads((root / "endpoint-truth.json").read_text(encoding="utf-8"))}
+    ingress = {"proxy": list(rows(root / "edge-proxy.jsonl")),
+               "http": list(rows(root / "ingress-zeek-http.jsonl")),
+               "truth": json.loads((root / "ingress-truth.json").read_text(encoding="utf-8"))}
+    data = {"objects": list(rows(root / "data-objects.jsonl")),
+            "windows": list(rows(root / "windows-file.jsonl")),
+            "http": list(rows(root / "zeek-http.jsonl")),
+            "firewall": list(rows(root / "egress-firewall.jsonl")),
+            "truth": json.loads((root / "data-access-truth.json").read_text(encoding="utf-8"))}
+    changes = list(rows(root / "state-changes.jsonl"))
+    expected = generate_response(truth["seed"], list(rows(root / "recon.jsonl")),
+                                 list(entities.values()), identity, endpoint, ingress,
+                                 data, changes, followup_at)
+    for name, key in (("detection-rules.jsonl", "rules"),
+                      ("detection-decisions.jsonl", "decisions"),
+                      ("alerts.jsonl", "alerts"),
+                      ("case-actions.jsonl", "case"),
+                      ("response-firewall.jsonl", "firewall")):
+        require(list(rows(root / name)) == expected[key],
+                f"response source differs from deterministic rule: {name}")
+    expected_truth = {**expected["truth"], "run_id": truth["run_id"]}
+    require(response_truth == expected_truth, "response truth differs from deterministic rule")
+    alerts = expected["alerts"]
+    require(len(alerts) == 2 and all(alert["evidence"] for alert in alerts),
+            "response alert set differs")
+    for alert in alerts:
+        require(alert["rule_version"] == "1.0" and
+                alert["last_observed_at"] <= alert["fired_at"] and
+                all(evidence["observed_at"] <= evidence["available_at"] <= alert["fired_at"]
+                    for evidence in alert["evidence"]) and
+                "object_id" not in alert and "transfer_id" not in alert,
+                "alert references future or generator-only evidence")
+    decisions = expected["decisions"]
+    require(len(decisions) == 3 and
+            len([row for row in decisions if row["outcome"] == "suppressed"]) == 1 and
+            any(row["reason"] == "approved-scanner-inventory" for row in decisions),
+            "approved scanner suppression differs")
+    case = expected["case"]
+    require([row["time"] for row in case] == sorted(row["time"] for row in case) and
+            case[0]["action"] == "opened" and case[-1]["action"] == "verified" and
+            case[-1]["time"] > followup_at,
+            "case chronology differs")
+    original = next(row for row in data["firewall"] if row["action"] == "allow" and
+                    row["dest_ip"] == expected["firewall"][0]["dest_ip"] and
+                    row["src_ip"] == expected["firewall"][0]["src_ip"])
+    retry = expected["firewall"][0]
+    require(original["time"] < response_truth["containment_effective_at"] < retry["time"] and
+            retry["action"] == "block" and retry["bytes_out"] == retry["bytes_in"] == 0 and
+            case[-1]["time"] > max(change["effective_at"] for change in changes),
+            "containment has no later blocked effect or remediation verification")
+    return len(alerts), len(case), len(decisions)
+
+
 def validate_bundle(path, truth):
     root = Path(path)
     seed = truth["seed"]
@@ -626,6 +687,17 @@ def validate_bundle(path, truth):
         require({item["network_event_id"] for item in timeline if item["kind"] == "ingress_interaction"} ==
                 {item["network_event_id"] for item in ingress_truth["interactions"]},
                 "timeline ingress interactions differ")
+    if (root / "response-truth.json").exists():
+        followup = next(item["at"] for item in timeline if item["kind"] == "followup_assessment")
+        counts = validate_response_bundle(root, truth, entities, followup)
+        result.update(zip(("response_alerts", "case_actions", "detection_decisions"), counts))
+        require({item["alert_id"] for item in timeline if item["kind"] == "alert"} ==
+                {item["alert_id"] for item in rows(root / "alerts.jsonl")} and
+                {item["action_id"] for item in timeline if item["kind"] == "case_action"} ==
+                {item["action_id"] for item in rows(root / "case-actions.jsonl")} and
+                {item["at"] for item in timeline if item["kind"] == "response_firewall"} ==
+                {item["time"] for item in rows(root / "response-firewall.jsonl")},
+                "response timeline differs")
     return result
 
 

@@ -87,8 +87,8 @@ class StoryTests(unittest.TestCase):
             self.assertEqual([item["at"] for item in timeline],
                              sorted(item["at"] for item in timeline))
             self.assertTrue(all(item["at"] > one["assessment_time"] for item in timeline[1:]))
-            self.assertEqual([item["kind"] for item in timeline[-3:]],
-                             ["state_change", "state_change", "followup_assessment"])
+            self.assertEqual([item["kind"] for item in timeline[-4:]],
+                             ["state_change", "state_change", "followup_assessment", "case_action"])
             self.assertTrue(all(op["last_observation_at"] < one["remediation_time"]
                                 for op in truth["operations"]))
             self.assertLess(one["remediation_time"], one["followup_time"])
