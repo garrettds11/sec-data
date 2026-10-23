@@ -1,0 +1,126 @@
+{
+  "schema_version": "1.0",
+  "reviewed_on": "2026-10-23",
+  "profiles": [
+    {
+      "id": "bianlian",
+      "source": {
+        "title": "AA23-136A: BianLian Ransomware Group",
+        "publisher": "FBI, CISA, ACSC",
+        "url": "https://www.ic3.gov/CSA/2023/230516.pdf",
+        "published_on": "2023-05-16",
+        "revised_on": null,
+        "evidence_type": "incident_report",
+        "location": "Discovery, PDF page 3; ATT&CK table, PDF page 9"
+      },
+      "supported_observations": ["Advanced Port Scanner and SoftPerfect Network Scanner were used for service discovery", "SoftPerfect Network Scanner and SharpShares were used for share discovery", "Native Windows discovery was observed"],
+      "implementation_assumptions": ["One modeled internal source is already compromised", "Four targets, selected ports, timing, results, and process observation are project-owned assumptions", "The generator does not imply one reported incident used these tools in this sequence"],
+      "tool_version": "unknown",
+      "sensor_version": "project-owned normalized schema 1.1",
+      "capture_checksum": null,
+      "extraction_configuration": null,
+      "calibration_status": "documented_behavior_only",
+      "reuse_conditions": "TLP:CLEAR; source attribution retained; no source text copied into output"
+    },
+    {
+      "id": "androxgh0st",
+      "source": {
+        "title": "AA24-016A: Known Indicators of Compromise Associated with Androxgh0st Malware",
+        "publisher": "FBI, CISA",
+        "url": "https://www.cisa.gov/news-events/cybersecurity-advisories/aa24-016a",
+        "published_on": "2024-01-16",
+        "revised_on": null,
+        "evidence_type": "incident_report",
+        "location": "Laravel Framework Targeting; Indicators of Compromise, URI list"
+      },
+      "supported_observations": ["GET requests for /.env", "Potential alternate /docker/.env and /local/.env paths"],
+      "implementation_assumptions": ["The modeled responses are 404 and contain no secrets", "Public IPs, target count, timing, and preceding probing are synthetic", "A path request alone does not establish actor identity or compromise"],
+      "tool_version": "unknown",
+      "sensor_version": "project-owned normalized schema 1.1",
+      "capture_checksum": null,
+      "extraction_configuration": null,
+      "calibration_status": "documented_behavior_only",
+      "reuse_conditions": "Public advisory linked; no retained third-party capture"
+    },
+    {
+      "id": "nmap-phases",
+      "source": {
+        "title": "The Phases of an Nmap Scan",
+        "publisher": "Nmap Project",
+        "url": "https://nmap.org/book/nmap-phases.html",
+        "published_on": null,
+        "revised_on": null,
+        "evidence_type": "tool_documentation",
+        "location": "Host discovery, port scanning, version detection, and script scanning sections"
+      },
+      "supported_observations": ["Host discovery and port scanning are distinct phases", "Version detection and NSE scripts require applicable options", "A SYN-only probe is not an HTTP request"],
+      "implementation_assumptions": ["The modeled profile uses only selected SYN probes and no NSE HTTP script", "Ports, timing, outcomes, and event counts are synthetic", "Explicit process telemetry exists only on monitored sources"],
+      "tool_version": "unknown",
+      "sensor_version": "project-owned normalized schema 1.1",
+      "capture_checksum": null,
+      "extraction_configuration": null,
+      "calibration_status": "documented_behavior_only",
+      "reuse_conditions": "Documentation linked; no retained packet capture"
+    },
+    {
+      "id": "nmap-discovery",
+      "source": {
+        "title": "Nmap Network Scanning: Host Discovery",
+        "publisher": "Nmap Project",
+        "url": "https://nmap.org/book/man-host-discovery.html",
+        "published_on": null,
+        "revised_on": null,
+        "evidence_type": "tool_documentation",
+        "location": "Host Discovery introduction and scan options"
+      },
+      "supported_observations": ["Host discovery can be skipped", "ARP discovery is for local Ethernet targets"],
+      "implementation_assumptions": ["No ARP is emitted by the current profile", "No universal scan phase order is inferred from these records"],
+      "tool_version": "unknown",
+      "sensor_version": "project-owned normalized schema 1.1",
+      "capture_checksum": null,
+      "extraction_configuration": null,
+      "calibration_status": "documented_behavior_only",
+      "reuse_conditions": "Documentation linked; no retained packet capture"
+    },
+    {
+      "id": "nmap-syn-lab-100",
+      "source": {
+        "title": "Nmap and Wireshark Lab: -sS capture",
+        "publisher": "Ryan Sapone",
+        "url": "https://github.com/Ryan-Sapone/Nmap-and-Wireshark-Lab/blob/main/SS%20Scan.pcapng",
+        "published_on": null,
+        "revised_on": null,
+        "evidence_type": "controlled_research_capture",
+        "location": "SS Scan.pcapng; all TCP packets between 192.168.12.235 and 192.168.12.148"
+      },
+      "supported_observations": ["100 single SYN probes to distinct ports", "Three SYN/ACK and 97 RST responses", "The capture contains no application exchange"],
+      "implementation_assumptions": ["The observed port set and outcomes are mapped to a synthetic inventory host", "Probe order is reshuffled and response delays vary within measured bounds", "The lab capture does not calibrate other scenario families"],
+      "tool_version": "unknown; source reports Nmap -sS -F",
+      "sensor_version": "unknown Wireshark version; project-owned normalized schema 1.1",
+      "capture_checksum": "sha256:e44221a0e3d2ffb76b42ca9c341b4936ce0ab0fea754a482424718b4eb8ef660",
+      "extraction_configuration": "tools/inspect_pcapng.py; Ethernet/IPv4/TCP; scanner 192.168.12.235; target 192.168.12.148; details in nmap-syn-lab-v1.json",
+      "calibration_status": "capture_calibrated",
+      "reuse_conditions": "No repository license was found. The capture is not redistributed."
+    },
+    {
+      "id": "cic-ids2017-reference",
+      "source": {
+        "title": "Intrusion detection evaluation dataset (CIC-IDS2017)",
+        "publisher": "Canadian Institute for Cybersecurity, University of New Brunswick",
+        "url": "https://www.unb.ca/cic/datasets/ids-2017.html",
+        "published_on": null,
+        "revised_on": null,
+        "evidence_type": "controlled_research_capture",
+        "location": "Dataset overview; no capture window selected"
+      },
+      "supported_observations": ["The dataset offers PCAPs, flow CSVs, topology, and scheduled attack activity"],
+      "implementation_assumptions": ["No current generator profile is calibrated to this dataset", "Labels and packet windows must be verified before calibration claims"],
+      "tool_version": "unknown",
+      "sensor_version": "unknown",
+      "capture_checksum": null,
+      "extraction_configuration": null,
+      "calibration_status": "reference_only",
+      "reuse_conditions": "Dataset use terms require review before retaining or redistributing captures"
+    }
+  ]
+}
