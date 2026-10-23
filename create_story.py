@@ -21,6 +21,7 @@ from common.data_access import VERSION as DATA_ACCESS_VERSION, generate as gener
 from common.export import export_records, parse_times
 from common.identity import (VERSION as IDENTITY_VERSION, generate as generate_identity,
                              render_windows_xml)
+from common.ingress import VERSION as INGRESS_VERSION, generate as generate_ingress
 from common.story_validation import validate_bundle
 from common.world import VERSION as WORLD_VERSION, SERVICES, iter_assets, iter_entities, iter_relationships, run_id
 from common.zeek_dns import render_dns
@@ -49,7 +50,7 @@ def recipe_checksums():
         "create_story.py", "create_vuln_table.py", "create_compliance_table.py",
         "create_recon_events.py", "common/assets.py", "common/export.py", "common/world.py",
         "common/zeek_dns.py", "common/story_validation.py", "common/identity.py",
-        "common/endpoint.py", "common/data_access.py")]
+        "common/endpoint.py", "common/data_access.py", "common/ingress.py")]
     for catalog in ("compliance", "recon", "vulnerability"):
         paths.extend(sorted((root / "catalogs" / catalog).glob("*.json")))
     return {path.relative_to(root).as_posix(): sha256_recipe_text(path) for path in paths}
@@ -217,6 +218,14 @@ def export_story(seed, start, duration_minutes, campaign_count, host_count, outp
         validate_recon_truth(truth, seed, host_count)
         dns_events, _ = recon.generate(seed, start, duration_minutes, campaign_count)
         save("dns.log", (render_dns(e) for e in dns_events if e["event_type"] == "dns"))
+        ingress_run = generate_ingress(read_jsonl(stage / "recon.jsonl"), truth,
+                                       list(iter_assets(seed, DEFAULT_HOST_COUNT)))
+        for name, records in (("ingress-firewall.jsonl", ingress_run["firewall"]),
+                              ("ingress-zeek-conn.jsonl", ingress_run["conn"]),
+                              ("ingress-zeek-http.jsonl", ingress_run["http"]),
+                              ("ingress-zeek-ssl.jsonl", ingress_run["ssl"]),
+                              ("edge-proxy.jsonl", ingress_run["proxy"])):
+            save(name, iter(records))
         identity_run = generate_identity(seed, start, duration_minutes, campaign_count,
                                          {host["short"]: host for host in
                                           build_hosts(random.Random(seed), DEFAULT_HOST_COUNT)})
@@ -273,6 +282,9 @@ def export_story(seed, start, duration_minutes, campaign_count, host_count, outp
         timeline.extend({"kind": "operation", "at": op["start_time"],
                          "operation_id": op["operation_id"], "family": op["family"],
                          "source_ref": op["source_ref"]} for op in truth["operations"])
+        timeline.extend({"kind": "ingress_interaction", "at": link["at"],
+                         "network_event_id": link["network_event_id"]}
+                        for link in ingress_run["truth"]["interactions"])
         timeline.extend({"kind": "identity_interaction", "at": interaction["at"],
                          "event_id": interaction["event_id"]}
                         for interaction in identity_run["truth"]["interactions"])
@@ -299,6 +311,11 @@ def export_story(seed, start, duration_minutes, campaign_count, host_count, outp
         truth_path.write_text(json.dumps(truth, indent=2, sort_keys=True) + "\n",
                               encoding="utf-8", newline="\n")
         files[truth_path.name] = {"sha256": sha256_file(truth_path)}
+        ingress_run["truth"]["run_id"] = run_identity
+        ingress_truth_path = stage / "ingress-truth.json"
+        ingress_truth_path.write_text(json.dumps(ingress_run["truth"], indent=2, sort_keys=True) + "\n",
+                                      encoding="utf-8", newline="\n")
+        files[ingress_truth_path.name] = {"sha256": sha256_file(ingress_truth_path)}
         identity_run["truth"]["run_id"] = run_identity
         identity_truth_path = stage / "identity-truth.json"
         identity_truth_path.write_text(json.dumps(identity_run["truth"], indent=2, sort_keys=True) + "\n",
@@ -323,7 +340,8 @@ def export_story(seed, start, duration_minutes, campaign_count, host_count, outp
             "host_count": host_count,
             "generator_versions": {"world": WORLD_VERSION, "recon": recon.VERSION,
                                    "identity": IDENTITY_VERSION, "endpoint": ENDPOINT_VERSION,
-                                   "data_access": DATA_ACCESS_VERSION},
+                                   "data_access": DATA_ACCESS_VERSION,
+                                   "ingress": INGRESS_VERSION},
             "recipe_sha256": recipe_hash, "recipe_files": recipe,
             "filtered_vulnerability_findings": skipped_findings,
             "validation": validation,

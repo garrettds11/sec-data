@@ -169,6 +169,10 @@ class Operation:
                 for j, uri in enumerate(("/.env", "/docker/.env", "/local/.env")):
                     self.web(44 + j * 1.2, src, target, 80, uri, status=404,
                              public=True, caused_by=parent)
+            tls_outcome, tls_parent = self.connection(48, src, target, 443, public=True)
+            if tls_outcome == "connected":
+                self.web(49, src, target, 443, "/", status=200,
+                         public=True, caused_by=tls_parent)
         elif self.family == "internal":
             source = hosts["prod-file-01"]
             self.process(1, source, "netscan.exe")

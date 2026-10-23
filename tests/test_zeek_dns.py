@@ -70,7 +70,8 @@ class ZeekDnsTests(unittest.TestCase):
     def test_repeated_browsing_uses_modeled_dns_cache(self):
         events, _ = recon.generate(42, START, 4, 1, background_sessions_per_minute=10)
         rows = list(events)
-        browsing = [e for e in rows if e["event_type"] == "http" and e.get("uri") == "/"]
+        browsing = [e for e in rows if e["event_type"] == "http" and e.get("uri") == "/"
+                    and e["src_ip"] != "203.0.113.50"]
         address_lookups = [e for e in rows if e["event_type"] == "dns"
                            and e["query_type"] == "A" and e["query"].startswith("prod-web-")]
         self.assertEqual(len(browsing), 40)

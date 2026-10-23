@@ -9,7 +9,7 @@ from pathlib import Path
 from common.zeek_dns import render_dns
 from common.identity import render_windows_xml
 from common.data_access import OBJECTS
-from common.world import iter_assets, iter_entities, iter_relationships
+from common.world import ENTITY_IPS, iter_assets, iter_entities, iter_relationships
 
 
 def rows(path):
@@ -390,6 +390,99 @@ def validate_data_access_bundle(root, truth, assets, entities):
     return len(windows), len(conn), len(firewall)
 
 
+def validate_ingress_bundle(root, truth, assets, entities):
+    ingress = json.loads((root / "ingress-truth.json").read_text(encoding="utf-8"))
+    require(ingress["run_id"] == truth["run_id"], "ingress run ID differs")
+    recon = {row["event_id"]: row for row in rows(root / "recon.jsonl")}
+    firewall = list(rows(root / "ingress-firewall.jsonl"))
+    conn = {row["uid"]: row for row in rows(root / "ingress-zeek-conn.jsonl")}
+    http = {row["uid"]: row for row in rows(root / "ingress-zeek-http.jsonl")}
+    ssl = {row["uid"]: row for row in rows(root / "ingress-zeek-ssl.jsonl")}
+    proxy = list(rows(root / "edge-proxy.jsonl"))
+    links = ingress["interactions"]
+    require(len(links) == len(firewall) == 4 and len(conn) == len(proxy) == 3 and
+            len(http) == 2 and len(ssl) == 1 and
+            len({row["network_event_id"] for row in links}) == 4,
+            "ingress sensor coverage or event IDs differ")
+    used_firewall, used_proxy = set(), set()
+    for link in links:
+        network = recon[link["network_event_id"]]
+        fi = link["firewall_index"]
+        require(fi not in used_firewall and 0 <= fi < len(firewall),
+                "ingress firewall reference differs")
+        used_firewall.add(fi)
+        fw = firewall[fi]
+        target = assets[link["target_asset_id"]]
+        require(network["event_type"] == "network_connection" and
+                network["timestamp"] == fw["time"] == link["at"] and
+                network["collected_at"] == fw["collected_at"] and
+                fw["time"] <= fw["collected_at"] and
+                network["src_ip"] == fw["src_ip"] == link["source_ip"] and
+                network["dst_ip"] == fw["dest_ip"] and
+                network["dst_port"] == fw["dest_port"] and
+                target["ip"] == (link["translated_destination"] or target["ip"]),
+                "ingress firewall/recon address or time differs")
+        if link["public_destination"]:
+            require(target["externally_exposed"] and
+                    link["public_destination"] == network["dst_ip"] and
+                    network["sensor_id"] == "perimeter-fw-01",
+                    "ingress public exposure differs")
+        else:
+            require(network["dst_ip"] == target["ip"], "internal destination differs")
+        app_id = link["application_event_id"]
+        uid = link["zeek_uid"]
+        if app_id is None:
+            require(network["outcome"] == "blocked" and fw["action"] == "block" and
+                    fw["bytes_in"] == 0 and uid is None and
+                    link["translated_destination"] is None and "proxy_index" not in link,
+                    "blocked ingress has downstream evidence")
+            continue
+        app = recon[app_id]
+        require(network["outcome"] == "connected" and fw["action"] == "allow" and
+                fw["translated_dest_ip"] == target["ip"] == app["dst_ip"] and
+                app["timestamp"] > network["timestamp"] and
+                app["collected_at"] >= app["timestamp"] and
+                app["src_ip"] == network["src_ip"] and
+                app["dst_port"] == network["dst_port"] and
+                any(item["event_id"] == app_id and item.get("caused_by") == link["network_event_id"]
+                    for op in truth["operations"] for item in op["interaction_links"]),
+                "ingress application causality differs")
+        pi = link["proxy_index"]
+        require(pi not in used_proxy and 0 <= pi < len(proxy), "edge proxy reference differs")
+        used_proxy.add(pi)
+        edge = proxy[pi]
+        require(edge["time"] == app["timestamp"] and edge["collected_at"] == app["collected_at"] and
+                edge["client_ip"] == app["src_ip"] and edge["server_ip"] == app["dst_ip"] and
+                edge["uri"] == app["uri"] and edge["method"] == app["method"] and
+                edge["status"] == app["status"] and
+                edge["response_bytes"] == app["response_bytes"],
+                "edge proxy/application request differs")
+        require(uid in conn and conn[uid]["id.orig_h"] == fw["src_ip"] and
+                conn[uid]["id.orig_p"] == fw["src_port"] and
+                conn[uid]["id.resp_h"] == target["ip"] and
+                conn[uid]["id.resp_p"] == fw["dest_port"] and
+                conn[uid]["orig_ip_bytes"] == fw["bytes_out"] and
+                conn[uid]["resp_ip_bytes"] == fw["bytes_in"] >= app["response_bytes"],
+                "ingress flow/edge byte or address differs")
+        if network["dst_port"] == 443:
+            require(uid in ssl and uid not in http and ssl[uid]["server_name"] == app["host"] and
+                    ssl[uid]["established"] and "uri" not in ssl[uid],
+                    "TLS visibility differs")
+        else:
+            require(uid in http and uid not in ssl and http[uid]["uri"] == app["uri"] and
+                    http[uid]["status_code"] == app["status"] and
+                    http[uid]["response_body_len"] == app["response_bytes"],
+                    "cleartext HTTP observation differs")
+    require({link["zeek_uid"] for link in links if link["zeek_uid"]} == set(conn) and
+            any(recon[link["application_event_id"]]["uri"] == "/.env" for link in links
+                if link["application_event_id"]) and
+            any(recon[link["application_event_id"]]["uri"] == "/" and
+                link["source_ip"] != ENTITY_IPS["entity-external-scanner-01"] for link in links
+                if link["application_event_id"]),
+            "ingress suspicious or benign controls differ")
+    return len(firewall), len(conn), len(ssl)
+
+
 def validate_bundle(path, truth):
     root = Path(path)
     seed = truth["seed"]
@@ -526,6 +619,13 @@ def validate_bundle(path, truth):
                 {item["transfer_id"] for item in timeline if item["kind"] == "outbound_transfer"} ==
                 {item["transfer_id"] for item in data_truth["transfers"]},
                 "timeline data access or transfer differs")
+    if (root / "ingress-truth.json").exists():
+        counts = validate_ingress_bundle(root, truth, assets, entities)
+        result.update(zip(("ingress_firewall_events", "ingress_flows", "ingress_tls"), counts))
+        ingress_truth = json.loads((root / "ingress-truth.json").read_text(encoding="utf-8"))
+        require({item["network_event_id"] for item in timeline if item["kind"] == "ingress_interaction"} ==
+                {item["network_event_id"] for item in ingress_truth["interactions"]},
+                "timeline ingress interactions differ")
     return result
 
 
