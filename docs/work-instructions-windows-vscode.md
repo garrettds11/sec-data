@@ -37,7 +37,7 @@ From the repository root in VS Code's integrated terminal (**Ctrl+`**):
 .\.venv\Scripts\python.exe -m unittest discover -s tests -v
 ```
 
-Expected: nine passing tests with `OK` at the time of this documentation. Test suite includes shared inventory compatibility, seeded compliance generation, catalog applicability, expected/observed value consistency, planted scenarios, JSON round-trip, uploader input validation, and table-definition checks. Unit tests do **not** prove connectivity or IAM permission to AWS.
+Expected: passing tests with `OK`. The suite covers inventory scaling, seeded generation, catalog applicability, JSON/JSONL export, historical keys, recon truth alignment and visibility, uploader input validation, and table definitions. Unit tests do **not** prove connectivity or IAM permission to AWS. If a restricted environment denies writes to the default temporary directory, set `TEMP` and `TMP` to a writable workspace directory before running tests.
 
 **VS Code Testing panel:** Click the beaker icon, choose **Configure Python Tests** if prompted, select `unittest`, directory `tests`, pattern `test_*.py`; then **Run All Tests** or debug individual test cases.
 
@@ -112,7 +112,9 @@ Check records from PowerShell:
 ((Get-Content .\compliance-findings.json -Raw | ConvertFrom-Json) | Measure-Object).Count
 ```
 
-If repeatability is important: the compliance generator accepts `--as-of 2026-10-15T12:00:00Z`. The vulnerability generator uses the current UTC time for some dates even at the same seed.
+For reproducibility, pass `--as-of 2026-10-15T12:00:00Z` to either finding generator. The vulnerability generator otherwise uses current UTC time. For large JSONL exports and historical snapshots, follow [Scale and historical exports](scale.md). For the offline recon generator, its truth file, and investigation examples, follow [Offline reconnaissance telemetry](recon.md).
+
+In VS Code, open `create_recon_events.py` and break in `Operation.build()`, `Operation.connection()`, or `generate()`. Inspect `SERVICES`, `PUBLIC_IPS`, `outcome`, `events`, and `manifest`. Run the script with `--dry-run --start-time 2026-10-22T12:00:00Z` while debugging; this avoids creating files. Normal local generation never performs a real scan or AWS operation.
 
 ## 7. Optional AWS upload — explicit separate operation
 
