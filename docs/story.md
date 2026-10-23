@@ -1,6 +1,6 @@
 # Linked synthetic run bundle
 
-`create_story.py` exports a consistent synthetic environment: internal assets, non-inventory entities, DNS/service/public-exposure relationships, baseline findings, recon, authentication, and endpoint activity, a modeled remediation, and a follow-up assessment. It uses the same seed and host inventory as the standalone generators. It does not contact AWS, scan a network, or require Splunk.
+`create_story.py` exports a consistent synthetic environment: internal assets, non-inventory entities, DNS/service/public-exposure relationships, baseline findings, recon, authentication, endpoint, data access, and egress activity, a modeled remediation, and a follow-up assessment. It uses the same seed and host inventory as the standalone generators. It does not contact AWS, scan a network, or require Splunk.
 
 ```powershell
 python .\create_story.py --seed 42 `
@@ -16,7 +16,7 @@ The exporter validates the cross-file contract before publishing. To check a sav
 | File | Meaning |
 | --- | --- |
 | `assets.jsonl` | Stable `asset_id`, host identity, address, segment, role, OS, and exposure |
-| `entities.jsonl` | Stable IDs for the external scanner, approved scanner, and enterprise resolver |
+| `entities.jsonl` | Stable IDs for scanners, resolver, external upload, approved backup, and denied egress destinations |
 | `relationships.jsonl` | Stable DNS A, modeled TCP service, and public-exposure edges |
 | `vulnerability.jsonl`, `compliance.jsonl` | Baseline assessments one minute before activity, with bundle `asset_id` |
 | `recon.jsonl`, `dns.log` | Normalized recon observations and optional Zeek-shaped DNS view |
@@ -25,13 +25,17 @@ The exporter validates the cross-file contract before publishing. To check a sav
 | `identity-state.jsonl`, `identity-truth.json` | Generator-only lockout, group grant, sessions, and links to recon |
 | `sysmon.jsonl`, `sysmon.xml` | File-server process, network, file, and registry observations |
 | `sensor-coverage.jsonl`, `endpoint-truth.json` | Generator-only endpoint visibility and cross-source links |
+| `data-objects.jsonl` | Object IDs, classification, path, and size without payloads |
+| `windows-file.jsonl`, `windows-file.xml` | Successful file reads (4663) and denied share check (5145) |
+| `zeek-conn.jsonl`, `zeek-http.jsonl`, `egress-firewall.jsonl` | Outbound HTTP, flow byte counts, and firewall allow/block decisions |
+| `data-access-truth.json` | Generator-only read, session, destination, and transfer links with evidence limits |
 | `state-changes.jsonl` | Generator-owned change records with effective time, asset/finding IDs, and before/after state |
 | `vulnerability-followup.jsonl`, `compliance-followup.jsonl` | Later assessments replayed from the baseline; only the selected remediated findings change status |
 | `timeline.jsonl`, `recon-truth.json` | Generator-only plan, causal links, authorization, and answer key |
 | `run-manifest.json` | Run inputs, recipe hashes, output hashes, and counts |
 
-Keep `timeline.jsonl`, `state-changes.jsonl`, `identity-state.jsonl`, `identity-truth.json`, `sensor-coverage.jsonl`, `endpoint-truth.json`, and `recon-truth.json` outside analyst-facing indexes. Raw event rows retain their source-owned schemas; stable asset/entity references and causal links live in the separate truth data. The recon operation manifest identifies its source asset/entity and target asset IDs, and the bundle validates these references before publication. After the last recon observation, the model fixes one active vulnerability and one failed control; a later assessment confirms both status changes. The change records represent synthetic maintenance and do not assert that recon caused the remediation. See [identity fixture](identity.md) and [endpoint fixture](endpoint.md) for source details.
+Keep `timeline.jsonl`, `state-changes.jsonl`, `identity-state.jsonl`, `identity-truth.json`, `sensor-coverage.jsonl`, `endpoint-truth.json`, `data-access-truth.json`, and `recon-truth.json` outside analyst-facing indexes. Raw event rows retain their source-owned schemas; stable asset/entity references and causal links live in the separate truth data. The recon operation manifest identifies its source asset/entity and target asset IDs, and the bundle validates these references before publication. After the last recon observation, the model fixes one active vulnerability and one failed control; a later assessment confirms both status changes. The change records represent synthetic maintenance and do not assert that recon caused the remediation. See [identity fixture](identity.md), [endpoint fixture](endpoint.md), and [data access fixture](data-access.md) for source details.
 
 The bundled vulnerability export keeps only local findings or findings on services that the current world catalog models on that host role. Its manifest counts filtered findings. The standalone vulnerability generator is unchanged. This prevents a bundled finding from claiming an exposed TCP service that the bundled network model says is absent. The modeled service catalog remains intentionally small; it does not describe every possible enterprise service.
 
-This bundle is a foundation for [the shared world-model issue](https://github.com/garrettds11/sec-data/issues/7). The four recon operations remain independent scenarios; the bundle does not claim they form one historical intrusion. Data access and incident response are future layers. Splunk CIM validation is source-specific and is not implied by this bundle; see [DNS validation](dns.md), [identity validation](identity.md), and [endpoint validation](endpoint.md).
+This bundle is a foundation for [the shared world-model issue](https://github.com/garrettds11/sec-data/issues/7). The four recon operations remain independent scenarios; the bundle does not claim they form one historical intrusion. The data access layer adds a later correlated read and upload but does not claim packet-level proof of the uploaded file's identity. Incident response is a future layer. Splunk CIM validation is source-specific and is not implied by this bundle; see [DNS validation](dns.md), [identity validation](identity.md), [endpoint validation](endpoint.md), and [data access validation](data-access.md).

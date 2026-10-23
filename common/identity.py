@@ -50,13 +50,15 @@ def render_windows_xml(row):
     node(system, "EventID", row["EventCode"])
     node(system, "Version", 2)
     node(system, "Level", 0)
+    if "Keywords" in row:
+        node(system, "Keywords", row["Keywords"])
     node(system, "TimeCreated", SystemTime=row["TimeCreated"])
     node(system, "EventRecordID", row["EventRecordID"])
     node(system, "Channel", row["Channel"])
     node(system, "Computer", row["Computer"])
     data = node(event, "EventData")
     for key, value in sorted(row.items()):
-        if key not in {"TimeCreated", "Channel", "Provider", "EventCode", "Computer", "EventRecordID"}:
+        if key not in {"TimeCreated", "Channel", "Provider", "EventCode", "Computer", "EventRecordID", "Keywords"}:
             node(data, "Data", value, Name=key)
     return ET.tostring(event, encoding="unicode", short_empty_elements=True)
 

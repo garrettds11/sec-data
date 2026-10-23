@@ -100,7 +100,7 @@ class StoryTests(unittest.TestCase):
             manifest = create_story.export_story(42, START, 60, 1, 50, root)
             self.assertEqual(manifest["files"]["assets.jsonl"]["records"], 50)
             self.assertEqual(rows(root / "assets.jsonl")[:23], list(iter_assets(42, 23)))
-            self.assertEqual(len(rows(root / "entities.jsonl")), 3)
+            self.assertEqual(len(rows(root / "entities.jsonl")), 6)
 
     def test_rejects_existing_target_and_cleans_failed_staging(self):
         with tempfile.TemporaryDirectory(dir=Path(__file__).parent) as tmp:

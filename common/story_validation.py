@@ -8,6 +8,7 @@ from pathlib import Path
 
 from common.zeek_dns import render_dns
 from common.identity import render_windows_xml
+from common.data_access import OBJECTS
 from common.world import iter_assets, iter_entities, iter_relationships
 
 
@@ -278,6 +279,117 @@ def validate_endpoint_bundle(root, truth, assets):
     return len(events), len(processes)
 
 
+def validate_data_access_bundle(root, truth, assets, entities):
+    data_truth = json.loads((root / "data-access-truth.json").read_text(encoding="utf-8"))
+    identity_truth = json.loads((root / "identity-truth.json").read_text(encoding="utf-8"))
+    endpoint_truth = json.loads((root / "endpoint-truth.json").read_text(encoding="utf-8"))
+    require(data_truth["run_id"] == truth["run_id"], "data access run ID differs")
+    objects = {row["object_id"]: row for row in rows(root / "data-objects.jsonl")}
+    require(len(objects) == len(OBJECTS) and
+            all({key: value for key, value in row.items() if key not in ("asset_id", "synthetic")} ==
+                expected and row["asset_id"] in assets and row["synthetic"]
+                for row, expected in zip(objects.values(), OBJECTS)),
+            "data object catalog differs")
+    windows = {}
+    for row in rows(root / "windows-file.jsonl"):
+        eid = f"windows-{row['Computer'].split('.')[0]}-{row['EventRecordID']}"
+        require(eid not in windows, "duplicate file audit event")
+        windows[eid] = row
+    with (root / "windows-file.xml").open(encoding="utf-8") as handle:
+        for expected, actual in zip_longest((render_windows_xml(row) for row in windows.values()),
+                                             (line.rstrip("\r\n") for line in handle)):
+            require(expected == actual, "file audit XML differs")
+    accesses = {row["event_id"]: row for row in data_truth["accesses"]}
+    sessions = {row["session_id"]: row for row in identity_truth["sessions"]}
+    identities = {row["identity_id"]: row for row in rows(root / "identities.jsonl")}
+    logons = {(row["Computer"], row["TargetUserName"]): row for row in
+              rows(root / "windows-security.jsonl") if row["EventCode"] == 4624}
+    require(set(windows) == set(accesses), "file audit interactions differ")
+    for eid, link in accesses.items():
+        row = windows[eid]
+        obj = objects[link["object_id"]]
+        session = sessions[link["session_id"]]
+        account = identities[link["identity_id"]]["account"].split("\\")[1]
+        require(link["asset_id"] == obj["asset_id"] == session["asset_id"] and
+                link["identity_id"] == session["identity_id"] and
+                link["at"] == row["TimeCreated"] and session["started_at"] < link["at"] and
+                row["Computer"] == assets[obj["asset_id"]]["fqdn"] and
+                row["SubjectUserName"] == account and
+                row["SubjectLogonId"] == logons[(row["Computer"], account)]["TargetLogonId"] and
+                row["AccessMask"] == "0x1", "file audit/session reference differs")
+        if link["result"] == "success":
+            require(row["EventCode"] == 4663 and row["ObjectName"] == obj["path"] and
+                    row["Keywords"] == "0x8020000000000000",
+                    "successful file read differs")
+        else:
+            require(link["result"] == "denied" and row["EventCode"] == 5145 and
+                    row["Keywords"] == "0x8010000000000000" and
+                    row["IpAddress"] == assets[link["source_asset_id"]]["ip"] and
+                    row["ShareLocalPath"] + "\\" + row["RelativeTargetName"] == obj["path"],
+                    "denied share audit differs")
+    conn = {row["uid"]: row for row in rows(root / "zeek-conn.jsonl")}
+    http = {row["uid"]: row for row in rows(root / "zeek-http.jsonl")}
+    firewall = list(rows(root / "egress-firewall.jsonl"))
+    transfers = {row["transfer_id"]: row for row in data_truth["transfers"]}
+    require(len(transfers) == 4 and len(firewall) == len(transfers) and
+            set(conn) == set(http) and len(conn) == 3,
+            "outbound observation count differs")
+    used_indices = set()
+    for link in transfers.values():
+        index = link["firewall_index"]
+        require(index not in used_indices and 0 <= index < len(firewall),
+                "firewall reference duplicates or is missing")
+        used_indices.add(index)
+        fw = firewall[index]
+        source = assets[link["source_asset_id"]]
+        entity = entities[link["destination_entity_id"]]
+        session = sessions[link["session_id"]]
+        require(link["identity_id"] == session["identity_id"] and
+                session["started_at"] <= link["at"] and
+                fw["time"] == link["at"] and fw["src_ip"] == source["ip"] and
+                fw["dest_ip"] == entity["ip"] and fw["action"] == link["result"],
+                "egress endpoint or session differs")
+        read_id = link["related_read_event_id"]
+        if read_id:
+            read = accesses[read_id]
+            require(read["result"] == "success" and read["identity_id"] == link["identity_id"] and
+                    read["session_id"] == link["session_id"] and read["at"] < link["at"] and
+                    objects[read["object_id"]]["size_bytes"] == link["body_bytes"],
+                    "transfer is not backed by a successful matching read")
+        if link["result"] == "allow":
+            uid = link["uid"]
+            require(uid in conn and uid in http and
+                    conn[uid]["id.orig_h"] == http[uid]["id.orig_h"] == source["ip"] and
+                    conn[uid]["id.resp_h"] == http[uid]["id.resp_h"] == entity["ip"] and
+                    conn[uid]["id.orig_p"] == http[uid]["id.orig_p"] == fw["src_port"] and
+                    http[uid]["method"] == link["method"] and
+                    http[uid]["request_body_len"] == link["body_bytes"] and
+                    conn[uid]["orig_ip_bytes"] == fw["bytes_out"] >= link["body_bytes"] and
+                    conn[uid]["resp_ip_bytes"] == fw["bytes_in"] and
+                    abs((http[uid]["ts"] - conn[uid]["ts"]) - 0.05) < 0.001,
+                    "Zeek, firewall, and transfer bytes differ")
+        else:
+            require(link["result"] == "block" and link["uid"] is None and
+                    link["body_bytes"] == fw["bytes_out"] == fw["bytes_in"] == 0 and
+                    read_id is None, "blocked transfer claims a payload")
+    require({row["result"] for row in transfers.values()} == {"allow", "block"} and
+            any(row["method"] == "GET" and row["body_bytes"] == 0 for row in transfers.values()) and
+            any(row["transfer_id"] == "transfer-backup" and row["related_read_event_id"]
+                for row in transfers.values()), "egress controls are missing")
+    backup = transfers["transfer-backup"]
+    sysmon = {f"sysmon-{row['Computer'].split('.')[0]}-{row['EventRecordID']}": row
+              for row in rows(root / "sysmon.jsonl")}
+    endpoint_link = next((row for row in endpoint_truth["interactions"]
+                          if row.get("related_transfer_id") == backup["transfer_id"]), None)
+    require(endpoint_link is not None and endpoint_link["event_id"] in sysmon and
+            sysmon[endpoint_link["event_id"]]["DestinationIp"] ==
+            entities[backup["destination_entity_id"]]["ip"] and
+            sysmon[endpoint_link["event_id"]]["SourceIp"] ==
+            assets[backup["source_asset_id"]]["ip"],
+            "backup endpoint network link differs")
+    return len(windows), len(conn), len(firewall)
+
+
 def validate_bundle(path, truth):
     root = Path(path)
     seed = truth["seed"]
@@ -405,6 +517,15 @@ def validate_bundle(path, truth):
         require({item["event_id"] for item in timeline if item["kind"] == "endpoint_interaction"} ==
                 {item["event_id"] for item in endpoint_truth["interactions"]},
                 "timeline endpoint interactions differ")
+    if (root / "data-access-truth.json").exists():
+        counts = validate_data_access_bundle(root, truth, assets, entities)
+        result.update(zip(("file_audit_events", "zeek_connections", "firewall_events"), counts))
+        data_truth = json.loads((root / "data-access-truth.json").read_text(encoding="utf-8"))
+        require({item["event_id"] for item in timeline if item["kind"] == "data_access"} ==
+                {item["event_id"] for item in data_truth["accesses"]} and
+                {item["transfer_id"] for item in timeline if item["kind"] == "outbound_transfer"} ==
+                {item["transfer_id"] for item in data_truth["transfers"]},
+                "timeline data access or transfer differs")
     return result
 
 

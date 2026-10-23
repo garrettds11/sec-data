@@ -17,6 +17,7 @@ import create_recon_events as recon
 import create_vuln_table as vuln
 from common.assets import DEFAULT_HOST_COUNT, build_hosts
 from common.endpoint import VERSION as ENDPOINT_VERSION, generate as generate_endpoint
+from common.data_access import VERSION as DATA_ACCESS_VERSION, generate as generate_data_access
 from common.export import export_records, parse_times
 from common.identity import (VERSION as IDENTITY_VERSION, generate as generate_identity,
                              render_windows_xml)
@@ -48,7 +49,7 @@ def recipe_checksums():
         "create_story.py", "create_vuln_table.py", "create_compliance_table.py",
         "create_recon_events.py", "common/assets.py", "common/export.py", "common/world.py",
         "common/zeek_dns.py", "common/story_validation.py", "common/identity.py",
-        "common/endpoint.py")]
+        "common/endpoint.py", "common/data_access.py")]
     for catalog in ("compliance", "recon", "vulnerability"):
         paths.extend(sorted((root / "catalogs" / catalog).glob("*.json")))
     return {path.relative_to(root).as_posix(): sha256_recipe_text(path) for path in paths}
@@ -242,6 +243,21 @@ def export_story(seed, start, duration_minutes, campaign_count, host_count, outp
                                    encoding="utf-8", newline="\n")
         files[sysmon_xml_path.name] = {"records": len(endpoint_run["records"]),
                                        "sha256": sha256_file(sysmon_xml_path)}
+        data_run = generate_data_access(seed, list(iter_assets(seed, DEFAULT_HOST_COUNT)),
+                                        list(iter_entities()), identity_run["truth"],
+                                        identity_run["windows_events"])
+        for name, records in (("data-objects.jsonl", data_run["objects"]),
+                              ("windows-file.jsonl", data_run["windows"]),
+                              ("zeek-conn.jsonl", data_run["conn"]),
+                              ("zeek-http.jsonl", data_run["http"]),
+                              ("egress-firewall.jsonl", data_run["firewall"])):
+            save(name, iter(records))
+        file_xml_path = stage / "windows-file.xml"
+        file_xml_path.write_text("".join(render_windows_xml(row) + "\n"
+                                         for row in data_run["windows"]),
+                                 encoding="utf-8", newline="\n")
+        files[file_xml_path.name] = {"records": len(data_run["windows"]),
+                                     "sha256": sha256_file(file_xml_path)}
 
         latest_observation = max(datetime.fromisoformat(
             op["last_observation_at"].replace("Z", "+00:00")) for op in truth["operations"])
@@ -266,6 +282,12 @@ def export_story(seed, start, duration_minutes, campaign_count, host_count, outp
         timeline.extend({"kind": "endpoint_interaction", "at": event["at"],
                          "event_id": event["event_id"]}
                         for event in endpoint_run["truth"]["interactions"])
+        timeline.extend({"kind": "data_access", "at": event["at"],
+                         "event_id": event["event_id"]}
+                        for event in data_run["truth"]["accesses"])
+        timeline.extend({"kind": "outbound_transfer", "at": event["at"],
+                         "transfer_id": event["transfer_id"]}
+                        for event in data_run["truth"]["transfers"])
         timeline.extend({"kind": "state_change", "at": effective_at,
                          "change_id": change["change_id"], "asset_id": change["asset_id"]}
                         for change in changes)
@@ -287,6 +309,11 @@ def export_story(seed, start, duration_minutes, campaign_count, host_count, outp
         endpoint_truth_path.write_text(json.dumps(endpoint_run["truth"], indent=2, sort_keys=True) + "\n",
                                        encoding="utf-8", newline="\n")
         files[endpoint_truth_path.name] = {"sha256": sha256_file(endpoint_truth_path)}
+        data_run["truth"]["run_id"] = run_identity
+        data_truth_path = stage / "data-access-truth.json"
+        data_truth_path.write_text(json.dumps(data_run["truth"], indent=2, sort_keys=True) + "\n",
+                                   encoding="utf-8", newline="\n")
+        files[data_truth_path.name] = {"sha256": sha256_file(data_truth_path)}
         validation = validate_bundle(stage, truth)
         manifest = {
             "schema_version": WORLD_VERSION, "run_id": run_identity,
@@ -295,14 +322,16 @@ def export_story(seed, start, duration_minutes, campaign_count, host_count, outp
             "duration_minutes": duration_minutes, "campaign_count": campaign_count,
             "host_count": host_count,
             "generator_versions": {"world": WORLD_VERSION, "recon": recon.VERSION,
-                                   "identity": IDENTITY_VERSION, "endpoint": ENDPOINT_VERSION},
+                                   "identity": IDENTITY_VERSION, "endpoint": ENDPOINT_VERSION,
+                                   "data_access": DATA_ACCESS_VERSION},
             "recipe_sha256": recipe_hash, "recipe_files": recipe,
             "filtered_vulnerability_findings": skipped_findings,
             "validation": validation,
             "files": files,
             "notes": ["All source formats are synthetic", "Scenario truth is separate from observations",
                       "Recon and identity activity currently use the default 23 hosts",
-                      "Windows XML, Sysmon XML, and web authentication CIM mappings are not live validated"],
+                      "Windows XML, Sysmon XML, Zeek HTTP/conn, and web authentication CIM mappings are not live validated",
+                      "Network byte counts and timing do not prove uploaded content identity"],
         }
         (stage / "run-manifest.json").write_text(
             json.dumps(manifest, indent=2, sort_keys=True) + "\n",

@@ -22,7 +22,7 @@ class EndpointTests(unittest.TestCase):
         with tempfile.TemporaryDirectory(dir=Path(__file__).parent) as tmp:
             root = Path(tmp) / "story"
             manifest = create_story.export_story(42, START, 60, 1, 23, root)
-            self.assertEqual(manifest["validation"]["endpoint_events"], 15)
+            self.assertEqual(manifest["validation"]["endpoint_events"], 16)
             events = rows(root / "sysmon.jsonl")
             coverage = rows(root / "sensor-coverage.jsonl")
             truth = json.loads((root / "endpoint-truth.json").read_text(encoding="utf-8"))
@@ -35,7 +35,8 @@ class EndpointTests(unittest.TestCase):
                 if "ParentProcessGuid" in row:
                     self.assertLess(processes[row["ParentProcessGuid"]]["TimeCreated"],
                                     row["TimeCreated"])
-            network_links = [link for link in truth["interactions"] if link["event_code"] == 3]
+            network_links = [link for link in truth["interactions"]
+                             if link["event_code"] == 3 and "related_recon_event_id" in link]
             recon = {row["event_id"]: row for row in rows(root / "recon.jsonl")}
             self.assertEqual(len(network_links), 4)
             self.assertTrue(all(recon[link["related_recon_event_id"]]["event_type"] ==

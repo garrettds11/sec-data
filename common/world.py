@@ -23,6 +23,15 @@ ENTITIES = (
     {"entity_id": "entity-enterprise-resolver-01", "kind": "internal_service",
      "name": "enterprise-resolver-01", "ip": "10.10.4.10",
      "role": "dns_resolver", "managed": True, "authorized": True},
+    {"entity_id": "entity-external-upload-01", "kind": "external_service",
+     "name": "files.example.net", "ip": "192.0.2.80", "role": "upload_endpoint",
+     "managed": False, "authorized": False},
+    {"entity_id": "entity-backup-provider-01", "kind": "external_service",
+     "name": "backup.example.net", "ip": "192.0.2.81", "role": "backup_provider",
+     "managed": False, "authorized": True},
+    {"entity_id": "entity-denied-egress-01", "kind": "external_service",
+     "name": "blocked.example.net", "ip": "203.0.113.80", "role": "blocked_destination",
+     "managed": False, "authorized": False},
 )
 ENTITY_IPS = {entity["entity_id"]: entity["ip"] for entity in ENTITIES}
 

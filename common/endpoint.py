@@ -2,6 +2,7 @@
 
 from datetime import datetime, timedelta, timezone
 from uuid import NAMESPACE_URL, uuid5
+from common.world import ENTITY_IPS
 
 
 VERSION = "1.0"
@@ -149,6 +150,14 @@ def generate(seed, start, assets, identity_truth, windows_auth, recon_truth, rec
                 TargetFilename=r"C:\ProgramData\BackupAgent\last-run.txt",
                 CreationUtcTime=utc_field(status_at), User="LAB\\svc_backup")
     link["process_guid"] = job["guid"]
+    network_at = backup_at + timedelta(seconds=2, milliseconds=500)
+    link = emit(network_at, 3, "identity-backup-01", backup["session_id"],
+                ProcessGuid=job["guid"], ProcessId=job["pid"], Image=job["image"],
+                User="LAB\\svc_backup", Protocol="tcp", Initiated="true",
+                SourceIp=file["ip"], SourcePort=51002,
+                DestinationIp=ENTITY_IPS["entity-backup-provider-01"], DestinationPort=80)
+    link["process_guid"] = job["guid"]
+    link["related_transfer_id"] = "transfer-backup"
     emit(status_at + timedelta(seconds=1), 5, "identity-backup-01", backup["session_id"],
          ProcessGuid=job["guid"], ProcessId=job["pid"], Image=job["image"], User="LAB\\svc_backup")
     records.sort(key=lambda row: (row["TimeCreated"], row["EventRecordID"]))
