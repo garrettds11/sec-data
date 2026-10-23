@@ -41,6 +41,7 @@ These commands create `C:\code\vuln-findings.json` and `C:\code\compliance-findi
 | `docs/work-instructions-windows-vscode.md` | End-to-end usage, unit testing and VS Code debugging |
 | `docs/scale.md` | Scale, snapshots, catalog extension, and measured benchmarks |
 | `docs/recon.md` | Recon schemas, evidence, Splunk investigation examples, and limits |
+| `docs/dns.md` | Optional Zeek-shaped DNS JSON export and CIM validation plan |
 
 ## Dataset behavior and limitations
 
@@ -50,6 +51,7 @@ These commands create `C:\code\vuln-findings.json` and `C:\code\compliance-findi
 - Compliance assessments support `--as-of <ISO8601>` (default fixed timestamp) for reproducibility. Both generators support `--seed`, `--output`, and `--dry-run`.
 - Both finding generators support `--host-count`, `--findings-per-host`, `--target-records`, `--format jsonl`, and `--snapshots` for larger or historical exports. JSON remains the default. Specify `--as-of` for byte-identical vulnerability output. See [scale guide](docs/scale.md) for count and catalog limits.
 - The recon generator writes analyst-facing normalized events separately from a truth manifest. Its optional small Nmap SYN profile is calibrated to a verified public lab capture; other profiles remain uncalibrated. No live Splunk ingestion validation is claimed. See [recon guide](docs/recon.md).
+- Use `--zeek-dns-output .\output\dns.log` with the recon generator for separate synthetic Zeek-shaped DNS JSONL. See [DNS guide](docs/dns.md); Splunk CIM mapping still requires an installed add-on test.
 
 ## Optional AWS upload (separate operation)
 

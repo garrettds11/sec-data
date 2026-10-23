@@ -14,13 +14,17 @@ python .\create_recon_events.py --seed 42 `
   --start-time 2026-10-22T12:00:00Z --nmap-profile lab-syn-100 `
   --output .\output\recon-calibrated.jsonl `
   --truth-output .\output\recon-calibrated-truth.json
+
+python .\create_recon_events.py --seed 42 `
+  --start-time 2026-10-22T12:00:00Z `
+  --zeek-dns-output .\output\dns.log
 ```
 
 `--campaign-count` is the number of four-family sets (1–100). `--duration-minutes` must allow four minutes per set. The default background model adds one internal browsing session per operation; `--background-sessions-per-minute` accepts 0–10 modeled sessions per minute and rounds to a whole-session count per operation. All rates, ports, results, delays, and target counts are project assumptions, **not observed incident or Nmap packet measurements**. Same seed, explicit start time, flags, and generator version produce byte-identical output. Events are sorted by occurrence time within each operation; `collected_at` may be later. Use `--dry-run` for counts without files.
 
 ## Event and truth schema
 
-Every analyst-facing JSONL row has `schema_version`, stable `event_id`, ISO 8601 millisecond `timestamp`, `collected_at`, `sensor_id`, `event_type`, and `synthetic=true`. The project-owned types are `network_connection`, `dns`, `http`, `process`, and `service_query`. Connection rows include source/destination IPs, destination port, transport, probe type, observed outcome, packets, bytes, and duration. DNS rows have resolver-visible questions and answers. HTTP rows are emitted by a modeled application sensor, so they can include HTTPS paths only if such an application observation is modeled; the current profile uses HTTP port 80. Process rows exist only for monitored internal sources. Service-query rows follow successful SMB connections. These records are **not native Zeek, Sysmon, firewall, or EDR schemas**.
+Every analyst-facing JSONL row has `schema_version`, stable `event_id`, ISO 8601 millisecond `timestamp`, `collected_at`, `sensor_id`, `event_type`, and `synthetic=true`. The project-owned types are `network_connection`, `dns`, `http`, `process`, and `service_query`. Connection rows include source/destination IPs, destination port, transport, probe type, observed outcome, packets, bytes, and duration. DNS rows have resolver-visible questions, response state, codes, answers, TTLs, transaction IDs, ports, and latency when observed. HTTP rows are emitted by a modeled application sensor, so they can include HTTPS paths only if such an application observation is modeled; the current profile uses HTTP port 80. Process rows exist only for monitored internal sources. Service-query rows follow successful SMB connections. These normalized records are **not native Zeek, Sysmon, firewall, or EDR schemas**. The optional [Zeek-shaped DNS export](dns.md) is separate and has not had a live Splunk/CIM validation.
 
 The JSON truth file carries operation IDs, family, authorization, source, intended tool when relevant, ATT&CK mappings, evidence references, event IDs, generator-only causal links, network translation, and omitted-observation counts. Keep it outside the analyst search index. Raw events do not contain scenario IDs, actor attribution, maliciousness labels, tool identity inferred from network behavior, or expected detection outcomes. `PUBLIC_IPS` are documentation-range public exposures mapped to private inventory hosts; an external scanner never connects directly to the private address in perimeter observations.
 
