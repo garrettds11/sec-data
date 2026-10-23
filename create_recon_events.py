@@ -42,11 +42,12 @@ def event_id(seed, operation_start, sequence, kind, sensor, fields):
 
 class Operation:
     def __init__(self, seed, number, family, start, assets, endpoint=True, http=True,
-                 nmap_indicator="explicit", background_offsets=(51,)):
+                 nmap_indicator="explicit", background_offsets=(51,), nmap_profile=None):
         self.seed, self.number, self.family, self.start = seed, number, family, start
         self.assets = assets
         self.endpoint, self.http, self.nmap_indicator = endpoint, http, nmap_indicator
         self.background_offsets = background_offsets
+        self.nmap_profile = nmap_profile
         self.rng = random.Random(f"recon:{VERSION}:{seed}:{number}:{family}")
         self.events = []
         self.links = []
@@ -165,10 +166,31 @@ class Operation:
             if self.family == "approved" and self.nmap_indicator == "explicit":
                 # Its authorization exists only in the answer key/asset context.
                 self.process(1, {"fqdn": "scanner-control.corp.example.local", "ip": src}, "nmap")
-            for j, name in enumerate(("prod-web-01", "prod-app-01", "prod-db-01", "dc-01")):
-                target = hosts[name]
-                for pi, port in enumerate((22, 80, 443, 445, 5432)):
-                    self.connection(3 + j * 8 + pi * 0.9, src, target, port, probe="syn")
+            if self.family == "nmap" and self.nmap_profile:
+                profile = self.nmap_profile["measurements"]
+                ports = list(profile["destination_ports"])
+                self.rng.shuffle(ports)
+                target = hosts["prod-web-01"]
+                open_ports = set(profile["open_ports"])
+                for j, port in enumerate(ports):
+                    opened = port in open_ports
+                    seconds = 3 + j * profile["probe_span_ms"] / (1000 * (len(ports) - 1))
+                    delay = self.rng.triangular(0.002, 0.243, 0.05)
+                    eid = self.emit("network_connection", seconds, "eastwest-fw-01",
+                                    src_ip=src, dst_ip=target["ip"], dst_port=port,
+                                    transport="tcp", probe_type="syn",
+                                    outcome="answered" if opened else "rejected",
+                                    packets=3 if opened else 2,
+                                    bytes_out=120 if opened else 60,
+                                    bytes_in=58 if opened else 54,
+                                    duration_ms=round(delay, 3))
+                    self.links.append({"event_id": eid, "target_asset": target["fqdn"],
+                                       "translated_destination": None})
+            else:
+                for j, name in enumerate(("prod-web-01", "prod-app-01", "prod-db-01", "dc-01")):
+                    target = hosts[name]
+                    for pi, port in enumerate((22, 80, 443, 445, 5432)):
+                        self.connection(3 + j * 8 + pi * 0.9, src, target, port, probe="syn")
         else:
             raise ValueError(f"Unknown scenario family: {self.family}")
         # Each background session has a DNS lookup and two related page requests.
@@ -185,19 +207,27 @@ class Operation:
 
 
 def generate(seed, start, duration_minutes, campaign_count, endpoint=True, http=True,
-             nmap_indicator="explicit", background_sessions_per_minute=None):
+             nmap_indicator="explicit", background_sessions_per_minute=None,
+             nmap_profile="basic"):
     if not 1 <= campaign_count <= 100:
         raise ValueError("--campaign-count must be between 1 and 100")
     if duration_minutes < 4 * campaign_count:
         raise ValueError("--duration-minutes must allow at least four minutes per campaign set")
     if background_sessions_per_minute is not None and not 0 <= background_sessions_per_minute <= 10:
         raise ValueError("--background-sessions-per-minute must be between 0 and 10")
+    if nmap_profile not in ("basic", "lab-syn-100"):
+        raise ValueError("Unknown Nmap profile")
+    profile_path = Path(__file__).resolve().parent / "catalogs" / "recon" / "nmap-syn-lab-v1.json"
+    profile_bytes = profile_path.read_bytes() if nmap_profile == "lab-syn-100" else None
+    profile_data = json.loads(profile_bytes) if profile_bytes else None
     assets = {h["short"]: h for h in build_hosts(random.Random(seed))}
     catalog_path = Path(__file__).resolve().parent / "catalogs" / "recon" / "evidence-v1.json"
     catalog_bytes = catalog_path.read_bytes()
     catalog_ids = {p["id"] for p in json.loads(catalog_bytes)["profiles"]}
     if any(not set(refs) <= catalog_ids for refs in EVIDENCE.values()):
         raise ValueError("Scenario references a missing evidence catalog entry")
+    if profile_data and profile_data["id"] not in catalog_ids:
+        raise ValueError("Nmap profile references a missing evidence catalog entry")
     manifest = {
         "schema_version": VERSION, "generator_version": VERSION, "seed": seed,
         "start_time": stamp(start), "duration_minutes": duration_minutes,
@@ -208,6 +238,8 @@ def generate(seed, start, duration_minutes, campaign_count, endpoint=True, http=
         "service_catalog": {role: sorted(ports) for role, ports in SERVICES.items()},
         "sensor_config": {"endpoint": endpoint, "http": http},
         "background_sessions_per_minute": background_sessions_per_minute,
+        "nmap_profile": nmap_profile,
+        "nmap_profile_sha256": hashlib.sha256(profile_bytes).hexdigest() if profile_bytes else None,
         "operations": [], "omitted_observations": {},
     }
     step = duration_minutes * 60 / (4 * campaign_count)
@@ -221,13 +253,15 @@ def generate(seed, start, duration_minutes, campaign_count, endpoint=True, http=
                 sessions = round(background_sessions_per_minute * step / 60)
                 offsets = tuple((i + 1) * (step - 4) / (sessions + 1) for i in range(sessions))
             op = Operation(seed, number, family, start + timedelta(seconds=number * step),
-                           assets, endpoint, http, nmap_indicator, offsets)
+                           assets, endpoint, http, nmap_indicator, offsets,
+                           profile_data if family == "nmap" else None)
             observations = op.build()
             omitted.update(op.omitted)
             manifest["operations"].append({
                 "operation_id": f"operation-{number:04d}", "family": family,
                 "intent": "authorized" if family == "approved" else "simulated_unapproved",
-                "authorization": family == "approved", "evidence_refs": EVIDENCE[family],
+                "authorization": family == "approved",
+                "evidence_refs": EVIDENCE[family] + (["nmap-syn-lab-100"] if family == "nmap" and profile_data else []),
                 "techniques": TECHNIQUES[family], "event_ids": [e["event_id"] for e in observations],
                 "interaction_links": op.links,
                 "intended_tool": "nmap" if family in ("nmap", "approved") else None,
@@ -237,7 +271,10 @@ def generate(seed, start, duration_minutes, campaign_count, endpoint=True, http=
                               assets["bastion-01"]["ip"]),
                 "expected_detection": ("contextual_suppression" if family == "approved" else
                                        "discovery_review"),
-                "calibration_status": "documented_behavior_only",
+                "calibration_status": ("capture_calibrated" if family == "nmap" and profile_data
+                                       else "documented_behavior_only"),
+                "service_overrides": ({"prod-web-01": profile_data["measurements"]["open_ports"]}
+                                      if family == "nmap" and profile_data else {}),
             })
             yield from observations
         manifest["omitted_observations"] = dict(omitted)
@@ -253,6 +290,7 @@ def main():
     parser.add_argument("--background-sessions-per-minute", type=float,
                         help="Modeled browsing sessions/minute; default is one per operation")
     parser.add_argument("--nmap-indicator", choices=("explicit", "behavior-only"), default="explicit")
+    parser.add_argument("--nmap-profile", choices=("basic", "lab-syn-100"), default="basic")
     parser.add_argument("--no-endpoint", action="store_true")
     parser.add_argument("--no-http-sensor", action="store_true")
     parser.add_argument("--output", default="output/recon-events.jsonl")
@@ -265,7 +303,7 @@ def main():
             raise ValueError("--output and --truth-output must differ")
         records, manifest = generate(args.seed, start, args.duration_minutes, args.campaign_count,
                                      not args.no_endpoint, not args.no_http_sensor, args.nmap_indicator,
-                                     args.background_sessions_per_minute)
+                                     args.background_sessions_per_minute, args.nmap_profile)
         counts = Counter()
         count = export_records(args.output, records, "jsonl", on_record=lambda e: counts.update([e["event_type"]]),
                                dry_run=args.dry_run)

@@ -49,7 +49,7 @@ These commands create `C:\code\vuln-findings.json` and `C:\code\compliance-findi
 - Compliance controls are *independently authored illustrations*: not official CIS recommendation IDs/text, real scan evidence, or a claim of CIS compliance. `synthetic=true` and `assessment_method=simulated` identify generated results.
 - Compliance assessments support `--as-of <ISO8601>` (default fixed timestamp) for reproducibility. Both generators support `--seed`, `--output`, and `--dry-run`.
 - Both finding generators support `--host-count`, `--findings-per-host`, `--target-records`, `--format jsonl`, and `--snapshots` for larger or historical exports. JSON remains the default. Specify `--as-of` for byte-identical vulnerability output. See [scale guide](docs/scale.md) for count and catalog limits.
-- The recon generator writes analyst-facing normalized events separately from a truth manifest. Its four scenario families are source-informed but **uncalibrated**; no packet capture or Splunk ingestion validation is claimed. See [recon guide](docs/recon.md).
+- The recon generator writes analyst-facing normalized events separately from a truth manifest. Its optional small Nmap SYN profile is calibrated to a verified public lab capture; other profiles remain uncalibrated. No live Splunk ingestion validation is claimed. See [recon guide](docs/recon.md).
 
 ## Optional AWS upload (separate operation)
 

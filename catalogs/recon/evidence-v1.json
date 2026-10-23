@@ -83,6 +83,26 @@
       "reuse_conditions": "Documentation linked; no retained packet capture"
     },
     {
+      "id": "nmap-syn-lab-100",
+      "source": {
+        "title": "Nmap and Wireshark Lab: -sS capture",
+        "publisher": "Ryan Sapone",
+        "url": "https://github.com/Ryan-Sapone/Nmap-and-Wireshark-Lab/blob/main/SS%20Scan.pcapng",
+        "published_on": null,
+        "revised_on": null,
+        "evidence_type": "controlled_research_capture",
+        "location": "SS Scan.pcapng; all TCP packets between 192.168.12.235 and 192.168.12.148"
+      },
+      "supported_observations": ["100 single SYN probes to distinct ports", "Three SYN/ACK and 97 RST responses", "The capture contains no application exchange"],
+      "implementation_assumptions": ["The observed port set and outcomes are mapped to a synthetic inventory host", "Probe order is reshuffled and response delays vary within measured bounds", "The lab capture does not calibrate other scenario families"],
+      "tool_version": "unknown; source reports Nmap -sS -F",
+      "sensor_version": "unknown Wireshark version; project-owned normalized schema 1.0",
+      "capture_checksum": "sha256:e44221a0e3d2ffb76b42ca9c341b4936ce0ab0fea754a482424718b4eb8ef660",
+      "extraction_configuration": "tools/inspect_pcapng.py; Ethernet/IPv4/TCP; scanner 192.168.12.235; target 192.168.12.148; details in nmap-syn-lab-v1.json",
+      "calibration_status": "capture_calibrated",
+      "reuse_conditions": "No repository license was found. The capture is not redistributed."
+    },
+    {
       "id": "cic-ids2017-reference",
       "source": {
         "title": "Intrusion detection evaluation dataset (CIC-IDS2017)",

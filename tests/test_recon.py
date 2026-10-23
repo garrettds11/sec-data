@@ -63,6 +63,26 @@ class ReconTests(unittest.TestCase):
         self.assertTrue(all(set(op["evidence_refs"]) <= known for op in truth["operations"]))
         self.assertTrue(all(op["calibration_status"] == "documented_behavior_only" for op in truth["operations"]))
 
+    def test_calibrated_syn_profile_matches_verified_capture_ranges(self):
+        profile = json.loads((Path(recon.__file__).parent /
+                              "catalogs/recon/nmap-syn-lab-v1.json").read_text())
+        stream, truth = recon.generate(42, START, 60, 1, nmap_profile="lab-syn-100")
+        events = list(stream)
+        operation = next(op for op in truth["operations"] if op["family"] == "nmap")
+        self.assertEqual(operation["calibration_status"], "capture_calibrated")
+        self.assertIn("nmap-syn-lab-100", operation["evidence_refs"])
+        probes = [e for e in events if e["event_id"] in operation["event_ids"]
+                  and e.get("probe_type") == "syn" and e.get("src_ip") == operation["source_ip"]]
+        self.assertEqual(len(probes), 100)
+        self.assertEqual({e["dst_port"] for e in probes}, set(profile["measurements"]["destination_ports"]))
+        self.assertEqual(Counter(e["outcome"] for e in probes), {"answered": 3, "rejected": 97})
+        self.assertEqual(sum(e["packets"] for e in probes), 203)
+        self.assertEqual(sum(e["bytes_out"] + e["bytes_in"] for e in probes), 11592)
+        self.assertTrue(all(0.002 <= e["duration_ms"] <= 0.243 for e in probes))
+        start = datetime.fromisoformat(probes[0]["timestamp"].replace("Z", "+00:00"))
+        end = datetime.fromisoformat(probes[-1]["timestamp"].replace("Z", "+00:00"))
+        self.assertTrue(9 <= (end - start).total_seconds() * 1000 <= 14)
+
     def test_invalid_configuration(self):
         with self.assertRaises(ValueError):
             recon.generate(42, START, 2, 1)
