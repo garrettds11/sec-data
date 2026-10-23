@@ -10,15 +10,11 @@ from pathlib import Path
 
 from common.assets import build_hosts
 from common.export import export_records, parse_times
+from common.world import ENTITY_IPS, PUBLIC_IPS, SERVICES, asset_id
 from common.zeek_dns import render_dns
 
 VERSION = "1.1"
 FAMILIES = ("external", "internal", "nmap", "approved")
-SERVICES = {
-    "web": {22, 80, 443}, "app": {22, 8080}, "db": {22, 5432},
-    "dc": {53, 88, 389, 445}, "win": {445, 3389}, "bastion": {22},
-}
-PUBLIC_IPS = {f"prod-web-{i:02d}": f"198.51.100.{10+i}" for i in range(1, 5)}
 EVIDENCE = {
     "external": ["androxgh0st", "nmap-phases"],
     "internal": ["bianlian"],
@@ -95,7 +91,8 @@ class Operation:
         self.dns_ports.add(client_port)
         response_observed = rcode is not None
         fields = dict(client_ip=host["ip"], client_port=client_port,
-                      resolver_ip="10.10.4.10", resolver_port=53, transport="udp",
+                      resolver_ip=ENTITY_IPS["entity-enterprise-resolver-01"],
+                      resolver_port=53, transport="udp",
                       transaction_id=rng.randint(0, 65535), query=name,
                       query_type=query_type, query_class="IN", rcode=rcode,
                       answers=list(answers), answer_ttls=list(ttls),
@@ -128,6 +125,7 @@ class Operation:
                         bytes_out=bytes_out, bytes_in=bytes_in,
                         duration_ms=self.rng.randint(3, 80) if outcome != "blocked" else 0)
         self.links.append({"event_id": eid, "target_asset": host["fqdn"],
+                           "target_asset_id": asset_id(host),
                            "translated_destination": host["ip"] if public else None})
         return outcome, eid
 
@@ -158,7 +156,7 @@ class Operation:
     def build(self):
         hosts = self.assets
         if self.family == "external":
-            src = "203.0.113.50"
+            src = ENTITY_IPS["entity-external-scanner-01"]
             targets = [hosts[f"prod-web-{i:02d}"] for i in range(1, 5)]
             for ti, host in enumerate(targets):
                 base = 3 + ti * 9
@@ -184,7 +182,7 @@ class Operation:
                                        caused_by=parent)
         elif self.family in ("nmap", "approved"):
             source = hosts["bastion-01"] if self.family == "nmap" else None
-            src = source["ip"] if source else "10.10.6.200"
+            src = source["ip"] if source else ENTITY_IPS["entity-approved-scanner-01"]
             if source and self.nmap_indicator == "explicit":
                 self.process(1, source, "nmap")
             if self.family == "approved" and self.nmap_indicator == "explicit":
@@ -209,6 +207,7 @@ class Operation:
                                     bytes_in=58 if opened else 54,
                                     duration_ms=round(delay, 3))
                     self.links.append({"event_id": eid, "target_asset": target["fqdn"],
+                                       "target_asset_id": asset_id(target),
                                        "translated_destination": None})
             else:
                 for j, name in enumerate(("prod-web-01", "prod-app-01", "prod-db-01", "dc-01")):
@@ -283,7 +282,8 @@ def generate(seed, start, duration_minutes, campaign_count, endpoint=True, http=
         "inventory_identity": "common/assets.py:default-23",
         "evidence_catalog": "catalogs/recon/evidence-v1.json",
         "evidence_catalog_sha256": hashlib.sha256(catalog_bytes).hexdigest(),
-        "public_exposures": PUBLIC_IPS, "authorized_scanner_ip": "10.10.6.200",
+        "public_exposures": PUBLIC_IPS,
+        "authorized_scanner_ip": ENTITY_IPS["entity-approved-scanner-01"],
         "service_catalog": {role: sorted(ports) for role, ports in SERVICES.items()},
         "sensor_config": {"endpoint": endpoint, "http": http},
         "background_sessions_per_minute": background_sessions_per_minute,
@@ -306,16 +306,23 @@ def generate(seed, start, duration_minutes, campaign_count, endpoint=True, http=
                            profile_data if family == "nmap" else None)
             observations = op.build()
             omitted.update(op.omitted)
+            source_ref = ({"entity_id": "entity-external-scanner-01"} if family == "external" else
+                          {"entity_id": "entity-approved-scanner-01"} if family == "approved" else
+                          {"asset_id": asset_id(assets["prod-file-01"])} if family == "internal" else
+                          {"asset_id": asset_id(assets["bastion-01"])})
             manifest["operations"].append({
                 "operation_id": f"operation-{number:04d}", "family": family,
+                "start_time": stamp(op.start),
+                "last_observation_at": observations[-1]["timestamp"] if observations else None,
+                "source_ref": source_ref,
                 "intent": "authorized" if family == "approved" else "simulated_unapproved",
                 "authorization": family == "approved",
                 "evidence_refs": EVIDENCE[family] + (["nmap-syn-lab-100"] if family == "nmap" and profile_data else []),
                 "techniques": TECHNIQUES[family], "event_ids": [e["event_id"] for e in observations],
                 "interaction_links": op.links,
                 "intended_tool": "nmap" if family in ("nmap", "approved") else None,
-                "source_ip": ("203.0.113.50" if family == "external" else
-                              "10.10.6.200" if family == "approved" else
+                "source_ip": (ENTITY_IPS["entity-external-scanner-01"] if family == "external" else
+                              ENTITY_IPS["entity-approved-scanner-01"] if family == "approved" else
                               assets["prod-file-01"]["ip"] if family == "internal" else
                               assets["bastion-01"]["ip"]),
                 "expected_detection": ("contextual_suppression" if family == "approved" else

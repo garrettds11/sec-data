@@ -32,6 +32,7 @@ These commands create `C:\code\vuln-findings.json` and `C:\code\compliance-findi
 | `create_vuln_table.py` | Local vulnerability JSON generator |
 | `create_compliance_table.py` | Local compliance JSON generator |
 | `create_recon_events.py` | Offline, scenario-driven normalized JSONL telemetry generator |
+| `create_story.py` | Linked inventory, entity, finding, recon, DNS, and manifest bundle |
 | `upload_to_aws.py` | Optional, separate AWS DynamoDB uploader |
 | `common/assets.py` | Shared synthetic inventory of 23 hosts |
 | `common/export.py` | Streaming JSON and JSONL output |
@@ -42,6 +43,7 @@ These commands create `C:\code\vuln-findings.json` and `C:\code\compliance-findi
 | `docs/scale.md` | Scale, snapshots, catalog extension, and measured benchmarks |
 | `docs/recon.md` | Recon schemas, evidence, Splunk investigation examples, and limits |
 | `docs/dns.md` | Optional Zeek-shaped DNS JSON export and CIM validation plan |
+| `docs/story.md` | Shared world catalog, run bundle, provenance, and current limits |
 
 ## Dataset behavior and limitations
 
@@ -52,6 +54,7 @@ These commands create `C:\code\vuln-findings.json` and `C:\code\compliance-findi
 - Both finding generators support `--host-count`, `--findings-per-host`, `--target-records`, `--format jsonl`, and `--snapshots` for larger or historical exports. JSON remains the default. Specify `--as-of` for byte-identical vulnerability output. See [scale guide](docs/scale.md) for count and catalog limits.
 - The recon generator writes analyst-facing normalized events separately from a truth manifest. Its optional small Nmap SYN profile is calibrated to a verified public lab capture; other profiles remain uncalibrated. No live Splunk ingestion validation is claimed. See [recon guide](docs/recon.md).
 - Use `--zeek-dns-output .\output\dns.log` with the recon generator for separate synthetic Zeek-shaped DNS JSONL. See [DNS guide](docs/dns.md); Splunk CIM mapping still requires an installed add-on test.
+- Use `create_story.py --start-time 2026-10-22T12:00:00Z --output-dir .\output\story-42` to export one reproducible linked run. See [story guide](docs/story.md).
 
 ## Optional AWS upload (separate operation)
 
