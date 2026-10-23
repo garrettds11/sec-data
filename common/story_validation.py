@@ -39,7 +39,7 @@ def validate_bundle(path, truth):
 
     def valid_asset_id(value):
         return (isinstance(value, str) and value.startswith("asset-") and
-                value[6:].isdigit() and 1 <= int(value[6:]) <= asset_count)
+                value[6:].isdigit() and 0 <= int(value[6:]) < asset_count)
 
     event_times = {}
     dns_count = 0
