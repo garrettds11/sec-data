@@ -16,6 +16,7 @@ import create_recon_events as recon
 import create_vuln_table as vuln
 from common.assets import DEFAULT_HOST_COUNT
 from common.export import export_records, parse_times
+from common.story_validation import validate_bundle
 from common.world import VERSION as WORLD_VERSION, SERVICES, iter_assets, iter_entities, iter_relationships, run_id
 from common.zeek_dns import render_dns
 
@@ -42,7 +43,7 @@ def recipe_checksums():
     paths = [root / name for name in (
         "create_story.py", "create_vuln_table.py", "create_compliance_table.py",
         "create_recon_events.py", "common/assets.py", "common/export.py", "common/world.py",
-        "common/zeek_dns.py")]
+        "common/zeek_dns.py", "common/story_validation.py")]
     for catalog in ("compliance", "recon", "vulnerability"):
         paths.extend(sorted((root / "catalogs" / catalog).glob("*.json")))
     return {path.relative_to(root).as_posix(): sha256_recipe_text(path) for path in paths}
@@ -100,6 +101,76 @@ def linked_compliance(seed, as_of, host_count):
         yield row
 
 
+def read_jsonl(path):
+    with Path(path).open(encoding="utf-8") as handle:
+        for line in handle:
+            yield json.loads(line)
+
+
+def choose_remediation(stage):
+    """Choose stable, present baseline findings; keep only two rows in memory."""
+    web = None
+    fallback_vuln = None
+    for row in read_jsonl(stage / "vulnerability.jsonl"):
+        if row["vulnerability_status"] not in ("open", "reopened"):
+            continue
+        if fallback_vuln is None:
+            fallback_vuln = row
+        if (row["host_name"].startswith("prod-web-02.") and
+                row["vulnerability_id"] == "CVE-2014-0160"):
+            web = row
+            break
+    control = None
+    fallback_control = None
+    for row in read_jsonl(stage / "compliance.jsonl"):
+        if row["compliance_status"] != "fail":
+            continue
+        if fallback_control is None:
+            fallback_control = row
+        if row["host_name"].startswith("prod-file-01.") and row["control_id"] == "WIN-FIREWALL":
+            control = row
+            break
+    selected = [("vulnerability", web or fallback_vuln),
+                ("compliance", control or fallback_control)]
+    if any(row is None for _, row in selected):
+        raise ValueError("Story requires a vulnerable and a noncompliant baseline finding")
+    return selected
+
+
+def remediation_changes(selected, effective_at):
+    for kind, row in selected:
+        before = row[f"{kind}_status"]
+        after = "fixed" if kind == "vulnerability" else "pass"
+        change = {
+            "change_id": f"change-{kind}-{row['asset_id']}-{row['finding_id']}",
+            "kind": "finding_remediation", "effective_at": effective_at,
+            "asset_id": row["asset_id"], "finding_id": row["finding_id"],
+            "finding_type": kind, "before": before, "after": after,
+            "synthetic": True,
+        }
+        if kind == "compliance":
+            change["actual_value_before"] = row["actual_value"]
+            change["actual_value_after"] = row["expected_value"]
+        yield change
+
+
+def followup_rows(stage, kind, changes, seed, assessed_at):
+    keyed = {(change["asset_id"], change["finding_id"]): change
+             for change in changes if change["finding_type"] == kind}
+    for row in read_jsonl(stage / f"{kind}.jsonl"):
+        row["assessment_id"] = f"synthetic-{seed}-{assessed_at}"
+        row["assessment_at"] = assessed_at
+        if kind == "compliance":
+            row["last_seen"] = assessed_at
+        change = keyed.get((row["asset_id"], row["finding_id"]))
+        if change:
+            row[f"{kind}_status"] = change["after"]
+            if kind == "compliance":
+                row["actual_value"] = change["actual_value_after"]
+            row["remediation_change_id"] = change["change_id"]
+        yield row
+
+
 def export_story(seed, start, duration_minutes, campaign_count, host_count, output_dir):
     if start.tzinfo is None:
         raise ValueError("--start-time must include a timezone")
@@ -141,25 +212,42 @@ def export_story(seed, start, duration_minutes, campaign_count, host_count, outp
         dns_events, _ = recon.generate(seed, start, duration_minutes, campaign_count)
         save("dns.log", (render_dns(e) for e in dns_events if e["event_type"] == "dns"))
 
+        latest_observation = max(datetime.fromisoformat(
+            op["last_observation_at"].replace("Z", "+00:00")) for op in truth["operations"])
+        effective_at = iso(latest_observation + timedelta(minutes=1))
+        followup_at = iso(latest_observation + timedelta(minutes=2))
+        changes = list(remediation_changes(choose_remediation(stage), effective_at))
+        save("state-changes.jsonl", iter(changes))
+        for kind in ("vulnerability", "compliance"):
+            save(f"{kind}-followup.jsonl", followup_rows(stage, kind, changes, seed, followup_at))
+
         timeline = [{"kind": "baseline_assessment", "at": assessment_at,
                      "datasets": ["vulnerability.jsonl", "compliance.jsonl"]}]
         timeline.extend({"kind": "operation", "at": op["start_time"],
                          "operation_id": op["operation_id"], "family": op["family"],
                          "source_ref": op["source_ref"]} for op in truth["operations"])
+        timeline.extend({"kind": "state_change", "at": effective_at,
+                         "change_id": change["change_id"], "asset_id": change["asset_id"]}
+                        for change in changes)
+        timeline.append({"kind": "followup_assessment", "at": followup_at,
+                         "datasets": ["vulnerability-followup.jsonl", "compliance-followup.jsonl"]})
         save("timeline.jsonl", iter(timeline))
         truth["run_id"] = identity
         truth_path = stage / "recon-truth.json"
         truth_path.write_text(json.dumps(truth, indent=2, sort_keys=True) + "\n",
                               encoding="utf-8", newline="\n")
         files[truth_path.name] = {"sha256": sha256_file(truth_path)}
+        validation = validate_bundle(stage, truth)
         manifest = {
             "schema_version": WORLD_VERSION, "run_id": identity,
             "seed": seed, "start_time": start_at, "assessment_time": assessment_at,
+            "remediation_time": effective_at, "followup_time": followup_at,
             "duration_minutes": duration_minutes, "campaign_count": campaign_count,
             "host_count": host_count,
             "generator_versions": {"world": WORLD_VERSION, "recon": recon.VERSION},
             "recipe_sha256": recipe_hash, "recipe_files": recipe,
             "filtered_vulnerability_findings": skipped_findings,
+            "validation": validation,
             "files": files,
             "notes": ["All source formats are synthetic", "Scenario truth is separate from observations",
                       "Recon activity currently uses the default 23 hosts"],
