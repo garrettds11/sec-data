@@ -28,6 +28,7 @@ import sys
 from collections import Counter, defaultdict
 from datetime import datetime, timedelta, timezone
 from decimal import Decimal
+from common.export import export_records, parse_times
 
 DEFAULT_TABLE = "aiwebdemo-vuln-findings"
 GSI_SEVERITY = "severity-lastseen-index"
@@ -184,7 +185,7 @@ PLANTED = {
 # --------------------------------------------------------------------------
 # Assets
 # --------------------------------------------------------------------------
-from common.assets import HOSTS, LINUX_OS, WIN_OS, VENDORS, ENV_OCTET, ROLE_OCTET, iso, build_hosts
+from common.assets import HOSTS, LINUX_OS, WIN_OS, VENDORS, ENV_OCTET, ROLE_OCTET, iso, build_hosts, iter_hosts, DEFAULT_HOST_COUNT
 
 
 def build_runs(rng, now):
@@ -212,14 +213,59 @@ def hash_stable(s):
     return zlib.crc32(s.encode())
 
 
-def build_items(seed):
+def load_additional_catalog(path):
+    """Load project-owned synthetic profiles without claiming real CVEs or plugins."""
+    import json
+    from pathlib import Path
+    entries = json.loads(Path(path).read_text(encoding="utf-8"))
+    if not isinstance(entries, list):
+        raise ValueError("Additional vulnerability catalog must be a JSON list")
+    result = []
+    ids = {v["id"] for v in CATALOG}
+    for entry in entries:
+        required = {"id", "title", "desc", "roles", "cats", "port", "proto", "service", "provenance"}
+        if not isinstance(entry, dict) or not required <= entry.keys():
+            raise ValueError(f"Synthetic profile missing fields: {sorted(required)}")
+        if not entry["id"].startswith("SYNTH-") or entry["id"] in ids:
+            raise ValueError("Additional profile IDs must be unique and start with SYNTH-")
+        if not isinstance(entry["roles"], list) or not set(entry["roles"]) <= {"web", "app", "db", "dc", "win", "bastion"}:
+            raise ValueError("Synthetic profile roles must be known asset roles")
+        if entry.get("family", "any") not in ("any", "linux", "windows"):
+            raise ValueError("Synthetic profile family must be any, linux, or windows")
+        if not isinstance(entry["port"], int) or not 0 <= entry["port"] <= 65535:
+            raise ValueError("Synthetic profile port is invalid")
+        profile = V(entry["id"], entry["title"], entry["desc"], None,
+                    entry.get("vector"), entry["port"], entry["proto"], entry["service"],
+                    entry["roles"], entry["cats"], False, None,
+                    family=entry.get("family", "any"), local=entry.get("local", False))
+        profile["synthetic"] = True
+        profile["provenance"] = entry["provenance"]
+        result.append(profile)
+        ids.add(entry["id"])
+    return result
+
+
+def parse_as_of(value):
+    dt = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    if dt.tzinfo is None:
+        raise ValueError("--as-of must include a timezone")
+    return dt.astimezone(timezone.utc)
+
+
+def iter_items(seed, as_of=None, host_count=DEFAULT_HOST_COUNT, findings_per_host=None, catalog=None):
+    """Stream findings without retaining the inventory or records in memory."""
+    if findings_per_host is not None and findings_per_host < 1:
+        raise ValueError("--findings-per-host must be positive")
     rng = random.Random(seed)
-    now = datetime.now(timezone.utc)
-    hosts = build_hosts(rng)
+    now = datetime.now(timezone.utc) if as_of is None else parse_as_of(as_of)
+    # Consume host RNG before scan-run RNG, as in the original generator.
+    # Reconstruct hosts from the same seed for bounded-memory output.
+    for _ in iter_hosts(rng, host_count):
+        pass
     runs = build_runs(rng, now)
-    items = []
-    for h in hosts:
-        for v in CATALOG:
+    for h in iter_hosts(random.Random(seed), host_count):
+        host_items = []
+        for v in CATALOG if catalog is None else catalog:
             key = (h["short"], v["id"])
             if key in PLANTED:
                 status = PLANTED[key]
@@ -254,23 +300,26 @@ def build_items(seed):
                 "network_protocol": v["proto"],
                 "service_name": v["service"],
                 "vulnerability_id": v["id"],
-                "vulnerability_enumeration": "CVE" if v["id"].startswith("CVE-") else "Plugin",
-                "vulnerability_classification": "CVSS",
+                "vulnerability_enumeration": ("Synthetic" if v.get("synthetic") else
+                                               "CVE" if v["id"].startswith("CVE-") else "Plugin"),
+                "vulnerability_classification": "Synthetic" if v.get("synthetic") else "CVSS",
                 "vulnerability_category": v["cats"],
                 "vulnerability_description": v["desc"],
                 "vulnerability_reference": (
                     [f"https://nvd.nist.gov/vuln/detail/{v['id']}", f"https://www.cve.org/CVERecord?id={v['id']}"]
                     if v["id"].startswith("CVE-")
-                    else [f"https://www.tenable.com/plugins/nessus/{v['plugin']}"]
+                    else [] if v.get("synthetic") else [f"https://www.tenable.com/plugins/nessus/{v['plugin']}"]
                 ),
                 "vulnerability_report_id": run["report_id"],
-                "vulnerability_scanner_vendor": h["vendor"],
+                "assessment_id": f"synthetic-{seed}-{iso(now)}",
+                "vulnerability_scanner_vendor": "Synthetic" if v.get("synthetic") else h["vendor"],
                 "vulnerability_score_base": Decimal(str(score)),
                 "vulnerability_score_version": "3.1",
                 "vulnerability_severity": severity_for(score),
                 "vulnerability_status": status,
                 "title": v["title"],
-                "scanner_plugin_id": plugin_id(h["vendor"], v["id"], v["plugin"]),
+                "scanner_plugin_id": (f"SYNTH-{hash_stable(v['id'])}" if v.get("synthetic") else
+                                      plugin_id(h["vendor"], v["id"], v["plugin"])),
                 "scan_type": "authenticated" if h["authenticated"] else "unauthenticated",
                 "scan_network": "external" if h["external"] else "internal",
                 "exploit_available": v["exploit"],
@@ -283,8 +332,19 @@ def build_items(seed):
                 item["cwe_id"] = v["cwe"]
             if v["epss"] is not None:
                 item["epss_score"] = Decimal(str(v["epss"]))
-            items.append(item)
-    return items
+            if v.get("synthetic"):
+                item["synthetic"] = True
+                item["provenance"] = v["provenance"]
+            host_items.append(item)
+        if findings_per_host is not None:
+            if len(host_items) < findings_per_host:
+                raise ValueError(f"{h['short']} has only {len(host_items)} findings; requested {findings_per_host}. Catalog and OS/role applicability limit this host")
+            host_items = host_items[:findings_per_host]
+        yield from host_items
+
+
+def build_items(seed, as_of=None, host_count=DEFAULT_HOST_COUNT, findings_per_host=None, catalog=None):
+    return list(iter_items(seed, as_of, host_count, findings_per_host, catalog))
 
 
 # --------------------------------------------------------------------------
@@ -327,24 +387,79 @@ def summarize(items):
 
 # Local file generation only. DynamoDB uploads are handled by upload_to_aws.py.
 def main():
-    import json
-    from pathlib import Path
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--seed", type=int, default=42)
+    ap.add_argument("--host-count", type=int, default=DEFAULT_HOST_COUNT)
+    ap.add_argument("--findings-per-host", type=int)
+    ap.add_argument("--target-records", type=int, help="Maximum exact exported record count; fails if unavailable")
+    ap.add_argument("--as-of", help="UTC or offset assessment time; required for reproducible dates")
+    ap.add_argument("--snapshots", nargs="+", help="Ascending, unique ISO 8601 assessment times")
+    ap.add_argument("--format", choices=("json", "jsonl"), default="json")
+    ap.add_argument("--additional-catalog", help="JSON list of project-owned SYNTH- vulnerability profiles")
     ap.add_argument("--output", default="output/vuln-findings.json")
     ap.add_argument("--dry-run", action="store_true", help="Print summary only; do not create file")
     args = ap.parse_args()
-    items = build_items(args.seed)
-    summarize(items)
-    if args.dry_run:
-        print("\\nSample item:")
-        for key, value in sorted(items[0].items()):
-            print(f"  {key}: {value}")
-        return
-    path = Path(args.output)
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(items, indent=2, default=lambda value: float(value) if isinstance(value, Decimal) else str(value)) + "\\n", encoding="utf-8")
-    print(f"Wrote {len(items)} findings to {path.resolve()}")
+    if args.as_of and args.snapshots:
+        ap.error("--as-of and --snapshots cannot be combined")
+    try:
+        times = parse_times(args.snapshots or [args.as_of]) if (args.snapshots or args.as_of) else [None]
+        catalog = CATALOG + load_additional_catalog(args.additional_catalog) if args.additional_catalog else None
+        if args.host_count < 1 or args.findings_per_host is not None and args.findings_per_host < 1:
+            raise ValueError("Host and finding counts must be positive")
+
+        def records():
+            for snapshot_index, as_of in enumerate(times):
+                for item in iter_items(args.seed, as_of, args.host_count, args.findings_per_host, catalog):
+                    if len(times) > 1:
+                        base_id = item["finding_id"]
+                        item["base_finding_id"] = base_id
+                        item["snapshot_id"] = as_of
+                        item["finding_id"] = f"{base_id}@{as_of}"
+                        if snapshot_index and (item["host_name"].split(".")[0], item["vulnerability_id"]) not in PLANTED:
+                            if hash_stable(f"{args.seed}:{item['host_name']}:{base_id}") % 7 == 0:
+                                item["vulnerability_status"] = "fixed" if snapshot_index % 2 else "reopened"
+                                seen = parse_as_of(as_of) - timedelta(days=21 if snapshot_index % 2 else 1)
+                                item["last_seen"] = iso(seen)
+                                item["first_seen"] = iso(seen - timedelta(days=30))
+                                item["vulnerability_report_id"] = f"{seen:%Y%m%d}.synthetic-history"
+                    yield item
+
+        statuses = Counter()
+        planted_hits = {}
+        sample = None
+        host_count = 0
+        previous_host = None
+        previous_snapshot = None
+        def tally(item):
+            nonlocal host_count, previous_host, previous_snapshot, sample
+            if sample is None:
+                sample = item
+            statuses[item["vulnerability_status"]] += 1
+            short = item["host_name"].split(".")[0]
+            if (short, item["vulnerability_id"]) in PLANTED:
+                planted_hits[(short, item["vulnerability_id"])] = item["vulnerability_status"]
+            snapshot = item.get("snapshot_id")
+            if snapshot != previous_snapshot:
+                previous_host = None
+                previous_snapshot = snapshot
+            if item["host_name"] != previous_host and (snapshot is None or snapshot == times[0]):
+                host_count += 1
+            previous_host = item["host_name"]
+        count = export_records(args.output, records(), args.format, args.target_records, tally, args.dry_run)
+        print(f"Generated {count} findings on {host_count} hosts")
+        print("Status:", dict(sorted(statuses.items())))
+        print("Planted facts in export:", ", ".join(f"{host}/{vid}={status}"
+                                                  for (host, vid), status in sorted(planted_hits.items())) or "none")
+        if args.dry_run:
+            import json
+            from common.export import json_default
+            print("Sample item:", json.dumps(sample, default=json_default, sort_keys=True))
+            print("Dry run; no file written")
+        else:
+            from pathlib import Path
+            print(f"Wrote {count} findings to {Path(args.output).resolve()}")
+    except (ValueError, OSError) as exc:
+        ap.error(str(exc))
 
 
 if __name__ == "__main__":
