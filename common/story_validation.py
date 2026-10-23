@@ -7,6 +7,7 @@ from itertools import zip_longest
 from pathlib import Path
 
 from common.zeek_dns import render_dns
+from common.identity import render_windows_xml
 from common.world import iter_assets, iter_entities, iter_relationships
 
 
@@ -19,6 +20,154 @@ def rows(path):
 def require(condition, message):
     if not condition:
         raise ValueError(f"Invalid story bundle: {message}")
+
+
+def validate_identity_bundle(root, truth, assets, entities):
+    identity_truth = json.loads((root / "identity-truth.json").read_text(encoding="utf-8"))
+    require(identity_truth["run_id"] == truth["run_id"], "identity run ID differs")
+    identities = {row["identity_id"]: row for row in rows(root / "identities.jsonl")}
+    policies = {row["policy_id"]: row for row in rows(root / "access-policies.jsonl")}
+    require(len(identities) == 4 and len({r["account"] for r in identities.values()}) == 4,
+            "identity catalog has duplicate or missing accounts")
+    require(all(p["identity_id"] in identities and p["asset_id"] in assets
+                for p in policies.values()), "access policy reference is missing")
+    require(len(policies) == 5, "access policy ID is duplicate or missing")
+    web = {row["request_id"]: row for row in rows(root / "web-auth.jsonl")}
+    windows = {}
+    for row in rows(root / "windows-security.jsonl"):
+        eid = f"windows-{row['Computer'].split('.')[0]}-{row['EventRecordID']}"
+        require(eid not in windows, "duplicate Windows record ID")
+        windows[eid] = row
+    with (root / "windows-security.xml").open(encoding="utf-8") as handle:
+        for expected, actual in zip_longest((render_windows_xml(row) for row in windows.values()),
+                                             (line.rstrip("\r\n") for line in handle)):
+            require(expected == actual, "Windows XML view diverges from JSON projection")
+    require(len(web) == 6 and len(windows) == 6,
+            "identity source event count differs")
+    interactions = {item["event_id"]: item for item in identity_truth["interactions"]}
+    require(len(interactions) == len(web) + len(windows),
+            "duplicate or missing identity interaction")
+    for eid, item in interactions.items():
+        require(item["identity_id"] in identities and item["asset_id"] in assets,
+                "identity interaction reference is missing")
+        if item["source"] == "web-auth":
+            require(eid in web and item["at"] == web[eid]["time"],
+                    "web authentication event differs from truth")
+            require(web[eid]["server_name"] == assets[item["asset_id"]]["fqdn"],
+                    "web authentication target differs")
+            require(web[eid]["account"] == identities[item["identity_id"]]["account"],
+                    "web account differs from identity")
+            if web[eid]["event"] == "login":
+                require(web[eid]["outcome"] == item["outcome"] and
+                        web[eid]["client_ip"] == item["source_ip"],
+                        "web login differs from truth")
+        elif item["source"] == "windows-security":
+            require(eid in windows and item["at"] == windows[eid]["TimeCreated"],
+                    "Windows event differs from truth")
+            require(windows[eid]["Computer"] == assets[item["asset_id"]]["fqdn"],
+                    "Windows event target differs")
+            if windows[eid]["EventCode"] in (4624, 4625):
+                require(windows[eid]["TargetUserName"] ==
+                        identities[item["identity_id"]]["account"].split("\\")[1],
+                        "Windows account differs from identity")
+                if "source_asset_id" in item:
+                    require(windows[eid]["IpAddress"] ==
+                            assets[item["source_asset_id"]]["ip"],
+                            "Windows source address differs")
+                else:
+                    require(windows[eid]["LogonType"] == 5 and "IpAddress" not in windows[eid],
+                            "service logon has a network source")
+                require(item["outcome"] ==
+                        ("success" if windows[eid]["EventCode"] == 4624 else "failure"),
+                        "Windows logon result differs")
+        else:
+            raise ValueError("Invalid story bundle: unknown identity source")
+        if "policy_id" in item:
+            policy = policies.get(item["policy_id"])
+            require(policy is not None and policy["identity_id"] == item["identity_id"] and
+                    policy["asset_id"] == item["asset_id"] and
+                    policy["valid_from"] <= item["at"] and
+                    (policy["valid_until"] is None or item["at"] < policy["valid_until"]),
+                    "identity interaction violates policy interval")
+        if "source_asset_id" in item:
+            require(item["source_asset_id"] in assets, "identity source asset is missing")
+        if "source_entity_id" in item:
+            require(item["source_entity_id"] in entities and
+                    item["source_ip"] == entities[item["source_entity_id"]]["ip"],
+                    "identity source entity differs")
+        if "related_operation_id" in item:
+            operation = next((op for op in truth["operations"]
+                              if op["operation_id"] == item["related_operation_id"]), None)
+            require(operation is not None and operation["start_time"] <= item["at"] and
+                    operation["source_ref"] == {"entity_id": item["source_entity_id"]},
+                    "related recon operation differs")
+        if "caused_by" in item and item["caused_by"] in interactions:
+            require(interactions[item["caused_by"]]["at"] <= item["at"],
+                    "identity causal parent occurs later")
+    require(set(web) | set(windows) == set(interactions), "unowned identity event")
+    sessions = {row["session_id"]: row for row in identity_truth["sessions"]}
+    require(len(sessions) == len(identity_truth["sessions"]), "duplicate session ID")
+    for sid, session in sessions.items():
+        require(session["identity_id"] in identities and session["asset_id"] in assets,
+                "session reference is missing")
+        require(any(item.get("session_id") == sid and item.get("outcome") == "success" and
+                    item["at"] == session["started_at"] for item in interactions.values()),
+                "session has no matching successful authentication")
+        if "linked_recon_operation_id" in session:
+            operation = next((op for op in truth["operations"]
+                              if op["operation_id"] == session["linked_recon_operation_id"]), None)
+            require(operation is not None and session["started_at"] < operation["start_time"] and
+                    operation["source_ref"] == {"asset_id": session["asset_id"]},
+                    "recon operation is not preceded by linked session")
+    changes = {row["change_id"]: row for row in rows(root / "identity-state.jsonl")}
+    require(changes == {row["change_id"]: row for row in identity_truth["state_changes"]},
+            "identity state differs from truth")
+    lockout = next(row for row in changes.values() if row["kind"] == "app_lockout")
+    grant = next(row for row in changes.values() if row["kind"] == "group_membership")
+    require(lockout["identity_id"] in identities and lockout["asset_id"] in assets and
+            lockout["effective_at"] < lockout["expires_at"], "invalid app lockout")
+    failures = [row for row in web.values() if row["event"] == "login" and
+                row["outcome"] == "failure" and row["reason"] == "invalid_password" and
+                row["time"] <= lockout["effective_at"]]
+    require(len(failures) == lockout["failure_threshold"] and
+            max(row["time"] for row in failures) == lockout["effective_at"],
+            "lockout does not follow the failed attempts")
+    locked = [row for row in web.values() if row["event"] == "login" and
+              row["reason"] == "account_locked"]
+    require(len(locked) == 1 and lockout["effective_at"] < locked[0]["time"] < lockout["expires_at"],
+            "locked attempt falls outside lockout")
+    success = [row for row in web.values() if row["event"] == "login" and
+               row["outcome"] == "success"]
+    require(len(success) == 1 and success[0]["time"] > lockout["expires_at"] and
+            success[0]["mfa_result"] == "passed" and
+            success[0]["client_ip"] == assets[
+                sessions[interactions[success[0]["request_id"]]["session_id"]]["source_asset_id"]]["ip"],
+            "web success violates lockout, source, or MFA policy")
+    require(grant["identity_id"] in identities and grant["actor_identity_id"] in identities and
+            grant["caused_by_session_id"] in sessions and grant["event_id"] in windows and
+            grant["effective_at"] == windows[grant["event_id"]]["TimeCreated"] and
+            sessions[grant["caused_by_session_id"]]["started_at"] < grant["effective_at"] and
+            grant["group"] == policies["policy-file-operator"]["required_group"],
+            "group grant lacks authorized preceding session")
+    admin_logon = next(item for item in interactions.values() if
+                       item.get("session_id") == grant["caused_by_session_id"] and
+                       item.get("outcome") == "success")
+    require(windows[grant["event_id"]]["SubjectLogonId"] ==
+            windows[admin_logon["event_id"]]["TargetLogonId"] and
+            windows[grant["event_id"]]["SubjectUserName"] == "admin" and
+            windows[grant["event_id"]]["EventCode"] == 4728,
+            "group grant does not match Windows admin session")
+    operator_windows = [item for item in interactions.values() if
+                        item["identity_id"] == grant["identity_id"] and
+                        item["source"] == "windows-security" and item.get("policy_id") == "policy-file-operator"]
+    require(len(operator_windows) == 2 and
+            any(item["at"] < grant["effective_at"] and item["outcome"] == "failure" and
+                windows[item["event_id"]]["EventCode"] == 4625 and
+                windows[item["event_id"]]["Status"] == "0xC000015B" for item in operator_windows) and
+            any(item["at"] > grant["effective_at"] and item["outcome"] == "success" and
+                windows[item["event_id"]]["EventCode"] == 4624 for item in operator_windows),
+            "operator logon does not follow privilege state")
+    return len(identities), len(interactions), len(changes)
 
 
 def validate_bundle(path, truth):
@@ -129,8 +278,19 @@ def validate_bundle(path, truth):
             "timeline is out of order")
     require({item["change_id"] for item in timeline if item["kind"] == "state_change"} ==
             {change["change_id"] for change in changes}, "timeline change set differs")
-    return {"assets": asset_count, "recon_events": len(event_times),
+    result = {"assets": asset_count, "recon_events": len(event_times),
             "dns_events": dns_count, "state_changes": len(changes)}
+    if (root / "identity-truth.json").exists():
+        counts = validate_identity_bundle(root, truth, assets, entities)
+        result.update(zip(("identities", "identity_events", "identity_changes"), counts))
+        identity_truth = json.loads((root / "identity-truth.json").read_text(encoding="utf-8"))
+        require({item["event_id"] for item in timeline if item["kind"] == "identity_interaction"} ==
+                {item["event_id"] for item in identity_truth["interactions"]},
+                "timeline identity interactions differ")
+        require({item["change_id"] for item in timeline if item["kind"] == "identity_change"} ==
+                {item["change_id"] for item in identity_truth["state_changes"]},
+                "timeline identity changes differ")
+    return result
 
 
 def validate_export(path):

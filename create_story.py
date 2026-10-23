@@ -5,6 +5,7 @@ import argparse
 import hashlib
 import json
 import os
+import random
 import shutil
 import tempfile
 import time
@@ -14,8 +15,10 @@ from pathlib import Path
 import create_compliance_table as compliance
 import create_recon_events as recon
 import create_vuln_table as vuln
-from common.assets import DEFAULT_HOST_COUNT
+from common.assets import DEFAULT_HOST_COUNT, build_hosts
 from common.export import export_records, parse_times
+from common.identity import (VERSION as IDENTITY_VERSION, generate as generate_identity,
+                             render_windows_xml)
 from common.story_validation import validate_bundle
 from common.world import VERSION as WORLD_VERSION, SERVICES, iter_assets, iter_entities, iter_relationships, run_id
 from common.zeek_dns import render_dns
@@ -43,7 +46,7 @@ def recipe_checksums():
     paths = [root / name for name in (
         "create_story.py", "create_vuln_table.py", "create_compliance_table.py",
         "create_recon_events.py", "common/assets.py", "common/export.py", "common/world.py",
-        "common/zeek_dns.py", "common/story_validation.py")]
+        "common/zeek_dns.py", "common/story_validation.py", "common/identity.py")]
     for catalog in ("compliance", "recon", "vulnerability"):
         paths.extend(sorted((root / "catalogs" / catalog).glob("*.json")))
     return {path.relative_to(root).as_posix(): sha256_recipe_text(path) for path in paths}
@@ -189,8 +192,8 @@ def export_story(seed, start, duration_minutes, campaign_count, host_count, outp
         start_at = iso(start)
         recipe = recipe_checksums()
         recipe_hash = hashlib.sha256(json.dumps(recipe, sort_keys=True).encode()).hexdigest()
-        identity = run_id(seed, start_at, host_count, duration_minutes,
-                          campaign_count, recipe_hash)
+        run_identity = run_id(seed, start_at, host_count, duration_minutes,
+                              campaign_count, recipe_hash)
         files = {}
 
         def save(name, records):
@@ -211,6 +214,21 @@ def export_story(seed, start, duration_minutes, campaign_count, host_count, outp
         validate_recon_truth(truth, seed, host_count)
         dns_events, _ = recon.generate(seed, start, duration_minutes, campaign_count)
         save("dns.log", (render_dns(e) for e in dns_events if e["event_type"] == "dns"))
+        identity_run = generate_identity(seed, start, duration_minutes, campaign_count,
+                                         {host["short"]: host for host in
+                                          build_hosts(random.Random(seed), DEFAULT_HOST_COUNT)})
+        for name, records in (("identities.jsonl", identity_run["identities"]),
+                              ("access-policies.jsonl", identity_run["policies"]),
+                              ("web-auth.jsonl", identity_run["web_events"]),
+                              ("windows-security.jsonl", identity_run["windows_events"]),
+                              ("identity-state.jsonl", identity_run["truth"]["state_changes"])):
+            save(name, iter(records))
+        windows_xml_path = stage / "windows-security.xml"
+        windows_xml_path.write_text("".join(render_windows_xml(row) + "\n"
+                                            for row in identity_run["windows_events"]),
+                                    encoding="utf-8", newline="\n")
+        files[windows_xml_path.name] = {"records": len(identity_run["windows_events"]),
+                                        "sha256": sha256_file(windows_xml_path)}
 
         latest_observation = max(datetime.fromisoformat(
             op["last_observation_at"].replace("Z", "+00:00")) for op in truth["operations"])
@@ -226,31 +244,44 @@ def export_story(seed, start, duration_minutes, campaign_count, host_count, outp
         timeline.extend({"kind": "operation", "at": op["start_time"],
                          "operation_id": op["operation_id"], "family": op["family"],
                          "source_ref": op["source_ref"]} for op in truth["operations"])
+        timeline.extend({"kind": "identity_interaction", "at": interaction["at"],
+                         "event_id": interaction["event_id"]}
+                        for interaction in identity_run["truth"]["interactions"])
+        timeline.extend({"kind": "identity_change", "at": change["effective_at"],
+                         "change_id": change["change_id"]}
+                        for change in identity_run["truth"]["state_changes"])
         timeline.extend({"kind": "state_change", "at": effective_at,
                          "change_id": change["change_id"], "asset_id": change["asset_id"]}
                         for change in changes)
         timeline.append({"kind": "followup_assessment", "at": followup_at,
                          "datasets": ["vulnerability-followup.jsonl", "compliance-followup.jsonl"]})
-        save("timeline.jsonl", iter(timeline))
-        truth["run_id"] = identity
+        save("timeline.jsonl", iter(sorted(timeline, key=lambda item: (item["at"], item["kind"]))))
+        truth["run_id"] = run_identity
         truth_path = stage / "recon-truth.json"
         truth_path.write_text(json.dumps(truth, indent=2, sort_keys=True) + "\n",
                               encoding="utf-8", newline="\n")
         files[truth_path.name] = {"sha256": sha256_file(truth_path)}
+        identity_run["truth"]["run_id"] = run_identity
+        identity_truth_path = stage / "identity-truth.json"
+        identity_truth_path.write_text(json.dumps(identity_run["truth"], indent=2, sort_keys=True) + "\n",
+                                       encoding="utf-8", newline="\n")
+        files[identity_truth_path.name] = {"sha256": sha256_file(identity_truth_path)}
         validation = validate_bundle(stage, truth)
         manifest = {
-            "schema_version": WORLD_VERSION, "run_id": identity,
+            "schema_version": WORLD_VERSION, "run_id": run_identity,
             "seed": seed, "start_time": start_at, "assessment_time": assessment_at,
             "remediation_time": effective_at, "followup_time": followup_at,
             "duration_minutes": duration_minutes, "campaign_count": campaign_count,
             "host_count": host_count,
-            "generator_versions": {"world": WORLD_VERSION, "recon": recon.VERSION},
+            "generator_versions": {"world": WORLD_VERSION, "recon": recon.VERSION,
+                                   "identity": IDENTITY_VERSION},
             "recipe_sha256": recipe_hash, "recipe_files": recipe,
             "filtered_vulnerability_findings": skipped_findings,
             "validation": validation,
             "files": files,
             "notes": ["All source formats are synthetic", "Scenario truth is separate from observations",
-                      "Recon activity currently uses the default 23 hosts"],
+                      "Recon and identity activity currently use the default 23 hosts",
+                      "Windows XML and web authentication CIM mappings are not live validated"],
         }
         (stage / "run-manifest.json").write_text(
             json.dumps(manifest, indent=2, sort_keys=True) + "\n",
