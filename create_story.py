@@ -16,6 +16,7 @@ import create_compliance_table as compliance
 import create_recon_events as recon
 import create_vuln_table as vuln
 from common.assets import DEFAULT_HOST_COUNT, build_hosts
+from common.endpoint import VERSION as ENDPOINT_VERSION, generate as generate_endpoint
 from common.export import export_records, parse_times
 from common.identity import (VERSION as IDENTITY_VERSION, generate as generate_identity,
                              render_windows_xml)
@@ -46,7 +47,8 @@ def recipe_checksums():
     paths = [root / name for name in (
         "create_story.py", "create_vuln_table.py", "create_compliance_table.py",
         "create_recon_events.py", "common/assets.py", "common/export.py", "common/world.py",
-        "common/zeek_dns.py", "common/story_validation.py", "common/identity.py")]
+        "common/zeek_dns.py", "common/story_validation.py", "common/identity.py",
+        "common/endpoint.py")]
     for catalog in ("compliance", "recon", "vulnerability"):
         paths.extend(sorted((root / "catalogs" / catalog).glob("*.json")))
     return {path.relative_to(root).as_posix(): sha256_recipe_text(path) for path in paths}
@@ -229,6 +231,17 @@ def export_story(seed, start, duration_minutes, campaign_count, host_count, outp
                                     encoding="utf-8", newline="\n")
         files[windows_xml_path.name] = {"records": len(identity_run["windows_events"]),
                                         "sha256": sha256_file(windows_xml_path)}
+        endpoint_run = generate_endpoint(seed, start, list(iter_assets(seed, DEFAULT_HOST_COUNT)),
+                                         identity_run["truth"], identity_run["windows_events"],
+                                         truth, read_jsonl(stage / "recon.jsonl"))
+        save("sensor-coverage.jsonl", iter(endpoint_run["coverage"]))
+        save("sysmon.jsonl", iter(endpoint_run["records"]))
+        sysmon_xml_path = stage / "sysmon.xml"
+        sysmon_xml_path.write_text("".join(render_windows_xml(row) + "\n"
+                                         for row in endpoint_run["records"]),
+                                   encoding="utf-8", newline="\n")
+        files[sysmon_xml_path.name] = {"records": len(endpoint_run["records"]),
+                                       "sha256": sha256_file(sysmon_xml_path)}
 
         latest_observation = max(datetime.fromisoformat(
             op["last_observation_at"].replace("Z", "+00:00")) for op in truth["operations"])
@@ -250,6 +263,9 @@ def export_story(seed, start, duration_minutes, campaign_count, host_count, outp
         timeline.extend({"kind": "identity_change", "at": change["effective_at"],
                          "change_id": change["change_id"]}
                         for change in identity_run["truth"]["state_changes"])
+        timeline.extend({"kind": "endpoint_interaction", "at": event["at"],
+                         "event_id": event["event_id"]}
+                        for event in endpoint_run["truth"]["interactions"])
         timeline.extend({"kind": "state_change", "at": effective_at,
                          "change_id": change["change_id"], "asset_id": change["asset_id"]}
                         for change in changes)
@@ -266,6 +282,11 @@ def export_story(seed, start, duration_minutes, campaign_count, host_count, outp
         identity_truth_path.write_text(json.dumps(identity_run["truth"], indent=2, sort_keys=True) + "\n",
                                        encoding="utf-8", newline="\n")
         files[identity_truth_path.name] = {"sha256": sha256_file(identity_truth_path)}
+        endpoint_run["truth"]["run_id"] = run_identity
+        endpoint_truth_path = stage / "endpoint-truth.json"
+        endpoint_truth_path.write_text(json.dumps(endpoint_run["truth"], indent=2, sort_keys=True) + "\n",
+                                       encoding="utf-8", newline="\n")
+        files[endpoint_truth_path.name] = {"sha256": sha256_file(endpoint_truth_path)}
         validation = validate_bundle(stage, truth)
         manifest = {
             "schema_version": WORLD_VERSION, "run_id": run_identity,
@@ -274,14 +295,14 @@ def export_story(seed, start, duration_minutes, campaign_count, host_count, outp
             "duration_minutes": duration_minutes, "campaign_count": campaign_count,
             "host_count": host_count,
             "generator_versions": {"world": WORLD_VERSION, "recon": recon.VERSION,
-                                   "identity": IDENTITY_VERSION},
+                                   "identity": IDENTITY_VERSION, "endpoint": ENDPOINT_VERSION},
             "recipe_sha256": recipe_hash, "recipe_files": recipe,
             "filtered_vulnerability_findings": skipped_findings,
             "validation": validation,
             "files": files,
             "notes": ["All source formats are synthetic", "Scenario truth is separate from observations",
                       "Recon and identity activity currently use the default 23 hosts",
-                      "Windows XML and web authentication CIM mappings are not live validated"],
+                      "Windows XML, Sysmon XML, and web authentication CIM mappings are not live validated"],
         }
         (stage / "run-manifest.json").write_text(
             json.dumps(manifest, indent=2, sort_keys=True) + "\n",

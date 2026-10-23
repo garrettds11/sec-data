@@ -1,6 +1,6 @@
 # sec-data
 
-Generate **synthetic vulnerability findings**, **CIS-inspired configuration compliance findings**, and **offline reconnaissance, DNS, and identity telemetry** for security analytics, AI demos, and testing. This project **does not scan real systems** and does not supply official CIS Benchmark content.
+Generate **synthetic vulnerability findings**, **CIS-inspired configuration compliance findings**, and **offline reconnaissance, DNS, identity, and endpoint telemetry** for security analytics, AI demos, and testing. This project **does not scan real systems** and does not supply official CIS Benchmark content.
 
 ## Quick start (Windows / PowerShell)
 
@@ -32,7 +32,7 @@ These commands create `C:\code\vuln-findings.json` and `C:\code\compliance-findi
 | `create_vuln_table.py` | Local vulnerability JSON generator |
 | `create_compliance_table.py` | Local compliance JSON generator |
 | `create_recon_events.py` | Offline, scenario-driven normalized JSONL telemetry generator |
-| `create_story.py` | Linked inventory, finding, recon, DNS, identity, and manifest bundle |
+| `create_story.py` | Linked inventory, finding, recon, DNS, identity, endpoint, and manifest bundle |
 | `upload_to_aws.py` | Optional, separate AWS DynamoDB uploader |
 | `common/assets.py` | Shared synthetic inventory of 23 hosts |
 | `common/export.py` | Streaming JSON and JSONL output |
@@ -45,6 +45,7 @@ These commands create `C:\code\vuln-findings.json` and `C:\code\compliance-findi
 | `docs/dns.md` | Optional Zeek-shaped DNS JSON export and CIM validation plan |
 | `docs/story.md` | Shared world catalog, run bundle, provenance, and current limits |
 | `docs/identity.md` | Linked authentication fixture, Windows XML projection, and Splunk mapping status |
+| `docs/endpoint.md` | Linked Sysmon fixture, sensor coverage, and Splunk mapping status |
 
 ## Dataset behavior and limitations
 

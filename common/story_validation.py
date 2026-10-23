@@ -170,6 +170,114 @@ def validate_identity_bundle(root, truth, assets, entities):
     return len(identities), len(interactions), len(changes)
 
 
+def validate_endpoint_bundle(root, truth, assets):
+    endpoint_truth = json.loads((root / "endpoint-truth.json").read_text(encoding="utf-8"))
+    identity_truth = json.loads((root / "identity-truth.json").read_text(encoding="utf-8"))
+    require(endpoint_truth["run_id"] == truth["run_id"], "endpoint run ID differs")
+    monitored = endpoint_truth["monitored_asset_id"]
+    require(monitored in assets and assets[monitored]["family"] == "windows",
+            "monitored endpoint is missing or non-Windows")
+    coverage = list(rows(root / "sensor-coverage.jsonl"))
+    require({row["asset_id"] for row in coverage} == set(assets),
+            "sensor coverage does not describe the fixture assets")
+    enabled = [row for row in coverage if row["enabled"]]
+    require(len(enabled) == 1 and enabled[0]["asset_id"] == monitored and
+            set(enabled[0]["event_codes"]) == {1, 3, 5, 11, 13},
+            "Sysmon coverage differs from modeled source")
+    require(all(not row["event_codes"] for row in coverage if not row["enabled"]),
+            "unmonitored host lists Sysmon events")
+
+    events = {}
+    for row in rows(root / "sysmon.jsonl"):
+        eid = f"sysmon-{row['Computer'].split('.')[0]}-{row['EventRecordID']}"
+        require(eid not in events, "duplicate Sysmon record ID")
+        require(row["Computer"] == assets[monitored]["fqdn"] and
+                row["EventCode"] in enabled[0]["event_codes"] and
+                row["Provider"] == "Microsoft-Windows-Sysmon" and
+                row["Channel"] == "Microsoft-Windows-Sysmon/Operational",
+                "Sysmon event is outside sensor coverage")
+        events[eid] = row
+    with (root / "sysmon.xml").open(encoding="utf-8") as handle:
+        for expected, actual in zip_longest((render_windows_xml(row) for row in events.values()),
+                                             (line.rstrip("\r\n") for line in handle)):
+            require(expected == actual, "Sysmon XML view diverges from JSON projection")
+    links = {row["event_id"]: row for row in endpoint_truth["interactions"]}
+    require(len(links) == len(events) and set(links) == set(events),
+            "Sysmon interaction set differs from source")
+    sessions = {row["session_id"]: row for row in identity_truth["sessions"]}
+    identities = {row["identity_id"]: row for row in rows(root / "identities.jsonl")}
+    windows_logons = {row["TargetUserName"]: row for row in rows(root / "windows-security.jsonl")
+                      if row["EventCode"] == 4624 and row["Computer"] == assets[monitored]["fqdn"]}
+    recon = {row["event_id"]: row for row in rows(root / "recon.jsonl")}
+    operation = next((op for op in truth["operations"] if
+                      op["operation_id"] == endpoint_truth["related_recon_operation_id"]), None)
+    require(operation is not None and operation["family"] == "internal",
+            "endpoint recon operation is missing")
+    processes = {}
+    terminations = {}
+    for eid, row in events.items():
+        link = links[eid]
+        require(link["at"] == row["TimeCreated"] and
+                link["event_code"] == row["EventCode"] and
+                link["asset_id"] == monitored and
+                link["session_id"] in sessions and
+                link["identity_id"] == sessions[link["session_id"]]["identity_id"] and
+                sessions[link["session_id"]]["asset_id"] == monitored and
+                sessions[link["session_id"]]["started_at"] <= link["at"],
+                "Sysmon event does not resolve to an active session")
+        account = identities[link["identity_id"]]["account"]
+        require(row["User"] == account, "Sysmon user differs from session")
+        if row["EventCode"] == 1:
+            pguid = row["ProcessGuid"]
+            require(pguid not in processes and link["process_guid"] == pguid,
+                    "duplicate or mismatched process GUID")
+            require(row["LogonId"] == windows_logons[account.split("\\")[1]]["TargetLogonId"],
+                    "Sysmon logon ID differs from Security logon")
+            processes[pguid] = row
+        elif row["EventCode"] == 5:
+            require(row["ProcessGuid"] not in terminations,
+                    "duplicate process termination")
+            terminations[row["ProcessGuid"]] = row["TimeCreated"]
+        if "related_recon_event_id" in link:
+            related = recon.get(link["related_recon_event_id"])
+            require(related is not None and related["event_id"] in operation["event_ids"] and
+                    related["timestamp"] == row["TimeCreated"],
+                    "Sysmon/recon correlation differs")
+            if row["EventCode"] == 3:
+                require(related["event_type"] == "network_connection" and
+                        row["SourceIp"] == related["src_ip"] and
+                        row["DestinationIp"] == related["dst_ip"] and
+                        row["DestinationPort"] == related["dst_port"],
+                        "Sysmon network observation differs from recon")
+            elif row["EventCode"] == 1:
+                require(related["event_type"] == "process" and
+                        row["Image"].split("\\")[-1] == related["executable"],
+                        "Sysmon process differs from recon")
+            else:
+                raise ValueError("Invalid story bundle: invalid Sysmon/recon link")
+    for row in events.values():
+        pguid = row["ProcessGuid"]
+        require(pguid in processes and processes[pguid]["TimeCreated"] <= row["TimeCreated"],
+                "Sysmon event references a missing or later process")
+        if pguid in terminations:
+            require(row["TimeCreated"] <= terminations[pguid],
+                    "Sysmon activity follows process termination")
+        if row["EventCode"] == 1 and "ParentProcessGuid" in row:
+            parent = processes.get(row["ParentProcessGuid"])
+            require(parent is not None and parent["TimeCreated"] < row["TimeCreated"] and
+                    parent["ProcessId"] == row["ParentProcessId"] and
+                    parent["Image"] == row["ParentImage"],
+                    "Sysmon parent process differs")
+    require(any(row["EventCode"] == 11 and row["User"] == "LAB\\analyst" for row in events.values()) and
+            any(row["EventCode"] == 13 and row["User"] == "LAB\\operator" for row in events.values()) and
+            any(row["EventCode"] == 11 and row["User"] == "LAB\\svc_backup" for row in events.values()),
+            "endpoint activity or benign control is missing")
+    grant = next(row for row in identity_truth["state_changes"] if row["kind"] == "group_membership")
+    require(all(row["TimeCreated"] > grant["effective_at"] for row in events.values()
+                if row["EventCode"] == 13), "registry change predates privilege grant")
+    return len(events), len(processes)
+
+
 def validate_bundle(path, truth):
     root = Path(path)
     seed = truth["seed"]
@@ -290,6 +398,13 @@ def validate_bundle(path, truth):
         require({item["change_id"] for item in timeline if item["kind"] == "identity_change"} ==
                 {item["change_id"] for item in identity_truth["state_changes"]},
                 "timeline identity changes differ")
+    if (root / "endpoint-truth.json").exists():
+        counts = validate_endpoint_bundle(root, truth, assets)
+        result.update(zip(("endpoint_events", "endpoint_processes"), counts))
+        endpoint_truth = json.loads((root / "endpoint-truth.json").read_text(encoding="utf-8"))
+        require({item["event_id"] for item in timeline if item["kind"] == "endpoint_interaction"} ==
+                {item["event_id"] for item in endpoint_truth["interactions"]},
+                "timeline endpoint interactions differ")
     return result
 
 
