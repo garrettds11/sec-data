@@ -1,0 +1,4 @@
+{"action":"allow","bytes_in":1264,"bytes_out":380,"dest_ip":"192.0.2.81","dest_port":80,"device":"edge-fw-01","protocol":"tcp","rule":"egress-http","src_ip":"10.10.4.27","src_port":51003,"time":"2026-10-22T12:33:04.000Z"}
+{"action":"allow","bytes_in":320,"bytes_out":4476,"dest_ip":"192.0.2.80","dest_port":80,"device":"edge-fw-01","protocol":"tcp","rule":"egress-http","src_ip":"10.10.6.32","src_port":51000,"time":"2026-10-22T12:39:10.000Z"}
+{"action":"block","bytes_in":0,"bytes_out":0,"dest_ip":"203.0.113.80","dest_port":80,"device":"edge-fw-01","protocol":"tcp","rule":"deny-unapproved","src_ip":"10.10.6.32","src_port":51001,"time":"2026-10-22T12:39:12.000Z"}
+{"action":"allow","bytes_in":320,"bytes_out":16764,"dest_ip":"192.0.2.81","dest_port":80,"device":"edge-fw-01","protocol":"tcp","rule":"egress-http","src_ip":"10.10.5.29","src_port":51002,"time":"2026-10-22T12:42:05.000Z"}

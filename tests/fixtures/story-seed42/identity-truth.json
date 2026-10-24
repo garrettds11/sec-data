@@ -1,0 +1,202 @@
+{
+  "interactions": [
+    {
+      "asset_id": "asset-0000001",
+      "at": "2026-10-22T12:03:45.000Z",
+      "event_id": "webauth-283dbea20fb90848940f",
+      "identity_id": "identity-operator-01",
+      "outcome": "failure",
+      "related_operation_id": "operation-0000",
+      "session_id": null,
+      "source": "web-auth",
+      "source_entity_id": "entity-external-scanner-01",
+      "source_ip": "203.0.113.50"
+    },
+    {
+      "asset_id": "asset-0000001",
+      "at": "2026-10-22T12:04:30.000Z",
+      "event_id": "webauth-8de41955febc91f6d2e1",
+      "identity_id": "identity-operator-01",
+      "outcome": "failure",
+      "related_operation_id": "operation-0000",
+      "session_id": null,
+      "source": "web-auth",
+      "source_entity_id": "entity-external-scanner-01",
+      "source_ip": "203.0.113.50"
+    },
+    {
+      "asset_id": "asset-0000001",
+      "at": "2026-10-22T12:05:15.000Z",
+      "event_id": "webauth-4088b532e909b63a905d",
+      "identity_id": "identity-operator-01",
+      "outcome": "failure",
+      "related_operation_id": "operation-0000",
+      "session_id": null,
+      "source": "web-auth",
+      "source_entity_id": "entity-external-scanner-01",
+      "source_ip": "203.0.113.50"
+    },
+    {
+      "asset_id": "asset-0000001",
+      "at": "2026-10-22T12:05:15.000Z",
+      "caused_by": "webauth-4088b532e909b63a905d",
+      "event_id": "webauth-d2a5733383fb76657e37",
+      "identity_id": "identity-operator-01",
+      "source": "web-auth"
+    },
+    {
+      "asset_id": "asset-0000001",
+      "at": "2026-10-22T12:06:00.000Z",
+      "event_id": "webauth-85fa101bb531e58d8005",
+      "identity_id": "identity-operator-01",
+      "outcome": "failure",
+      "related_operation_id": "operation-0000",
+      "session_id": null,
+      "source": "web-auth",
+      "source_entity_id": "entity-external-scanner-01",
+      "source_ip": "203.0.113.50"
+    },
+    {
+      "asset_id": "asset-0000001",
+      "at": "2026-10-22T12:30:00.000Z",
+      "event_id": "webauth-f623d9d8af4291b09b6f",
+      "identity_id": "identity-operator-01",
+      "outcome": "success",
+      "session_id": "session-dd4f2f705c3522b11e08",
+      "source": "web-auth",
+      "source_ip": "10.10.6.32"
+    },
+    {
+      "asset_id": "asset-0000019",
+      "at": "2026-10-22T12:14:50.000Z",
+      "event_id": "windows-prod-file-01-100001",
+      "identity_id": "identity-analyst-01",
+      "outcome": "success",
+      "policy_id": "policy-file-analyst",
+      "session_id": "session-08f76722fe9f53e2f1cb",
+      "source": "windows-security",
+      "source_asset_id": "asset-0000022"
+    },
+    {
+      "asset_id": "asset-0000017",
+      "at": "2026-10-22T12:33:00.000Z",
+      "event_id": "windows-dc-01-100002",
+      "identity_id": "identity-admin-01",
+      "outcome": "success",
+      "policy_id": "policy-dc-admin",
+      "session_id": "session-61a0cf22de07aa87a321",
+      "source": "windows-security",
+      "source_asset_id": "asset-0000022"
+    },
+    {
+      "asset_id": "asset-0000019",
+      "at": "2026-10-22T12:34:48.000Z",
+      "event_id": "windows-prod-file-01-100003",
+      "identity_id": "identity-operator-01",
+      "outcome": "failure",
+      "policy_id": "policy-file-operator",
+      "reason": "logon_right_not_granted",
+      "source": "windows-security",
+      "source_asset_id": "asset-0000022"
+    },
+    {
+      "actor_identity_id": "identity-admin-01",
+      "asset_id": "asset-0000017",
+      "at": "2026-10-22T12:36:00.000Z",
+      "event_id": "windows-dc-01-100004",
+      "identity_id": "identity-operator-01",
+      "session_id": "session-61a0cf22de07aa87a321",
+      "source": "windows-security"
+    },
+    {
+      "asset_id": "asset-0000019",
+      "at": "2026-10-22T12:39:00.000Z",
+      "caused_by": "identity-change-5a6ac274cbc8471ba8ae",
+      "event_id": "windows-prod-file-01-100005",
+      "identity_id": "identity-operator-01",
+      "outcome": "success",
+      "policy_id": "policy-file-operator",
+      "session_id": "session-716d4329f05119032796",
+      "source": "windows-security",
+      "source_asset_id": "asset-0000022"
+    },
+    {
+      "asset_id": "asset-0000019",
+      "at": "2026-10-22T12:42:00.000Z",
+      "event_id": "windows-prod-file-01-100006",
+      "identity_id": "identity-backup-01",
+      "outcome": "success",
+      "policy_id": "policy-backup-service",
+      "session_id": "session-ad3ce4b92979bd3e757f",
+      "source": "windows-security"
+    }
+  ],
+  "notes": [
+    "Web lockout is application-local",
+    "Windows Security records are JSON field projections"
+  ],
+  "run_id": "run-e948987f440351200c64",
+  "schema_version": "1.0",
+  "sessions": [
+    {
+      "asset_id": "asset-0000001",
+      "identity_id": "identity-operator-01",
+      "session_id": "session-dd4f2f705c3522b11e08",
+      "source_asset_id": "asset-0000022",
+      "started_at": "2026-10-22T12:30:00.000Z"
+    },
+    {
+      "asset_id": "asset-0000019",
+      "identity_id": "identity-analyst-01",
+      "linked_recon_operation_id": "operation-0001",
+      "session_id": "session-08f76722fe9f53e2f1cb",
+      "source_asset_id": "asset-0000022",
+      "started_at": "2026-10-22T12:14:50.000Z"
+    },
+    {
+      "asset_id": "asset-0000017",
+      "identity_id": "identity-admin-01",
+      "session_id": "session-61a0cf22de07aa87a321",
+      "source_asset_id": "asset-0000022",
+      "started_at": "2026-10-22T12:33:00.000Z"
+    },
+    {
+      "asset_id": "asset-0000019",
+      "identity_id": "identity-operator-01",
+      "session_id": "session-716d4329f05119032796",
+      "source_asset_id": "asset-0000022",
+      "started_at": "2026-10-22T12:39:00.000Z"
+    },
+    {
+      "asset_id": "asset-0000019",
+      "identity_id": "identity-backup-01",
+      "session_id": "session-ad3ce4b92979bd3e757f",
+      "started_at": "2026-10-22T12:42:00.000Z"
+    }
+  ],
+  "state_changes": [
+    {
+      "after": "locked",
+      "asset_id": "asset-0000001",
+      "before": "active",
+      "change_id": "identity-change-4e624826586dcd03e557",
+      "effective_at": "2026-10-22T12:05:15.000Z",
+      "expires_at": "2026-10-22T12:09:45.000Z",
+      "failure_threshold": 3,
+      "identity_id": "identity-operator-01",
+      "kind": "app_lockout"
+    },
+    {
+      "actor_identity_id": "identity-admin-01",
+      "after": "member",
+      "before": "absent",
+      "caused_by_session_id": "session-61a0cf22de07aa87a321",
+      "change_id": "identity-change-5a6ac274cbc8471ba8ae",
+      "effective_at": "2026-10-22T12:36:00.000Z",
+      "event_id": "windows-dc-01-100004",
+      "group": "File Operators",
+      "identity_id": "identity-operator-01",
+      "kind": "group_membership"
+    }
+  ]
+}

@@ -1,0 +1,160 @@
+{
+  "interactions": [
+    {
+      "asset_id": "asset-0000019",
+      "at": "2026-10-22T12:14:51.000Z",
+      "event_code": 1,
+      "event_id": "sysmon-prod-file-01-200001",
+      "identity_id": "identity-analyst-01",
+      "process_guid": "{6b30a066-a4df-50ba-ae65-7a24bd35cb40}",
+      "session_id": "session-08f76722fe9f53e2f1cb"
+    },
+    {
+      "asset_id": "asset-0000019",
+      "at": "2026-10-22T12:14:52.000Z",
+      "event_code": 1,
+      "event_id": "sysmon-prod-file-01-200002",
+      "identity_id": "identity-analyst-01",
+      "parent_process_guid": "{6b30a066-a4df-50ba-ae65-7a24bd35cb40}",
+      "process_guid": "{f1e06b55-61c3-5dd2-b42a-8045889be358}",
+      "session_id": "session-08f76722fe9f53e2f1cb"
+    },
+    {
+      "asset_id": "asset-0000019",
+      "at": "2026-10-22T12:15:01.000Z",
+      "event_code": 1,
+      "event_id": "sysmon-prod-file-01-200003",
+      "identity_id": "identity-analyst-01",
+      "parent_process_guid": "{f1e06b55-61c3-5dd2-b42a-8045889be358}",
+      "process_guid": "{b061ed14-86d0-5f2b-ac56-6722a80e16f5}",
+      "related_recon_event_id": "c552d8fad5dcca10d9962bf3",
+      "session_id": "session-08f76722fe9f53e2f1cb"
+    },
+    {
+      "asset_id": "asset-0000019",
+      "at": "2026-10-22T12:15:04.000Z",
+      "event_code": 3,
+      "event_id": "sysmon-prod-file-01-200004",
+      "identity_id": "identity-analyst-01",
+      "process_guid": "{b061ed14-86d0-5f2b-ac56-6722a80e16f5}",
+      "related_recon_event_id": "030cd89b8f967a178f61144c",
+      "session_id": "session-08f76722fe9f53e2f1cb"
+    },
+    {
+      "asset_id": "asset-0000019",
+      "at": "2026-10-22T12:15:07.000Z",
+      "event_code": 3,
+      "event_id": "sysmon-prod-file-01-200005",
+      "identity_id": "identity-analyst-01",
+      "process_guid": "{b061ed14-86d0-5f2b-ac56-6722a80e16f5}",
+      "related_recon_event_id": "f7b46a4124bd4a7fa5227bec",
+      "session_id": "session-08f76722fe9f53e2f1cb"
+    },
+    {
+      "asset_id": "asset-0000019",
+      "at": "2026-10-22T12:15:10.000Z",
+      "event_code": 3,
+      "event_id": "sysmon-prod-file-01-200006",
+      "identity_id": "identity-analyst-01",
+      "process_guid": "{b061ed14-86d0-5f2b-ac56-6722a80e16f5}",
+      "related_recon_event_id": "50906ba6e8edb44fd3d9eb66",
+      "session_id": "session-08f76722fe9f53e2f1cb"
+    },
+    {
+      "asset_id": "asset-0000019",
+      "at": "2026-10-22T12:15:13.000Z",
+      "event_code": 3,
+      "event_id": "sysmon-prod-file-01-200007",
+      "identity_id": "identity-analyst-01",
+      "process_guid": "{b061ed14-86d0-5f2b-ac56-6722a80e16f5}",
+      "related_recon_event_id": "bcb45d9ee9f9b72b8d2f8939",
+      "session_id": "session-08f76722fe9f53e2f1cb"
+    },
+    {
+      "asset_id": "asset-0000019",
+      "at": "2026-10-22T12:15:15.000Z",
+      "created_file": "C:\\ProgramData\\SecData\\inventory-summary.txt",
+      "event_code": 11,
+      "event_id": "sysmon-prod-file-01-200008",
+      "identity_id": "identity-analyst-01",
+      "process_guid": "{b061ed14-86d0-5f2b-ac56-6722a80e16f5}",
+      "session_id": "session-08f76722fe9f53e2f1cb"
+    },
+    {
+      "asset_id": "asset-0000019",
+      "at": "2026-10-22T12:15:16.000Z",
+      "event_code": 5,
+      "event_id": "sysmon-prod-file-01-200009",
+      "identity_id": "identity-analyst-01",
+      "session_id": "session-08f76722fe9f53e2f1cb"
+    },
+    {
+      "asset_id": "asset-0000019",
+      "at": "2026-10-22T12:39:02.000Z",
+      "event_code": 1,
+      "event_id": "sysmon-prod-file-01-200010",
+      "identity_id": "identity-operator-01",
+      "process_guid": "{bfc7886d-0941-5e79-90b3-45ca5c122408}",
+      "session_id": "session-716d4329f05119032796"
+    },
+    {
+      "asset_id": "asset-0000019",
+      "at": "2026-10-22T12:39:04.000Z",
+      "event_code": 13,
+      "event_id": "sysmon-prod-file-01-200011",
+      "identity_id": "identity-operator-01",
+      "process_guid": "{bfc7886d-0941-5e79-90b3-45ca5c122408}",
+      "registry_key": "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\\AuditHelper",
+      "session_id": "session-716d4329f05119032796"
+    },
+    {
+      "asset_id": "asset-0000019",
+      "at": "2026-10-22T12:39:05.000Z",
+      "event_code": 5,
+      "event_id": "sysmon-prod-file-01-200012",
+      "identity_id": "identity-operator-01",
+      "session_id": "session-716d4329f05119032796"
+    },
+    {
+      "asset_id": "asset-0000019",
+      "at": "2026-10-22T12:42:02.000Z",
+      "event_code": 1,
+      "event_id": "sysmon-prod-file-01-200013",
+      "identity_id": "identity-backup-01",
+      "process_guid": "{d76d33be-8f95-5a0a-8169-2b0104c26f0e}",
+      "session_id": "session-ad3ce4b92979bd3e757f"
+    },
+    {
+      "asset_id": "asset-0000019",
+      "at": "2026-10-22T12:42:04.000Z",
+      "event_code": 11,
+      "event_id": "sysmon-prod-file-01-200014",
+      "identity_id": "identity-backup-01",
+      "process_guid": "{d76d33be-8f95-5a0a-8169-2b0104c26f0e}",
+      "session_id": "session-ad3ce4b92979bd3e757f"
+    },
+    {
+      "asset_id": "asset-0000019",
+      "at": "2026-10-22T12:42:04.500Z",
+      "event_code": 3,
+      "event_id": "sysmon-prod-file-01-200015",
+      "identity_id": "identity-backup-01",
+      "process_guid": "{d76d33be-8f95-5a0a-8169-2b0104c26f0e}",
+      "related_transfer_id": "transfer-backup",
+      "session_id": "session-ad3ce4b92979bd3e757f"
+    },
+    {
+      "asset_id": "asset-0000019",
+      "at": "2026-10-22T12:42:05.000Z",
+      "event_code": 5,
+      "event_id": "sysmon-prod-file-01-200016",
+      "identity_id": "identity-backup-01",
+      "session_id": "session-ad3ce4b92979bd3e757f"
+    }
+  ],
+  "monitored_asset_id": "asset-0000019",
+  "related_recon_operation_id": "operation-0001",
+  "run_id": "run-e948987f440351200c64",
+  "schema_version": "1.0",
+  "source": "XmlWinEventLog:Microsoft-Windows-Sysmon/Operational"
+}
