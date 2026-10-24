@@ -1,0 +1,20 @@
+# Linked data access and egress fixture
+
+The story bundle contains a small synthetic object catalog without file contents. `data-objects.jsonl` records stable IDs, paths, classification, size, and owning asset. The user-facing sensor files contain only information available to their respective sources; `data-access-truth.json` holds the generator's session, object, and transfer links and should stay out of analyst-facing indexes.
+
+| File | Source-shaped observation |
+| --- | --- |
+| `windows-file.jsonl`, `windows-file.xml` | Windows Security 4663 successful file reads and 5145 denied share access check |
+| `zeek-conn.jsonl` | Zeek `conn` JSON with addresses, ports, UID, state, and IP byte counts |
+| `zeek-http.jsonl` | Zeek `http` JSON with method, host, URI, status, and request/response body lengths |
+| `egress-firewall.jsonl` | A project-owned firewall projection with allow/block action and byte counts |
+
+The operator signs in after the modeled group grant, reads a confidential report on `prod-file-01`, and makes a later HTTP POST from the bastion to an unauthorized external entity. The source logs support the read, the later network transfer, and correlation by user session, source host, time, and size. They do **not** prove that the POST contained the report's bytes. A separate 5145 failure shows a share-level denial for a restricted payroll object; it has no successful read or object-linked upload. The later blocked egress attempt has zero transferred payload and no Zeek flow or HTTP record. A service account reads an internal backup manifest and uploads to an approved provider, with a matching Sysmon 3 connection on the file server. An administrator makes a benign HTTP GET with response bytes. These controls keep bulk traffic and downloads distinguishable from the operator sequence.
+
+[Microsoft documents 4663](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/auditing/event-4663) as evidence that an access right was used and states that it has no failure variant. [5145](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/auditing/event-5145) can report share-level denial; NTFS-only denials do not produce a 5145 failure. The fixture models a share-level denial. Windows XML here is a synthetic projection of the documented event fields, not a captured event. The firewall format is project-owned and has no claimed vendor add-on.
+
+## Splunk mapping status
+
+The candidate apps are [Splunk Add-on for Microsoft Windows](https://splunkbase.splunk.com/app/742) **10.0.1** for the XML Security records and [TA for Zeek](https://splunkbase.splunk.com/app/5466/) **1.0.11** for the Zeek JSON. Archives were retrieved through [Splunk's Attack Range binary manifest](https://github.com/splunk/security_content/blob/develop/contentctl.yml), inspected locally in ignored `output/reference/`, and are not redistributed. Their SHA-256 hashes are, respectively, `444a0894c6a954f4453cf398e1414a29852de23bb7ea9121dd7c4144903a86c6` and `d5fabacc1cae4c66b19b633d165687f11e10772c1d734746e674e2ee9f7fdcfc`. Splunkbase itself requires login to download; these pinned copies may lag its current listings.
+
+The intended mappings are [Data Access](https://docs.splunk.com/Documentation/CIM/6.1.0/User/DataAccess) for Windows file auditing, [Network Traffic](https://help.splunk.com/en/data-management/common-information-model/6.3/data-models/network-traffic) for `zeek:conn`, and [Web](https://help.splunk.com/en/data-management/common-information-model/6.3/data-models/web) for `zeek:http`. The pinned Zeek add-on's event types and tags select these latter two models; its props map `orig_ip_bytes`/`resp_ip_bytes` to outbound/inbound bytes and HTTP body lengths to web byte fields. **Live CIM inclusion is unverified.** In a running Splunk test, ingest the XML with `XmlWinEventLog:Security` and Zeek JSON with the add-on's sourcetypes, then inspect extracted fields, tags, event types, data model membership, and direction of byte mappings. A generic firewall projection needs its own ingestion and mapping before any CIM claim.

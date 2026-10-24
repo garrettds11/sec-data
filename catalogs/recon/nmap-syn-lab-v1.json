@@ -1,0 +1,53 @@
+{
+  "id": "nmap-syn-lab-100",
+  "schema_version": "1.0",
+  "calibration_status": "capture_calibrated",
+  "reviewed_on": "2026-10-23",
+  "source": {
+    "title": "Nmap and Wireshark Lab: -sS capture",
+    "publisher": "Ryan Sapone",
+    "url": "https://github.com/Ryan-Sapone/Nmap-and-Wireshark-Lab/blob/main/SS%20Scan.pcapng",
+    "documentation_url": "https://github.com/Ryan-Sapone/Nmap-and-Wireshark-Lab/blob/main/README.md",
+    "published_on": null,
+    "revised_on": null,
+    "evidence_type": "controlled_research_capture",
+    "reuse_conditions": "No repository license was found. The PCAP is not redistributed; only measurements and port numbers are retained."
+  },
+  "capture": {
+    "sha256": "e44221a0e3d2ffb76b42ca9c341b4936ce0ab0fea754a482424718b4eb8ef660",
+    "size_bytes": 18652,
+    "capture_window_epoch": [1658092032.2331135, 1658092032.24433],
+    "scanner_ip": "192.168.12.235",
+    "target_ip": "192.168.12.148",
+    "topology": "Single local IPv4 scanner and target; README reports Netcat listeners on TCP 80, 143, and 995; other network details unknown",
+    "tool_profile": "Nmap -sS -F, per source README; exact full command and Nmap version unknown",
+    "sensor": "Wireshark capture; version, capture interface, and snap length unknown",
+    "extraction": "tools/inspect_pcapng.py: Ethernet/IPv4/TCP only; scanner-to-target TCP SYN without ACK; responses matched by target source port; no external labels trusted"
+  },
+  "measurements": {
+    "destination_ports": [7, 9, 13, 21, 22, 23, 25, 26, 37, 53, 79, 80, 81, 88, 106, 110, 111, 113, 119, 135, 139, 143, 144, 179, 199, 389, 427, 443, 444, 445, 465, 513, 514, 515, 543, 544, 548, 554, 587, 631, 646, 873, 990, 993, 995, 1025, 1026, 1027, 1028, 1029, 1110, 1433, 1720, 1723, 1755, 1900, 2000, 2001, 2049, 2121, 2717, 3000, 3128, 3306, 3389, 3986, 4899, 5000, 5009, 5051, 5060, 5101, 5190, 5357, 5432, 5631, 5666, 5800, 5900, 6000, 6001, 6646, 7070, 8000, 8008, 8009, 8080, 8081, 8443, 8888, 9100, 9999, 10000, 32768, 49152, 49153, 49154, 49155, 49156, 49157],
+    "open_ports": [80, 143, 995],
+    "syn_probes_per_port": 1,
+    "response_outcomes": {"syn_ack": 3, "rst": 97, "no_response": 0},
+    "packet_counts": {"scanner_to_target": 103, "target_to_scanner": 100, "total": 203},
+    "frame_bytes": {"syn": 60, "open_response": 58, "closed_response": 54, "open_reset": 60},
+    "probe_span_ms": 11.2165,
+    "probe_gap_ms": {"min": 0.0, "median": 0.0, "max": 2.531},
+    "response_delay_ms": {"min": 0.002, "median": 0.077, "max": 0.243},
+    "application_exchanges": 0
+  },
+  "comparison_tolerances": {
+    "destination_port_cardinality": "exactly 100, same measured set",
+    "outcomes": "exactly 3 answered and 97 rejected",
+    "packet_and_byte_totals": "exactly 203 packets: 3 open ports with 120 outbound + 58 inbound bytes, 97 closed ports with 60 outbound + 54 inbound bytes",
+    "probe_span_ms": "9 to 14; millisecond event timestamps round the measured 11.2165 ms window",
+    "response_delay_ms": "generated values within measured 0.002 to 0.243 ms; distribution is approximate",
+    "retries": "zero in this selected capture",
+    "application_exchanges": "zero; SYN scan does not establish an application session"
+  },
+  "implementation_assumptions": [
+    "The captured port set and outcome distribution are transplanted onto one synthetic inventory host with a service override for ports 80, 143, and 995",
+    "Probe order is shuffled per seed; exact wire order is not retained",
+    "The capture is a small single-target lab trace and does not calibrate the other scenario families, typical enterprise scanning, or source-compatible sensor schemas"
+  ]
+}
