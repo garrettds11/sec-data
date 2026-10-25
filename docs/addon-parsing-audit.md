@@ -34,18 +34,29 @@ project-owned normalized recon, edge, web-auth, alert, and case-action JSONL
 have no claimed vendor add-on; they need explicit sourcetypes and mapping if
 they are to participate in CIM searches.
 
-Before indexing the complete fixture, choose a path per source:
+## Selected direction
 
-1. If the aim is to exercise a vendor add-on, obtain a genuine sample through
-   its documented collection path, match its event framing and raw syntax,
-   then compare the generated record against the add-on's `props.conf`,
-   `transforms.conf`, `eventtypes.conf`, and `tags.conf`.
-2. If the aim is a stable CIM-ready synthetic dataset, retain the current
-   normalized/source-projection records and write a small project-owned Splunk
-   add-on with explicit JSON/XML extractions, field aliases, event types, and
-   tags. Do not assign a vendor sourcetype merely to obtain its tags.
-3. In either case, run a focused live ingest test and record `_time`, event
-   boundaries, extracted fields, tags, and data-model membership. Static
-   inspection cannot prove the effective Splunk configuration.
+The project will map its own synthetic formats with project-owned Splunk
+knowledge objects. The vendor add-ons are optional schema references, not
+runtime dependencies. The Splunk Common Information Model add-on remains the
+target for testing data-model membership in a live Splunk instance.
+
+Prefer the bundle's JSONL projections for the initial ingest. Give them
+project-owned sourcetypes, define explicit time and JSON extraction, then add
+only field aliases, calculated fields, event types, and tags supported by the
+observations. Keep generator truth files out of the analyst index. The XML
+projections and vendor-shaped Zeek JSON can remain as source-format examples;
+their resemblance to a vendor log does not make them compatible with that
+vendor's add-on.
+
+Run a focused live ingest test of the project-owned mapping and record
+`_time`, event boundaries, extracted fields, tags, and data-model membership.
+Static inspection cannot prove the effective Splunk configuration.
+
+If a future test specifically needs to exercise a vendor add-on, obtain a
+genuine sample through its documented collection path, match its event framing
+and raw syntax, then compare the generated record against the add-on's
+`props.conf`, `transforms.conf`, `eventtypes.conf`, and `tags.conf`. That is
+separate vendor-fidelity work, not a prerequisite for the synthetic CIM dataset.
 
 Track the live result and any generator or mapping changes in issue #22.
