@@ -36,18 +36,24 @@ they are to participate in CIM searches.
 
 ## Selected direction
 
-The project will map its own synthetic formats with project-owned Splunk
-knowledge objects. The vendor add-ons are optional schema references, not
-runtime dependencies. The Splunk Common Information Model add-on remains the
-target for testing data-model membership in a live Splunk instance.
+The project will emit a **separate CIM-shaped JSONL projection** from its
+synthetic world model, while retaining the source-shaped evidence. The current
+fixture is not already CIM-ready: for example, `dns.log` uses `id.orig_h` and
+`id.resp_h` rather than `src` and `dest`, and the Windows authentication JSONL
+uses `TargetUserName` and `IpAddress` rather than the corresponding CIM fields.
+The new projection should use CIM names and value semantics where the modeled
+source supports them, without inventing unavailable observations or leaking
+generator truth.
 
-Prefer the bundle's JSONL projections for the initial ingest. Give them
-project-owned sourcetypes, define explicit time and JSON extraction, then add
-only field aliases, calculated fields, event types, and tags supported by the
-observations. Keep generator truth files out of the analyst index. The XML
-projections and vendor-shaped Zeek JSON can remain as source-format examples;
-their resemblance to a vendor log does not make them compatible with that
-vendor's add-on.
+Give the CIM-shaped files project-owned sourcetypes and explicit event-time
+parsing. A small project-owned Splunk add-on can then provide event types,
+tags, and any remaining calculated fields or aliases. The vendor technology
+add-ons are optional schema references, not runtime dependencies. The Splunk
+Common Information Model add-on remains the target for testing data-model
+membership in a live Splunk instance. Keep generator truth files out of the
+analyst index. The XML projections and vendor-shaped Zeek JSON can remain as
+source-format examples; their resemblance to a vendor log does not make them
+compatible with that vendor's add-on.
 
 Run a focused live ingest test of the project-owned mapping and record
 `_time`, event boundaries, extracted fields, tags, and data-model membership.
