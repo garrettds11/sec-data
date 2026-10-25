@@ -50,6 +50,7 @@ These commands create `C:\code\vuln-findings.json` and `C:\code\compliance-findi
 | `docs/data-access.md` | File auditing, Zeek HTTP/conn, firewall controls, and CIM mapping status |
 | `docs/ingress.md` | Public NAT, edge and Zeek views, TLS visibility, and Splunk smoke test |
 | `docs/response.md` | Detection rules, analyst case, containment effect, and CIM smoke test |
+| `docs/addon-parsing-audit.md` | Offline comparison of generated records with pinned Splunk add-on parsing rules |
 
 ## Dataset behavior and limitations
 

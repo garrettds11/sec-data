@@ -40,6 +40,8 @@ It is not part of the one-campaign bundle or its manifest.
   handling. Use `dns-edge-cases.log` for that parser check.
 - The Windows XML files are synthetic event projections, and the Zeek JSON
   records are rendered by this generator, not captured from those products.
+  The [static add-on audit](../../docs/addon-parsing-audit.md) finds concrete
+  parser-format mismatches in the pinned Zeek, Windows, and Sysmon add-ons.
   Splunk time extraction, field aliases, tags, and CIM data-model membership
   remain unverified. Track live ingestion results in issue #22.
 - The response case deliberately treats the public probe as context; it does
