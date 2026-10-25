@@ -1,6 +1,8 @@
 """Check source-aware CIM projections and their manifest."""
 
+import configparser
 import json
+import re
 import tempfile
 import unittest
 from pathlib import Path
@@ -18,6 +20,8 @@ class CimProjectionTests(unittest.TestCase):
         event = project("recon.jsonl", row)
         self.assertEqual(event["sec_data_cim_dataset"], "Network_Resolution.DNS")
         self.assertEqual(event["reply_code"], "Non-Existent Domain")
+        self.assertEqual(event["reply_code_id"], 3)
+        self.assertEqual(event["record_type"], "A")
         self.assertEqual(event["response_time"], 0.041)
         self.assertEqual(event["answer_count"], 0)
         self.assertNotIn("tag", event)
@@ -29,7 +33,7 @@ class CimProjectionTests(unittest.TestCase):
                 "vulnerability_category": ["TLS"], "title": "Cipher issue",
                 "scanner_plugin_id": "123", "vulnerability_id": "PLUGIN-123"}
         event = project("vulnerability.jsonl", base)
-        self.assertEqual(event["time"], "2026-10-22T11:59:00Z")
+        self.assertEqual(event["time"], "2026-10-22T11:59:00.000Z")
         self.assertEqual(event["severity"], "informational")
         self.assertEqual(event["category"], "TLS")
         self.assertNotIn("cve", event)
@@ -60,6 +64,29 @@ class CimProjectionTests(unittest.TestCase):
             self.assertFalse((root / "cim" / "compliance.cim.jsonl").exists())
             with self.assertRaises(ValueError):
                 export_file("web-auth.jsonl", story / "web-auth.jsonl", root / "cim" / "web-auth.cim.jsonl")
+
+    def test_addon_routes_every_projected_dataset(self):
+        root = Path(__file__).resolve().parents[1] / "splunk" / "TA-sec-data-cim"
+        events = configparser.ConfigParser(interpolation=None)
+        tags = configparser.ConfigParser(interpolation=None)
+        props = configparser.ConfigParser(interpolation=None)
+        events.read(root / "default" / "eventtypes.conf")
+        tags.read(root / "default" / "tags.conf")
+        props.read(root / "default" / "props.conf")
+        datasets = {re.search(r'sec_data_cim_dataset="([^"]+)"',
+                              events[section]["search"]).group(1)
+                    for section in events.sections()}
+        self.assertEqual(datasets, {
+            "Network_Resolution.DNS", "Network_Traffic.All_Traffic", "Web.Web",
+            "Authentication.Authentication", "Vulnerabilities.Vulnerabilities",
+            "Endpoint.Processes", "Endpoint.Filesystem", "Endpoint.Registry",
+            "Data_Access.Data_Access", "Alerts.Alerts", "Change.All_Changes",
+            "TicketManagement.All_Ticket_Management"})
+        for section in events.sections():
+            self.assertIn("eventtype=" + section, tags)
+            self.assertTrue(all(value == "enabled" for value in tags["eventtype=" + section].values()))
+        self.assertEqual(props["secdata:cim:json"]["kv_mode"], "json")
+        self.assertEqual(props["secdata:cim:json"]["time_format"], "%Y-%m-%dT%H:%M:%S.%3NZ")
 
 
 if __name__ == "__main__":

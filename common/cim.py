@@ -26,7 +26,10 @@ def _time(value):
         return datetime.fromtimestamp(value, timezone.utc).isoformat(timespec="milliseconds").replace("+00:00", "Z")
     if not value:
         raise ValueError("Observation has no event time")
-    return value
+    parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    if parsed.tzinfo is None:
+        raise ValueError("Observation time must include a timezone")
+    return parsed.astimezone(timezone.utc).isoformat(timespec="milliseconds").replace("+00:00", "Z")
 
 
 def _put(out, row, **fields):
@@ -63,9 +66,16 @@ def project(source, row):
             _put(out, row, src="client_ip", src_port="client_port", dest="resolver_ip",
                  dest_port="resolver_port", query="query", query_type="query_type",
                  answer="answers", transaction_id="transaction_id", transport="transport")
+            out["record_type"] = row["query_type"]
+            out["query_count"] = 1
+            out["message_type"] = ("Response" if row.get("response_observed") or
+                                   row.get("rcode") is not None else "Query")
             out["answer_count"] = len(row.get("answers", []))
             if row.get("rcode") is not None:
                 out["reply_code"] = _dns_reply(row["rcode"])
+                if row["rcode"] in {"NOERROR": 0, "FORMERR": 1, "SERVFAIL": 2, "NXDOMAIN": 3}:
+                    out["reply_code_id"] = {"NOERROR": 0, "FORMERR": 1,
+                                            "SERVFAIL": 2, "NXDOMAIN": 3}[row["rcode"]]
             if row.get("response_time_ms") is not None:
                 out["response_time"] = row["response_time_ms"] / 1000
             if row.get("answer_ttls"):
@@ -101,6 +111,9 @@ def project(source, row):
         _zeek_flow(out, row)
         _put(out, row, query="query", query_type="qtype_name", answer="answers",
              transaction_id="trans_id", response_time="rtt")
+        out["record_type"] = row["qtype_name"]
+        out["query_count"] = 1
+        out["message_type"] = "Response" if row.get("rcode_name") is not None else "Query"
         out["answer_count"] = len(row.get("answers", []))
         if row.get("rcode_name") is not None:
             out["reply_code"] = _dns_reply(row["rcode_name"])

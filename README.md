@@ -34,6 +34,7 @@ These commands create `C:\code\vuln-findings.json` and `C:\code\compliance-findi
 | `create_recon_events.py` | Offline, scenario-driven normalized JSONL telemetry generator |
 | `create_story.py` | Linked inventory, finding, recon, DNS, ingress, identity, endpoint, data access, egress, response, and manifest bundle |
 | `create_cim_events.py` | Separate CIM-shaped JSONL projection of generated observations |
+| `splunk/TA-sec-data-cim/` | Project-owned Splunk add-on for JSON extraction, event types, and CIM tags |
 | `upload_to_aws.py` | Optional, separate AWS DynamoDB uploader |
 | `common/assets.py` | Shared synthetic inventory of 23 hosts |
 | `common/export.py` | Streaming JSON and JSONL output |
