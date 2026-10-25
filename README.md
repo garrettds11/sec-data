@@ -33,6 +33,7 @@ These commands create `C:\code\vuln-findings.json` and `C:\code\compliance-findi
 | `create_compliance_table.py` | Local compliance JSON generator |
 | `create_recon_events.py` | Offline, scenario-driven normalized JSONL telemetry generator |
 | `create_story.py` | Linked inventory, finding, recon, DNS, ingress, identity, endpoint, data access, egress, response, and manifest bundle |
+| `create_cim_events.py` | Separate CIM-shaped JSONL projection of generated observations |
 | `upload_to_aws.py` | Optional, separate AWS DynamoDB uploader |
 | `common/assets.py` | Shared synthetic inventory of 23 hosts |
 | `common/export.py` | Streaming JSON and JSONL output |
@@ -49,6 +50,7 @@ These commands create `C:\code\vuln-findings.json` and `C:\code\compliance-findi
 | `docs/data-access.md` | File auditing, Zeek HTTP/conn, firewall controls, and CIM mapping status |
 | `docs/ingress.md` | Public NAT, edge and Zeek views, TLS visibility, and Splunk smoke test |
 | `docs/response.md` | Detection rules, analyst case, containment effect, and CIM smoke test |
+| `docs/cim.md` | CIM projection coverage, commands, field decisions, and validation limits |
 
 ## Dataset behavior and limitations
 
@@ -60,6 +62,7 @@ These commands create `C:\code\vuln-findings.json` and `C:\code\compliance-findi
 - The recon generator writes analyst-facing normalized events separately from a truth manifest. Its optional small Nmap SYN profile is calibrated to a verified public lab capture; other profiles remain uncalibrated. No live Splunk ingestion validation is claimed. See [recon guide](docs/recon.md).
 - Use `--zeek-dns-output .\output\dns.log` with the recon generator for separate synthetic Zeek-shaped DNS JSONL. See [DNS guide](docs/dns.md); Splunk CIM mapping still requires an installed add-on test.
 - Use `create_story.py --start-time 2026-10-22T12:00:00Z --output-dir .\output\story-42` to export one reproducible linked run. See [story guide](docs/story.md).
+- Add `--cim-output-dir .\output\story-42-cim` to generate a separate CIM-shaped event bundle, or project an existing bundle with `create_cim_events.py`. See [CIM guide](docs/cim.md).
 
 ## Optional AWS upload (separate operation)
 
