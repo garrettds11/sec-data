@@ -1,0 +1,6 @@
+{"authorized":false,"entity_id":"entity-external-scanner-01","ip":"203.0.113.50","kind":"external_host","managed":false,"name":"external-scanner-01","role":"scanner","synthetic":true}
+{"authorized":true,"entity_id":"entity-approved-scanner-01","ip":"10.10.6.200","kind":"internal_host","managed":true,"name":"scanner-control.corp.example.local","role":"approved_scanner","synthetic":true}
+{"authorized":true,"entity_id":"entity-enterprise-resolver-01","ip":"10.10.4.10","kind":"internal_service","managed":true,"name":"enterprise-resolver-01","role":"dns_resolver","synthetic":true}
+{"authorized":false,"entity_id":"entity-external-upload-01","ip":"192.0.2.80","kind":"external_service","managed":false,"name":"files.example.net","role":"upload_endpoint","synthetic":true}
+{"authorized":true,"entity_id":"entity-backup-provider-01","ip":"192.0.2.81","kind":"external_service","managed":false,"name":"backup.example.net","role":"backup_provider","synthetic":true}
+{"authorized":false,"entity_id":"entity-denied-egress-01","ip":"203.0.113.80","kind":"external_service","managed":false,"name":"blocked.example.net","role":"blocked_destination","synthetic":true}

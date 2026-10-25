@@ -38,6 +38,7 @@ These commands create `C:\code\vuln-findings.json` and `C:\code\compliance-findi
 | `common/export.py` | Streaming JSON and JSONL output |
 | `catalogs/compliance/*.json` | Independently authored illustrative controls |
 | `tests/` | Python unittest checks |
+| `tests/fixtures/` | Small generated story records, DNS edge cases, and review notes |
 | `docs/windows-software-requirements.md` | Supported Windows tooling and optional prerequisites |
 | `docs/work-instructions-windows-vscode.md` | End-to-end usage, unit testing and VS Code debugging |
 | `docs/scale.md` | Scale, snapshots, catalog extension, and measured benchmarks |
@@ -49,6 +50,7 @@ These commands create `C:\code\vuln-findings.json` and `C:\code\compliance-findi
 | `docs/data-access.md` | File auditing, Zeek HTTP/conn, firewall controls, and CIM mapping status |
 | `docs/ingress.md` | Public NAT, edge and Zeek views, TLS visibility, and Splunk smoke test |
 | `docs/response.md` | Detection rules, analyst case, containment effect, and CIM smoke test |
+| `docs/addon-parsing-audit.md` | Offline comparison of generated records with pinned Splunk add-on parsing rules |
 
 ## Dataset behavior and limitations
 
@@ -60,6 +62,7 @@ These commands create `C:\code\vuln-findings.json` and `C:\code\compliance-findi
 - The recon generator writes analyst-facing normalized events separately from a truth manifest. Its optional small Nmap SYN profile is calibrated to a verified public lab capture; other profiles remain uncalibrated. No live Splunk ingestion validation is claimed. See [recon guide](docs/recon.md).
 - Use `--zeek-dns-output .\output\dns.log` with the recon generator for separate synthetic Zeek-shaped DNS JSONL. See [DNS guide](docs/dns.md); Splunk CIM mapping still requires an installed add-on test.
 - Use `create_story.py --start-time 2026-10-22T12:00:00Z --output-dir .\output\story-42` to export one reproducible linked run. See [story guide](docs/story.md).
+- A checked-in seed-42 story bundle and an extra DNS edge-case sample are in [test fixtures](tests/fixtures/README.md). The manifest supports offline integrity checks; live Splunk CIM validation is still pending.
 
 ## Optional AWS upload (separate operation)
 

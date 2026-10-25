@@ -1,0 +1,105 @@
+{
+  "accesses": [
+    {
+      "action": "read",
+      "asset_id": "asset-0000019",
+      "at": "2026-10-22T12:39:05.000Z",
+      "event_id": "windows-prod-file-01-300001",
+      "identity_id": "identity-operator-01",
+      "object_id": "object-finance-report",
+      "result": "success",
+      "session_id": "session-716d4329f05119032796",
+      "source_asset_id": "asset-0000022"
+    },
+    {
+      "action": "read",
+      "asset_id": "asset-0000019",
+      "at": "2026-10-22T12:39:06.000Z",
+      "event_id": "windows-prod-file-01-300002",
+      "identity_id": "identity-operator-01",
+      "object_id": "object-payroll",
+      "result": "denied",
+      "session_id": "session-716d4329f05119032796",
+      "source_asset_id": "asset-0000022"
+    },
+    {
+      "action": "read",
+      "asset_id": "asset-0000019",
+      "at": "2026-10-22T12:42:04.000Z",
+      "event_id": "windows-prod-file-01-300003",
+      "identity_id": "identity-backup-01",
+      "object_id": "object-backup-manifest",
+      "result": "success",
+      "session_id": "session-ad3ce4b92979bd3e757f",
+      "source_asset_id": "asset-0000019"
+    }
+  ],
+  "notes": [
+    "Object payloads are not generated",
+    "HTTP observes byte counts, not file identity"
+  ],
+  "run_id": "run-e948987f440351200c64",
+  "schema_version": "1.0",
+  "transfers": [
+    {
+      "at": "2026-10-22T12:33:04.000Z",
+      "body_bytes": 0,
+      "destination_entity_id": "entity-backup-provider-01",
+      "evidence_limit": null,
+      "firewall_index": 0,
+      "identity_id": "identity-admin-01",
+      "method": "GET",
+      "related_read_event_id": null,
+      "result": "allow",
+      "session_id": "session-61a0cf22de07aa87a321",
+      "source_asset_id": "asset-0000017",
+      "transfer_id": "transfer-admin-download",
+      "uid": "C0000002a0004"
+    },
+    {
+      "at": "2026-10-22T12:39:10.000Z",
+      "body_bytes": 4096,
+      "destination_entity_id": "entity-external-upload-01",
+      "evidence_limit": "correlated timing and size; content identity not observed",
+      "firewall_index": 1,
+      "identity_id": "identity-operator-01",
+      "method": "POST",
+      "related_read_event_id": "windows-prod-file-01-300001",
+      "result": "allow",
+      "session_id": "session-716d4329f05119032796",
+      "source_asset_id": "asset-0000022",
+      "transfer_id": "transfer-finance",
+      "uid": "C0000002a0001"
+    },
+    {
+      "at": "2026-10-22T12:39:12.000Z",
+      "body_bytes": 0,
+      "destination_entity_id": "entity-denied-egress-01",
+      "evidence_limit": null,
+      "firewall_index": 2,
+      "identity_id": "identity-operator-01",
+      "method": "POST",
+      "related_read_event_id": null,
+      "result": "block",
+      "session_id": "session-716d4329f05119032796",
+      "source_asset_id": "asset-0000022",
+      "transfer_id": "transfer-blocked",
+      "uid": null
+    },
+    {
+      "at": "2026-10-22T12:42:05.000Z",
+      "body_bytes": 16384,
+      "destination_entity_id": "entity-backup-provider-01",
+      "evidence_limit": "correlated timing and size; content identity not observed",
+      "firewall_index": 3,
+      "identity_id": "identity-backup-01",
+      "method": "POST",
+      "related_read_event_id": "windows-prod-file-01-300003",
+      "result": "allow",
+      "session_id": "session-ad3ce4b92979bd3e757f",
+      "source_asset_id": "asset-0000019",
+      "transfer_id": "transfer-backup",
+      "uid": "C0000002a0003"
+    }
+  ]
+}
