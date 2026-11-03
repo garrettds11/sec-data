@@ -144,7 +144,7 @@ def project(source, row):
     elif source in ("ingress-zeek-conn.jsonl", "zeek-conn.jsonl"):
         model = "Network_Traffic.All_Traffic"
         _zeek_flow(out, row)
-        _put(out, row, bytes_in="orig_ip_bytes", bytes_out="resp_ip_bytes",
+        _put(out, row, bytes_out="orig_ip_bytes", bytes_in="resp_ip_bytes",
              duration="duration", app="service", connection_state="conn_state")
         out["bytes"] = row.get("orig_ip_bytes", 0) + row.get("resp_ip_bytes", 0)
     elif source in ("ingress-zeek-http.jsonl", "zeek-http.jsonl"):
@@ -218,7 +218,18 @@ def project(source, row):
             out["object_path"] = row.get("ShareLocalPath", "") + "\\" + row["RelativeTargetName"]
         out["object"] = PureWindowsPath(out["object_path"]).name
         out["object_category"] = "file"
-        out["action"] = "read"
+        if row["EventCode"] == 4663:
+            out["action"] = "read"
+            out["access_result"] = "success"
+        else:
+            # 5145 is a share access check, not proof that a read occurred.
+            out["action"] = "unknown"
+            if row.get("Keywords"):
+                failure = bool(int(row["Keywords"], 16) & 0x0010000000000000)
+                out["access_result"] = "failure" if failure else "success"
+            if row.get("AccessMask") == "0x1":
+                out["requested_action"] = "read"
+            _put(out, row, access_reason="AccessReason")
         out["event_id"] = f"file-{row['Computer']}-{row['EventRecordID']}"
     elif source == "alerts.jsonl":
         model = "Alerts.Alerts"

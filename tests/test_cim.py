@@ -57,6 +57,26 @@ class CimProjectionTests(unittest.TestCase):
         event = project("egress-firewall.jsonl", row)
         self.assertEqual((event["action"], event["bytes"]), ("blocked", 25))
 
+    def test_zeek_byte_direction(self):
+        row = {"ts": 1792672750.0, "id.orig_h": "10.10.6.32",
+               "id.resp_h": "192.0.2.80", "orig_ip_bytes": 4476,
+               "resp_ip_bytes": 320}
+        event = project("zeek-conn.jsonl", row)
+        self.assertEqual((event["bytes_out"], event["bytes_in"], event["bytes"]),
+                         (4476, 320, 4796))
+
+    def test_denied_share_check_is_not_a_read(self):
+        row = {"TimeCreated": "2026-10-22T12:39:06Z", "EventCode": 5145,
+               "Computer": "file.example", "EventRecordID": 2,
+               "ShareLocalPath": "D:\\Shares", "RelativeTargetName": "HR\\payroll.csv",
+               "Keywords": "0x8010000000000000", "AccessMask": "0x1",
+               "AccessReason": "%%4416: %%1802"}
+        event = project("windows-file.jsonl", row)
+        self.assertEqual(event["action"], "unknown")
+        self.assertEqual(event["access_result"], "failure")
+        self.assertEqual(event["requested_action"], "read")
+        self.assertEqual(event["access_reason"], "%%4416: %%1802")
+
     def test_case_action_retains_observed_links(self):
         row = {"time": "2026-10-22T12:39:12Z", "case_id": "case-1",
                "action_id": "action-1", "action": "opened", "status": "investigating",
