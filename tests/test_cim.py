@@ -81,7 +81,7 @@ class CimProjectionTests(unittest.TestCase):
             "Authentication.Authentication", "Vulnerabilities.Vulnerabilities",
             "Endpoint.Processes", "Endpoint.Filesystem", "Endpoint.Registry",
             "Data_Access.Data_Access", "Alerts.Alerts", "Change.All_Changes",
-            "TicketManagement.All_Ticket_Management"})
+            "Ticket_Management.All_Ticket_Management"})
         for section in events.sections():
             self.assertIn("eventtype=" + section, tags)
             self.assertTrue(all(value == "enabled" for value in tags["eventtype=" + section].values()))

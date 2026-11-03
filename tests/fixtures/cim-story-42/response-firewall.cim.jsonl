@@ -1,0 +1,1 @@
+{"action":"blocked","bytes":0,"bytes_in":0,"bytes_out":0,"dest":"192.0.2.80","dest_port":80,"dvc":"edge-fw-01","rule":"block-bastion-to-upload-endpoint","sec_data_cim_dataset":"Network_Traffic.All_Traffic","sec_data_source":"response-firewall.jsonl","src":"10.10.6.32","src_port":51100,"synthetic":true,"time":"2026-10-22T12:39:16.050Z","transport":"tcp"}

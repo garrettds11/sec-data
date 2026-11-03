@@ -227,7 +227,7 @@ def project(source, row):
         out["description"] = row["title"]
         out["app"] = "sec-data detector"
     elif source == "case-actions.jsonl":
-        model = "TicketManagement.All_Ticket_Management"
+        model = "Ticket_Management.All_Ticket_Management"
         _put(out, row, ticket_id="case_id", status="status", action="action",
              event_id="action_id")
     else:

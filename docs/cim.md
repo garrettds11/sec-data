@@ -1,6 +1,6 @@
 # CIM-shaped synthetic observations
 
-`create_cim_events.py` creates separate JSONL files with Splunk CIM field names. It reads the existing synthetic observations without changing their source files or scenario truth. Its mapping reference is Splunk CIM **8.8**. The project-owned `splunk/TA-sec-data-cim` add-on supplies a synthetic sourcetype, JSON and timestamp extraction, event types, tags, and global visibility. No live Splunk validation is claimed.
+`create_cim_events.py` creates separate JSONL files with Splunk CIM field names. It reads the existing synthetic observations without changing their source files or scenario truth. Its mapping reference is Splunk CIM **8.8**. The project-owned `splunk/TA-sec-data-cim` add-on supplies a synthetic sourcetype, JSON and timestamp extraction, event types, tags, and global visibility. A deterministic fixture has also been tested against Splunk Enterprise 10.4.0 and the CIM add-on 8.7.0; see [the lab validation report](splunk-validation.md).
 
 ## Generate
 
@@ -25,7 +25,7 @@ python create_recon_events.py --start-time 2026-10-22T12:00:00Z --output .\outpu
 python create_cim_events.py --input-file .\output\recon.jsonl --source recon.jsonl --output-file .\output\recon.cim.jsonl
 ```
 
-The story projection creates one `.cim.jsonl` file per observed source and a `cim-manifest.json` with source and output checksums, counts, unmapped counts, and validation status. All output paths must be new.
+The story projection creates one `.cim.jsonl` file per observed source and a `cim-manifest.json` with source and output checksums, counts, unmapped counts, and validation status. All output paths must be new. A small deterministic set of these files is committed under `tests/fixtures/cim-story-42/`.
 
 ## Mapping coverage
 
@@ -39,7 +39,7 @@ The story projection creates one `.cim.jsonl` file per observed source and a `ci
 | Sysmon | Endpoint Processes, Filesystem, Registry; Network Traffic | Process and file actions come from the Sysmon event code. |
 | Windows file audit | Data Access | Share path is assembled from the observed local share path and relative target. |
 | vulnerability baseline/follow-up | Vulnerabilities | Only actual CVE IDs populate `cve`; scanner-only plugins still have a signature. |
-| alerts and case actions | Alerts and TicketManagement | Describes detector output and case history, not raw activity. |
+| alerts and case actions | Alerts and Ticket_Management | Describes detector output and case history, not raw activity. |
 
 Inventory, entities, identities, policies, compliance assessment snapshots, timeline, state changes, and truth manifests remain outside the CIM event projection. A compliance snapshot has no direct event mapping here; the status remains available in the source bundle for context.
 
@@ -51,4 +51,4 @@ Install `splunk/TA-sec-data-cim` as one app on the appropriate Splunk parsing an
 
 The add-on uses `props.conf` for one-line JSON and UTC millisecond timestamps, `eventtypes.conf` to select the twelve projected datasets by `sec_data_cim_dataset`, `tags.conf` for their CIM tags, and `metadata/default.meta` to expose the knowledge objects to the CIM app. One app handles all generated sources because they share a JSON structure; `sec_data_source` retains each originating generator view. If a future source needs a distinct parser, it can get its own project-owned sourcetype in this add-on. The add-on does not create an input or choose an index because those are deployment-specific.
 
-Before declaring the data CIM compliant in Splunk, ingest a deterministic fixture with this add-on and verify `_time`, JSON extraction, event types, tags, and representative events in each intended data model. Compare source and projected counts using the manifest and inspect field values, especially action and byte direction. Pin the Splunk platform and CIM add-on versions during that live test. Splunk documentation: [CIM DNS](https://help.splunk.com/en/data-management/common-information-model/8.8/data-models/network-resolution-dns), [CIM Network Traffic](https://help.splunk.com/en/data-management/common-information-model/8.8/data-models/network-traffic), [CIM Vulnerabilities](https://help.splunk.com/en/data-management/common-information-model/8.8/data-models/vulnerabilities), [event types and tags](https://help.splunk.com/en/splunk-cloud-platform/manage-knowledge-objects/knowledge-management-manual/10.5.2605/event-types/about-event-types).
+For another Splunk or CIM version, repeat the live checks for `_time`, JSON extraction, event types, tags, and representative fields in each intended data model. Compare source and projected counts using the manifest and inspect field values, especially action and byte direction. Data-model membership by itself does not prove every field has the intended semantics. Splunk documentation: [CIM DNS](https://help.splunk.com/en/data-management/common-information-model/8.8/data-models/network-resolution-dns), [CIM Network Traffic](https://help.splunk.com/en/data-management/common-information-model/8.8/data-models/network-traffic), [CIM Vulnerabilities](https://help.splunk.com/en/data-management/common-information-model/8.8/data-models/vulnerabilities), [event types and tags](https://help.splunk.com/en/splunk-cloud-platform/manage-knowledge-objects/knowledge-management-manual/10.5.2605/event-types/about-event-types).
