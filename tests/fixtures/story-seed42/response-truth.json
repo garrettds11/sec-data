@@ -1,0 +1,11 @@
+{
+  "blocked_retry_at": "2026-10-22T12:39:16.050Z",
+  "blocked_retry_destination_entity_id": "entity-external-upload-01",
+  "case_id": "case-f8db413e2d670ad9",
+  "containment_effective_at": "2026-10-22T12:39:15.050Z",
+  "expected_outcome": "blocked retry; report content identity not sensor-proven",
+  "run_id": "run-e948987f440351200c64",
+  "schema_version": "1.0",
+  "suppressed_control_entity_id": "entity-approved-scanner-01",
+  "trigger_transfer_id": "transfer-finance"
+}

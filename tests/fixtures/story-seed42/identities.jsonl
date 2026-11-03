@@ -1,0 +1,4 @@
+{"account":"LAB\\analyst","enabled":true,"groups":["File Readers"],"identity_id":"identity-analyst-01","kind":"user","synthetic":true}
+{"account":"LAB\\operator","enabled":true,"groups":[],"identity_id":"identity-operator-01","kind":"user","synthetic":true}
+{"account":"LAB\\admin","enabled":true,"groups":["Domain Admins"],"identity_id":"identity-admin-01","kind":"user","synthetic":true}
+{"account":"LAB\\svc_backup","enabled":true,"groups":["Backup Operators"],"identity_id":"identity-backup-01","kind":"service_account","synthetic":true}

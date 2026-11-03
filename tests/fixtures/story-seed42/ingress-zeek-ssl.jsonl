@@ -1,0 +1,1 @@
+{"cipher":"TLS_AES_128_GCM_SHA256","established":true,"id.orig_h":"203.0.113.50","id.orig_p":61566,"id.resp_h":"10.10.1.11","id.resp_p":443,"next_protocol":"http/1.1","resumed":false,"server_name":"prod-web-02.corp.example.local","ts":1792670448.02,"uid":"Ca650a6082dc92b20","version":"TLSv13"}

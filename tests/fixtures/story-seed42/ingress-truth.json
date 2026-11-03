@@ -1,0 +1,57 @@
+{
+  "interactions": [
+    {
+      "application_event_id": null,
+      "at": "2026-10-22T12:00:04.400Z",
+      "firewall_index": 0,
+      "network_event_id": "3dd7706d9f641c9e2dd34e7f",
+      "public_destination": "198.51.100.11",
+      "source_ip": "203.0.113.50",
+      "target_asset_id": "asset-0000000",
+      "translated_destination": null,
+      "zeek_uid": null
+    },
+    {
+      "application_event_id": "797d60c69c6f72ccdc5238c3",
+      "at": "2026-10-22T12:00:43.000Z",
+      "firewall_index": 1,
+      "network_event_id": "838cc96afef9d1f9f099c7d1",
+      "proxy_index": 0,
+      "public_destination": "198.51.100.12",
+      "source_ip": "203.0.113.50",
+      "target_asset_id": "asset-0000001",
+      "translated_destination": "10.10.1.11",
+      "zeek_uid": "Cb4586dc9e5392f71"
+    },
+    {
+      "application_event_id": "9eeeb3e09b46abb021a52de5",
+      "at": "2026-10-22T12:00:48.000Z",
+      "firewall_index": 2,
+      "network_event_id": "9a8e837c8e19cab341a0e7c7",
+      "proxy_index": 1,
+      "public_destination": "198.51.100.12",
+      "source_ip": "203.0.113.50",
+      "target_asset_id": "asset-0000001",
+      "translated_destination": "10.10.1.11",
+      "zeek_uid": "Ca650a6082dc92b20"
+    },
+    {
+      "application_event_id": "19bcea1e928f050d2d92fea8",
+      "at": "2026-10-22T12:00:52.000Z",
+      "firewall_index": 3,
+      "network_event_id": "b085d1ccf3a48734cacf7d80",
+      "proxy_index": 2,
+      "public_destination": null,
+      "source_ip": "10.30.2.22",
+      "target_asset_id": "asset-0000000",
+      "translated_destination": "10.10.1.10",
+      "zeek_uid": "Cfad3f42fbbd539c3"
+    }
+  ],
+  "notes": [
+    "Zeek observes TLS metadata, not encrypted paths",
+    "Firewall byte counts are modeled after request completion"
+  ],
+  "run_id": "run-e948987f440351200c64",
+  "schema_version": "1.0"
+}

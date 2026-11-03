@@ -1,0 +1,237 @@
+{
+  "assessment_time": "2026-10-22T11:59:00Z",
+  "campaign_count": 1,
+  "duration_minutes": 60,
+  "files": {
+    "access-policies.jsonl": {
+      "records": 5,
+      "sha256": "a182a6cc48389abc438acc39dd8afbcf848bc93be0947dad9d1bcec21a354a2b"
+    },
+    "alerts.jsonl": {
+      "records": 2,
+      "sha256": "d95731a0edcebba6a95b95eb67d65e7b23b08ad418644ec3250dec954eee8a34"
+    },
+    "assets.jsonl": {
+      "records": 23,
+      "sha256": "9d360300f6d12eb9c33725acdbfa6c627ab3e40718f417a09fc0688a43951ea8"
+    },
+    "case-actions.jsonl": {
+      "records": 7,
+      "sha256": "c3a15f9d7ec3f9a99d82f7b009d2c36a8f9427d1d021b14b64eca2818be6df0c"
+    },
+    "compliance-followup.jsonl": {
+      "records": 21,
+      "sha256": "679430c2f5262b638deb23fe29bc295043164e636c2682e3b8bc3d6a5a8322cb"
+    },
+    "compliance.jsonl": {
+      "records": 21,
+      "sha256": "c52802ae39d458567870e0133117e8a680a900903bdc379a87e06841ae72fd94"
+    },
+    "data-access-truth.json": {
+      "sha256": "d9c707dfe7fcdbcad9415d2f22b521ebb41858a57dc7eb43eeead208703e1107"
+    },
+    "data-objects.jsonl": {
+      "records": 3,
+      "sha256": "7649d1cb19ba3dd99e372f455338dab0494d7012541efcfc5ec606d8e0e3b71b"
+    },
+    "detection-decisions.jsonl": {
+      "records": 3,
+      "sha256": "9f437f7f0c71af2df55086ed328401e33e1709a82ac5af21a7d7eb2911097532"
+    },
+    "detection-rules.jsonl": {
+      "records": 2,
+      "sha256": "767442ca88090bce105ba6a03d7a1542cf3bbb0c0362aeb358a5af504a5d0278"
+    },
+    "dns.log": {
+      "records": 8,
+      "sha256": "266a12f61944f57117281da33695be08172b9ae95d2eea25729a2cd34e219d54"
+    },
+    "edge-proxy.jsonl": {
+      "records": 3,
+      "sha256": "0c1f1fdd8b67364b0106552fffe011ab922af9035ee790a6a84a1d06fe28226c"
+    },
+    "egress-firewall.jsonl": {
+      "records": 4,
+      "sha256": "fea330efe09ed8f1e2859144b99e287175f6c427588273585cca2c4db943122f"
+    },
+    "endpoint-truth.json": {
+      "sha256": "2c35a55e7a854d50188fb6cb03ff06283ec1d0c20eab9286d1542993b31d015e"
+    },
+    "entities.jsonl": {
+      "records": 6,
+      "sha256": "aa231e93cd5ec7337751cd50853df44fecc92051fbd25b252d94c394887b45e5"
+    },
+    "identities.jsonl": {
+      "records": 4,
+      "sha256": "e086aa547d6064f4f16b35bd6a483f803bd19bd2d78a12984b56f030b95a8eb6"
+    },
+    "identity-state.jsonl": {
+      "records": 2,
+      "sha256": "53090e0882b34df861de3f5abbfc8bd1042eee77c16399d92b666709f9ca8a99"
+    },
+    "identity-truth.json": {
+      "sha256": "b06a9154152e793fe1f068ca1b0fa7c636b405f852d6bf3b9e323bbff04522a6"
+    },
+    "ingress-firewall.jsonl": {
+      "records": 4,
+      "sha256": "66e6132760ae611320f0698116d098cc6248e7599f01a9c1cbd223f5206314a6"
+    },
+    "ingress-truth.json": {
+      "sha256": "3c00d8c38baf4a3ccf8f82419c677f6b5b5407351a38a81463f70c684f7aef76"
+    },
+    "ingress-zeek-conn.jsonl": {
+      "records": 3,
+      "sha256": "b55e2e92ca51226ee71ac7d243795700298fa66115644aab972c0e241c10de39"
+    },
+    "ingress-zeek-http.jsonl": {
+      "records": 2,
+      "sha256": "27a0aeaa2fa3bb10a3cd9e0b702cf68f11097c0b5e7b9d08b1720e0435319237"
+    },
+    "ingress-zeek-ssl.jsonl": {
+      "records": 1,
+      "sha256": "2a866a56eccc57a342039d9fc236e13e6434f0c48c83f9575759a10ae6c2118c"
+    },
+    "recon-truth.json": {
+      "sha256": "84ea76201f2bbba5da9a3bd050f65caab26da4571296f37b722be42b34d9843a"
+    },
+    "recon.jsonl": {
+      "records": 89,
+      "sha256": "af66bb70bf2b87f7254ad79aecafc30a4c3bd8a79b7018bf6886a8a372e2b385"
+    },
+    "relationships.jsonl": {
+      "records": 87,
+      "sha256": "d19cf7eff72eae8e4e5a040cda3e52fc5ece4d660f98cab4601b8221b716a1c9"
+    },
+    "response-firewall.jsonl": {
+      "records": 1,
+      "sha256": "5e07afa7fadb9ec8c9a94039f7acac858e9f724ba4d66a082d56b9b53841e1aa"
+    },
+    "response-truth.json": {
+      "sha256": "3e5749751318045a2d04cd920dca922b7ac4eca1cdc8b109273f556ea9f41d18"
+    },
+    "sensor-coverage.jsonl": {
+      "records": 23,
+      "sha256": "2d4630b3759fb745a9f0288227cc03fc96870a9502fa92fee6235c24bea51d79"
+    },
+    "state-changes.jsonl": {
+      "records": 2,
+      "sha256": "e4c2f093d1bc17490fa8dd5dfcf96fe3d6cd057f725682d5b67197d352641e80"
+    },
+    "sysmon.jsonl": {
+      "records": 16,
+      "sha256": "dbad4018761ccdbb2fd1d6a637ee39cd7c6ab193624d0f3e8c326ddfaf4309c0"
+    },
+    "sysmon.xml": {
+      "records": 16,
+      "sha256": "aae0983675e2730685df5b9525f3c27b3ae74110cb5008fcb13654eacafd2b5e"
+    },
+    "timeline.jsonl": {
+      "records": 59,
+      "sha256": "75dd87794f028c807fb88a29cad1c82ae296c3378365fbfb01e6bddb490554f6"
+    },
+    "vulnerability-followup.jsonl": {
+      "records": 68,
+      "sha256": "a192c9afa041d7eed4c838648e608efe702222597a1685b519a3693735ee3a77"
+    },
+    "vulnerability.jsonl": {
+      "records": 68,
+      "sha256": "9290e31353d902f67063eba81a028c671e0d69552d919f57056b095c3dcf004a"
+    },
+    "web-auth.jsonl": {
+      "records": 6,
+      "sha256": "91313a8383631b3fbcd9b8bd380e831f3d6efc794e40aa0f7d5125ab7bd44e2a"
+    },
+    "windows-file.jsonl": {
+      "records": 3,
+      "sha256": "b6a7e3d10d3e55167d1bab8d1f6cce3704a7cc6d9edec88b8c72adc5c97736eb"
+    },
+    "windows-file.xml": {
+      "records": 3,
+      "sha256": "a9d54a041cea1defcd4ebeef6a222e7f98a7dd67d3da27f65b65c9909da9506c"
+    },
+    "windows-security.jsonl": {
+      "records": 6,
+      "sha256": "5df646a119231ef4125f68cfe3831bf31e0e32681872b8393ace627f6408ce2a"
+    },
+    "windows-security.xml": {
+      "records": 6,
+      "sha256": "e9a8bf21d2358d9861228ddbbd49d8cc71128ef234612453d205ea3a1e1b23d8"
+    },
+    "zeek-conn.jsonl": {
+      "records": 3,
+      "sha256": "79d4bff9126806e08365852e64489ddfb668f819e1eaa3128d3045b2ee7fde53"
+    },
+    "zeek-http.jsonl": {
+      "records": 3,
+      "sha256": "7c3439f21131d0a70f14814e80f6700a7885523ad05b6157c703e65c038f41b0"
+    }
+  },
+  "filtered_vulnerability_findings": {
+    "unsupported_service": 22
+  },
+  "followup_time": "2026-10-22T12:47:55Z",
+  "generator_versions": {
+    "data_access": "1.0",
+    "endpoint": "1.0",
+    "identity": "1.0",
+    "ingress": "1.0",
+    "recon": "1.1",
+    "response": "1.0",
+    "world": "1.0"
+  },
+  "host_count": 23,
+  "notes": [
+    "All source formats are synthetic",
+    "Scenario truth is separate from observations",
+    "Recon and identity activity currently use the default 23 hosts",
+    "Windows XML, Sysmon XML, Zeek HTTP/conn, and web authentication CIM mappings are not live validated",
+    "Network byte counts and timing do not prove uploaded content identity"
+  ],
+  "recipe_files": {
+    "catalogs/compliance/ubuntu-2204.json": "55a3049eb11716e1d490c7c223a14a43fab8c76ea5061d83ed6806af508a48a4",
+    "catalogs/compliance/windows-server-2022.json": "b3d3512c685cbf444be1a2cd517288e7102c8d4f9382376ff916708de78c7f12",
+    "catalogs/recon/evidence-v1.json": "469d894949a012d0ced70979b49d4e373e6f845027e1a4eb3868ef2f36494512",
+    "catalogs/recon/nmap-syn-lab-v1.json": "fb5103bb422970a05d3f8ce484cc3b4f923b29b8738c21f647592f4f48f9fc3b",
+    "catalogs/vulnerability/illustrative.json": "8d60ebea93d7c459ea74cad064f94998b91d8768b822d3cbc4c34a27df5529c5",
+    "common/assets.py": "712e4bafcc6cc2df2ca16bbf7d99d8f0987bd3a7d78d5370d4e3978b638361aa",
+    "common/data_access.py": "a0cb58adbbd5d49e8eecd58fe812c2a896f7e4a4b8e54910ac9fcba1c17f80c9",
+    "common/endpoint.py": "06385d272829df4e9ee7bf96d3317cda23a62df3da4c55b9fe711c63d42fcc4f",
+    "common/export.py": "e26682647c1fb530cbea25caf88a4a1fa354fce749c8878bda3b27a6b86ac31d",
+    "common/identity.py": "9cd25b3bab7673581d08d7ff456fa82d5bbd60be8b6b3b8534c89843350004cc",
+    "common/ingress.py": "7da8cf026b99064128a69b6aadb249dbee715bc1a8a449061ea19c1bc419173f",
+    "common/response.py": "7eefee909dc9be6228181ab43f9a879ef36b5a0967f867a8dac3680d555dbbbc",
+    "common/story_validation.py": "3489f77f6fbcb48f5704367b4d08852ad3e7292470318e02d20e5948945bae23",
+    "common/world.py": "ffa9128dfae2bbad5eca7a6b183dc38d1ae525ce98611a8e7270089cef27606a",
+    "common/zeek_dns.py": "c26fb00d507747d6419a09635783fa89c8abe677c57a3d2930da9ca34221299d",
+    "create_compliance_table.py": "2e76d0682880ff0992e2d6304fce54ac5e300fdeee9158db07287a4d7ea88e69",
+    "create_recon_events.py": "1f6254800e6bb495d773b9276cb57f378cd183c110bf2e76fb9dd33029989b58",
+    "create_story.py": "de43211597f1ae01f3708100a7fde44b4fc63ad815422dd022ed5e4a2e08d221",
+    "create_vuln_table.py": "f9bbf2723050892b169916cbefa40cba48e36fcc44369f562335a5b56cc58ef0"
+  },
+  "recipe_sha256": "909a98b49237cc060d8799d1408010d41c62083c86634be9066756b30d2a0a75",
+  "remediation_time": "2026-10-22T12:46:55Z",
+  "run_id": "run-e948987f440351200c64",
+  "schema_version": "1.0",
+  "seed": 42,
+  "start_time": "2026-10-22T12:00:00Z",
+  "validation": {
+    "assets": 23,
+    "case_actions": 7,
+    "detection_decisions": 3,
+    "dns_events": 8,
+    "endpoint_events": 16,
+    "endpoint_processes": 5,
+    "file_audit_events": 3,
+    "firewall_events": 4,
+    "identities": 4,
+    "identity_changes": 2,
+    "identity_events": 12,
+    "ingress_firewall_events": 4,
+    "ingress_flows": 3,
+    "ingress_tls": 1,
+    "recon_events": 89,
+    "response_alerts": 2,
+    "state_changes": 2,
+    "zeek_connections": 3
+  }
+}

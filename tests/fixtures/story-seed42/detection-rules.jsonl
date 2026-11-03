@@ -1,0 +1,2 @@
+{"collection_lag_seconds":0,"rule_id":"recon-port-burst","signal":"network probe burst","source":"recon.jsonl","suppression":"authorized scanner entity in inventory","threshold":3,"version":"1.0"}
+{"file_collection_lag_seconds":2,"network_collection_lag_seconds":1,"rule_id":"sensitive-read-outbound","signal":"confidential read followed by outbound POST","sources":["data-objects.jsonl","windows-security.jsonl","windows-file.jsonl","zeek-http.jsonl","entities.jsonl"],"suppression":"none; requires matching session, source, time, and byte size","version":"1.0"}

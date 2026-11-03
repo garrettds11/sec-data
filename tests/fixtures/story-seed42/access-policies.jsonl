@@ -1,0 +1,5 @@
+{"allowed_source":"internal","asset_id":"asset-0000001","identity_id":"identity-operator-01","mfa_required":true,"policy_id":"policy-web-operator","service":"web_login","valid_from":"2026-10-22T12:00:00.000Z","valid_until":null}
+{"asset_id":"asset-0000019","identity_id":"identity-analyst-01","policy_id":"policy-file-analyst","required_group":"File Readers","service":"windows_network_logon","valid_from":"2026-10-22T12:00:00.000Z","valid_until":null}
+{"asset_id":"asset-0000017","identity_id":"identity-admin-01","policy_id":"policy-dc-admin","required_group":"Domain Admins","service":"windows_network_logon","valid_from":"2026-10-22T12:00:00.000Z","valid_until":null}
+{"asset_id":"asset-0000019","identity_id":"identity-operator-01","policy_id":"policy-file-operator","required_group":"File Operators","service":"windows_network_logon","valid_from":"2026-10-22T12:00:00.000Z","valid_until":null}
+{"asset_id":"asset-0000019","identity_id":"identity-backup-01","policy_id":"policy-backup-service","required_group":"Backup Operators","service":"windows_service_logon","valid_from":"2026-10-22T12:00:00.000Z","valid_until":null}

@@ -40,6 +40,7 @@ These commands create `C:\code\vuln-findings.json` and `C:\code\compliance-findi
 | `common/export.py` | Streaming JSON and JSONL output |
 | `catalogs/compliance/*.json` | Independently authored illustrative controls |
 | `tests/` | Python unittest checks |
+| `tests/fixtures/` | Small generated story records, DNS edge cases, and review notes |
 | `docs/windows-software-requirements.md` | Supported Windows tooling and optional prerequisites |
 | `docs/work-instructions-windows-vscode.md` | End-to-end usage, unit testing and VS Code debugging |
 | `docs/scale.md` | Scale, snapshots, catalog extension, and measured benchmarks |
@@ -52,6 +53,8 @@ These commands create `C:\code\vuln-findings.json` and `C:\code\compliance-findi
 | `docs/ingress.md` | Public NAT, edge and Zeek views, TLS visibility, and Splunk smoke test |
 | `docs/response.md` | Detection rules, analyst case, containment effect, and CIM smoke test |
 | `docs/cim.md` | CIM projection coverage, commands, field decisions, and validation limits |
+| `docs/splunk-validation.md` | Local Splunk CIM add-on validation results |
+| `docs/addon-parsing-audit.md` | Offline comparison of generated records with pinned Splunk add-on parsing rules |
 
 ## Dataset behavior and limitations
 
@@ -64,6 +67,7 @@ These commands create `C:\code\vuln-findings.json` and `C:\code\compliance-findi
 - Use `--zeek-dns-output .\output\dns.log` with the recon generator for separate synthetic Zeek-shaped DNS JSONL. See [DNS guide](docs/dns.md); Splunk CIM mapping still requires an installed add-on test.
 - Use `create_story.py --start-time 2026-10-22T12:00:00Z --output-dir .\output\story-42` to export one reproducible linked run. See [story guide](docs/story.md).
 - Add `--cim-output-dir .\output\story-42-cim` to generate a separate CIM-shaped event bundle, or project an existing bundle with `create_cim_events.py`. See [CIM guide](docs/cim.md).
+- Checked-in seed-42 source and CIM bundles, plus a DNS edge-case sample, are in [test fixtures](tests/fixtures/README.md). The project-owned CIM-shaped bundle passed a local Splunk 10.4.0 and CIM 8.7.0 smoke test; see [validation results](docs/splunk-validation.md). Vendor raw-event parsing remains unvalidated.
 
 ## Optional AWS upload (separate operation)
 

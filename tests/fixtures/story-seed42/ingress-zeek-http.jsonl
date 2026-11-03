@@ -1,0 +1,2 @@
+{"host":"prod-web-02.corp.example.local","id.orig_h":"203.0.113.50","id.orig_p":55676,"id.resp_h":"10.10.1.11","id.resp_p":80,"method":"GET","request_body_len":0,"response_body_len":0,"status_code":404,"ts":1792670444.0,"uid":"Cb4586dc9e5392f71","uri":"/.env","version":"1.1"}
+{"host":"prod-web-01.corp.example.local","id.orig_h":"10.30.2.22","id.orig_p":57189,"id.resp_h":"10.10.1.10","id.resp_p":80,"method":"GET","request_body_len":0,"response_body_len":512,"status_code":200,"ts":1792670453.0,"uid":"Cfad3f42fbbd539c3","uri":"/","version":"1.1"}
