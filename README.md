@@ -53,6 +53,7 @@ These commands create `C:\code\vuln-findings.json` and `C:\code\compliance-findi
 | `docs/ingress.md` | Public NAT, edge and Zeek views, TLS visibility, and Splunk smoke test |
 | `docs/response.md` | Detection rules, analyst case, containment effect, and CIM smoke test |
 | `docs/cim.md` | CIM projection coverage, commands, field decisions, and validation limits |
+| `docs/cim-fields.md` | Core, conditional, derived, and unsupported CIM projection fields |
 | `docs/splunk-validation.md` | Local Splunk CIM add-on validation results |
 | `docs/addon-parsing-audit.md` | Offline comparison of generated records with pinned Splunk add-on parsing rules |
 

@@ -229,7 +229,8 @@ def project(source, row):
     elif source == "case-actions.jsonl":
         model = "Ticket_Management.All_Ticket_Management"
         _put(out, row, ticket_id="case_id", status="status", action="action",
-             event_id="action_id")
+             event_id="action_id", trigger_alert_id="trigger_alert_id",
+             change_id="change_id", finding_id="finding_id", target_ip="target_ip")
     else:
         raise AssertionError(source)
     out["sec_data_cim_dataset"] = model

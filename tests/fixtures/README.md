@@ -26,6 +26,10 @@ local Splunk Enterprise 10.4.0 and CIM 8.7.0 smoke test. See the
 [lab validation report](../../docs/splunk-validation.md) for counts, timestamp
 checks, model membership, and limits.
 
+`cim-dns-multianswer.jsonl` is one additional 505-byte projected DNS response
+with two answers and two TTL values. It was ingested separately to check that
+Splunk's JSON array extraction preserves both values under the CIM field names.
+
 `dns-edge-cases.log` is a separate Zeek-shaped JSONL sample from the same
 parameters with `--campaign-count 2`. Its 17 records cover A, AAAA with no
 answer, NXDOMAIN, SERVFAIL, CNAME, and an unanswered query followed by a

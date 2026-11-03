@@ -1,6 +1,6 @@
 # CIM-shaped synthetic observations
 
-`create_cim_events.py` creates separate JSONL files with Splunk CIM field names. It reads the existing synthetic observations without changing their source files or scenario truth. Its mapping reference is Splunk CIM **8.8**. The project-owned `splunk/TA-sec-data-cim` add-on supplies a synthetic sourcetype, JSON and timestamp extraction, event types, tags, and global visibility. A deterministic fixture has also been tested against Splunk Enterprise 10.4.0 and the CIM add-on 8.7.0; see [the lab validation report](splunk-validation.md).
+`create_cim_events.py` creates separate JSONL files with Splunk CIM field names. It reads the existing synthetic observations without changing their source files or scenario truth. Its mapping reference is Splunk CIM **8.8**. The project-owned `splunk/TA-sec-data-cim` add-on supplies a synthetic sourcetype, JSON and timestamp extraction, event types, tags, and global visibility. A deterministic fixture has also been tested against Splunk Enterprise 10.4.0 and the CIM add-on 8.7.0; see [the lab validation report](splunk-validation.md) and [field decisions](cim-fields.md).
 
 ## Generate
 

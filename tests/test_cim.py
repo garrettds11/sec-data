@@ -26,6 +26,17 @@ class CimProjectionTests(unittest.TestCase):
         self.assertEqual(event["answer_count"], 0)
         self.assertNotIn("tag", event)
 
+    def test_dns_multivalue_answers_and_ttls(self):
+        row = {"event_type": "dns", "timestamp": "2026-10-22T12:00:00Z",
+               "client_ip": "10.0.0.1", "resolver_ip": "10.0.0.53",
+               "query": "pool.example", "query_type": "A",
+               "answers": ["192.0.2.10", "192.0.2.11"],
+               "answer_ttls": [60, 120], "rcode": "NOERROR"}
+        event = project("recon.jsonl", row)
+        self.assertEqual(event["answer"], ["192.0.2.10", "192.0.2.11"])
+        self.assertEqual(event["answer_count"], 2)
+        self.assertEqual(event["ttl"], [60, 120])
+
     def test_vulnerability_cve_and_assessment_time(self):
         base = {"assessment_id": "synthetic-42-2026-10-22T11:59:00Z",
                 "last_seen": "2026-01-01T00:00:00Z", "host_name": "host.example",
@@ -45,6 +56,17 @@ class CimProjectionTests(unittest.TestCase):
                "dest_ip": "10.0.0.2", "action": "block", "bytes_in": 20, "bytes_out": 5}
         event = project("egress-firewall.jsonl", row)
         self.assertEqual((event["action"], event["bytes"]), ("blocked", 25))
+
+    def test_case_action_retains_observed_links(self):
+        row = {"time": "2026-10-22T12:39:12Z", "case_id": "case-1",
+               "action_id": "action-1", "action": "opened", "status": "investigating",
+               "trigger_alert_id": "alert-1", "finding_id": "CVE-1",
+               "change_id": "change-1"}
+        event = project("case-actions.jsonl", row)
+        self.assertEqual(event["ticket_id"], "case-1")
+        self.assertEqual(event["trigger_alert_id"], "alert-1")
+        self.assertEqual(event["finding_id"], "CVE-1")
+        self.assertEqual(event["change_id"], "change-1")
 
     def test_bundle_manifest_counts_and_exclusions(self):
         with tempfile.TemporaryDirectory() as temp:
@@ -87,6 +109,8 @@ class CimProjectionTests(unittest.TestCase):
             self.assertTrue(all(value == "enabled" for value in tags["eventtype=" + section].values()))
         self.assertEqual(props["secdata:cim:json"]["kv_mode"], "json")
         self.assertEqual(props["secdata:cim:json"]["time_format"], "%Y-%m-%dT%H:%M:%S.%3NZ")
+        self.assertEqual(props["secdata:cim:json"]["eval-answer"], "'answer{}'")
+        self.assertEqual(props["secdata:cim:json"]["eval-ttl"], "'ttl{}'")
 
 
 if __name__ == "__main__":
