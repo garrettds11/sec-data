@@ -25,6 +25,17 @@ cd C:\code
 
 These commands create `C:\code\vuln-findings.json` and `C:\code\compliance-findings.json`, outside the repository. Or use `--dry-run` to inspect output without writing files. A relative `--output` path is resolved against the **current working directory**, not the script's location.
 
+## Linked story and CIM output
+
+From the repository root, generate the linked source story and a separate CIM-shaped event bundle:
+
+```powershell
+cd C:\code\Github\sec-data
+.\.venv\Scripts\python.exe .\create_story.py --seed 42 --start-time 2026-10-22T12:00:00Z --output-dir .\output\story-42 --cim-output-dir .\output\story-42-cim
+```
+
+Both output directories must be new. With the default 60-minute, one-campaign run, the CIM bundle contains 291 observations in 18 JSONL files; five source observations have no supported mapping. The repository also includes this deterministic [source and CIM fixture](tests/fixtures/README.md), so you can inspect sample records without generating them. For Splunk, install the project-owned `TA-sec-data-cim` add-on and ingest the `.cim.jsonl` files with sourcetype `secdata:cim:json` into your chosen index. See the [CIM guide](docs/cim.md) for the mapping and the [lab report](docs/splunk-validation.md) for validated searches.
+
 ## Files
 
 | Path | Purpose |
@@ -64,11 +75,11 @@ These commands create `C:\code\vuln-findings.json` and `C:\code\compliance-findi
 - Compliance controls are *independently authored illustrations*: not official CIS recommendation IDs/text, real scan evidence, or a claim of CIS compliance. `synthetic=true` and `assessment_method=simulated` identify generated results.
 - Compliance assessments support `--as-of <ISO8601>` (default fixed timestamp) for reproducibility. Both generators support `--seed`, `--output`, and `--dry-run`.
 - Both finding generators support `--host-count`, `--findings-per-host`, `--target-records`, `--format jsonl`, and `--snapshots` for larger or historical exports. JSON remains the default. Specify `--as-of` for byte-identical vulnerability output. See [scale guide](docs/scale.md) for count and catalog limits.
-- The recon generator writes analyst-facing normalized events separately from a truth manifest. Its optional small Nmap SYN profile is calibrated to a verified public lab capture; other profiles remain uncalibrated. No live Splunk ingestion validation is claimed. See [recon guide](docs/recon.md).
-- Use `--zeek-dns-output .\output\dns.log` with the recon generator for separate synthetic Zeek-shaped DNS JSONL. See [DNS guide](docs/dns.md); Splunk CIM mapping still requires an installed add-on test.
+- The recon generator writes analyst-facing normalized events separately from a truth manifest. Its optional small Nmap SYN profile is calibrated to a verified public lab capture; other profiles remain uncalibrated. The standalone normalized output has not been validated under its own Splunk sourcetype. The seed-42 story's separate CIM projection has been validated. See [recon guide](docs/recon.md).
+- Use `--zeek-dns-output .\output\dns.log` with the recon generator for separate synthetic Zeek-shaped DNS JSONL. Its vendor add-on parsing has not been validated; the project's CIM-shaped DNS projection passed the local Splunk test. See [DNS guide](docs/dns.md).
 - Use `create_story.py --start-time 2026-10-22T12:00:00Z --output-dir .\output\story-42` to export one reproducible linked run. See [story guide](docs/story.md).
 - Add `--cim-output-dir .\output\story-42-cim` to generate a separate CIM-shaped event bundle, or project an existing bundle with `create_cim_events.py`. See [CIM guide](docs/cim.md).
-- Checked-in seed-42 source and CIM bundles, plus a DNS edge-case sample, are in [test fixtures](tests/fixtures/README.md). The project-owned CIM-shaped bundle passed a local Splunk 10.4.0 and CIM 8.7.0 smoke test; see [validation results](docs/splunk-validation.md). Vendor raw-event parsing remains unvalidated.
+- The seed-42 CIM fixture indexed as 291 separate events in local Splunk Enterprise 10.4.0; all twelve intended data-model searches matched their expected counts with the CIM add-on 8.7.0. Selected fields, timestamps, DNS arrays, and investigation searches passed. See [validation results](docs/splunk-validation.md) for the checks and limits. Vendor raw-event parsing remains unvalidated.
 
 ## Optional AWS upload (separate operation)
 
