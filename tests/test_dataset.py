@@ -38,6 +38,23 @@ class DatasetTests(unittest.TestCase):
             self.assertEqual(rows[2]["bytes"],
                              rows[2]["bytes_in"] + rows[2]["bytes_out"])
             self.assertEqual(rows[3]["url"].split("/")[0], rows[1]["dest"])
+            fixture_root = Path(__file__).parent / "fixtures" / "cim-story-42"
+            comparable = {"src", "dest", "src_port", "dest_port", "query",
+                          "answer", "ttl", "response_time", "user", "action",
+                          "bytes", "bytes_in", "bytes_out", "duration", "url",
+                          "http_method", "status", "transport"}
+            fixture_rows = [json.loads(line)
+                            for path in fixture_root.glob("*.cim.jsonl")
+                            for line in path.read_text(encoding="utf-8").splitlines()]
+            for background in rows[:4]:
+                candidates = [event for event in fixture_rows
+                              if event["sec_data_cim_dataset"] ==
+                              background["sec_data_cim_dataset"]]
+                reference = max(candidates, key=lambda event: len(
+                    comparable & event.keys() & background.keys()))
+                for field in comparable & reference.keys() & background.keys():
+                    self.assertIs(type(background[field]), type(reference[field]),
+                                  f"{background['sec_data_cim_dataset']}.{field}")
 
     def test_published_events_have_one_cim_view(self):
         with tempfile.TemporaryDirectory(dir=Path(__file__).parent) as temp:

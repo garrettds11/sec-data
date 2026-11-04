@@ -17,7 +17,11 @@ The output directory must be new. The package contains:
 
 For seed 42 and the default 60-minute run, the planted investigation contributes **274 records in 15 files across ten CIM datasets**. The earlier projection fixture had 291 records: this package omits eight duplicate DNS records from the second view and nine scripted alert/case records. The expected alert and case outcomes remain in `truth/` for comparing with Splunk detections; they are not preloaded as analyst events. Five source observations have no sound CIM mapping, and one TLS metadata observation is not yet mapped. The manifest records these omissions.
 
-`--target-events` sets the **exact published count**, with a minimum of the linked story's 274 records. The default is 10,000. The difference is streamed into `events/background-session.jsonl` as ordinary benign sessions: DNS resolution, successful authentication, an allowed connection, and an HTTP GET share a session ID and assets from the run's inventory. Seed and start time make the sequence repeatable. A 10,000-event run has 9,726 background records, about 2,430 of each event family. For a high-volume run:
+`--target-events` sets the **exact published count**, with a minimum of the linked story's 274 records. The default is 10,000. The difference is streamed into `events/background-session.jsonl` as ordinary benign sessions: DNS resolution, successful authentication, an allowed connection, and an HTTP GET share a session ID and assets from the run's inventory. Seed and start time make the sequence repeatable. A 10,000-event run has 9,726 background records, about 2,430 of each event family.
+
+The planted story and high-volume session generator are separate components. Both emit the same common event fields and use the same CIM dataset names, field types, and value directions. A regression check compares representative DNS, authentication, traffic, and web fields against the Splunk-validated story fixture. Source-specific optional fields may differ because the modeled observations differ.
+
+For a high-volume run:
 
 ```powershell
 python create_dataset.py --seed 42 --start-time 2026-10-22T12:00:00Z --target-events 1000000 --output-dir .\output\dataset-1m
