@@ -19,6 +19,17 @@ py -3.12 -m common.story_validation .\tests\fixtures\story-seed42
 The generated files were independently reproduced with the same parameters;
 all 43 files matched byte for byte. The standalone bundle validator passed.
 
+`cim-story-42/` contains the 18 CIM-shaped event files projected from that
+story. It has 291 JSONL records (about 144 KiB) across twelve intended CIM
+datasets; five source observations remain unmapped. The same records passed a
+local Splunk Enterprise 10.4.0 and CIM 8.7.0 smoke test. See the
+[lab validation report](../../docs/splunk-validation.md) for counts, timestamp
+checks, model membership, and limits.
+
+`cim-dns-multianswer.jsonl` is one additional 505-byte projected DNS response
+with two answers and two TTL values. It was ingested separately to check that
+Splunk's JSON array extraction preserves both values under the CIM field names.
+
 `dns-edge-cases.log` is a separate Zeek-shaped JSONL sample from the same
 parameters with `--campaign-count 2`. Its 17 records cover A, AAAA with no
 answer, NXDOMAIN, SERVFAIL, CNAME, and an unanswered query followed by a
@@ -43,7 +54,8 @@ It is not part of the one-campaign bundle or its manifest.
   The [static add-on audit](../../docs/addon-parsing-audit.md) finds concrete
   parser-format mismatches in the pinned Zeek, Windows, and Sysmon add-ons.
   Splunk time extraction, field aliases, tags, and CIM data-model membership
-  remain unverified. Track live ingestion results in issue #22.
+  for those vendor raw-event formats remain unverified. The separate
+  `cim-story-42/` projection has its own live test in the lab report.
 - The response case deliberately treats the public probe as context; it does
   not establish that the public scanner and later operator are the same actor.
 

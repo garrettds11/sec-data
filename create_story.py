@@ -401,11 +401,17 @@ def main():
     parser.add_argument("--campaign-count", type=int, default=1)
     parser.add_argument("--host-count", type=int, default=DEFAULT_HOST_COUNT)
     parser.add_argument("--output-dir", required=True, help="New directory for this run")
+    parser.add_argument("--cim-output-dir", help="Optional new directory for CIM-shaped observation files")
     args = parser.parse_args()
     try:
         start = datetime.fromisoformat(parse_times([args.start_time])[0].replace("Z", "+00:00"))
         manifest = export_story(args.seed, start, args.duration_minutes,
                                 args.campaign_count, args.host_count, args.output_dir)
+        if args.cim_output_dir:
+            from create_cim_events import export_cim
+            cim_manifest = export_cim(args.output_dir, args.cim_output_dir)
+            print(f"Wrote {cim_manifest['cim_records']} CIM-shaped observations to "
+                  f"{Path(args.cim_output_dir).resolve()}")
         print(f"Wrote {manifest['run_id']} to {Path(args.output_dir).resolve()}")
         print("Records:", {name: item["records"] for name, item in manifest["files"].items()
                            if "records" in item})
