@@ -1,5 +1,17 @@
 # Scale and historical exports
 
+## Linked CIM event volume
+
+The primary `create_dataset.py` command accepts `--target-events N` for an exact published event count from the 274-record planted story upward. It keeps the planted investigation and streams additional benign DNS, authentication, network, and web records linked by session ID and inventory assets. The default is 10,000 events, with roughly 2,400 background records per family. For a million-event run:
+
+```powershell
+python .\create_dataset.py --seed 42 --start-time 2026-10-22T12:00:00Z --target-events 1000000 --output-dir .\output\dataset-1m
+```
+
+A measured 100,000-event package contained 42,520,967 event bytes, and a count-only million-event background stream completed in 14.49 seconds on the local machine. The million-event command's full disk-write time and Splunk ingest behavior have not been measured. Read the actual event byte total from `dataset-manifest.json` before indexing against a daily license limit. The [dataset guide](dataset.md) explains the package layout and the seeded core.
+
+## Standalone finding volume
+
 The finding generators run locally with Python 3.12 and the standard library. The first 23 asset identities and default seeded behavior are preserved. Additional assets use unique `synthetic-*` names, locally administered MAC addresses, and private IPs starting at `10.100.0.1`. Both generators use the same inventory for the same seed and host count. Capacity is validated before generation.
 
 ```powershell

@@ -1,6 +1,6 @@
 # Linked synthetic run bundle
 
-`create_story.py` exports a consistent synthetic environment: internal assets, non-inventory entities, DNS/service/public-exposure relationships, baseline findings, recon, authentication, endpoint, data access, and egress activity, detection alerts, an analyst case, containment, remediation, and a follow-up assessment. It uses the same seed and host inventory as the standalone generators. It does not contact AWS, scan a network, or require Splunk.
+`create_story.py` exports a consistent synthetic environment: internal assets, non-inventory entities, DNS/service/public-exposure relationships, baseline findings, recon, authentication, endpoint, data access, and egress activity, detection alerts, an analyst case, containment, remediation, and a follow-up assessment. It uses the same seed and host inventory as the standalone generators. It does not contact AWS, scan a network, or require Splunk. This source bundle is retained for reproducibility and generator validation; use [the single-view dataset command](dataset.md) for analyst-facing CIM events.
 
 ```powershell
 python .\create_story.py --seed 42 `

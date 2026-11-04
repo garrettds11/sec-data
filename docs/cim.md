@@ -1,16 +1,16 @@
 # CIM-shaped synthetic observations
 
-`create_cim_events.py` creates separate JSONL files with Splunk CIM field names. It reads the existing synthetic observations without changing their source files or scenario truth. Its mapping reference is Splunk CIM **8.8**. The project-owned `splunk/TA-sec-data-cim` add-on supplies a synthetic sourcetype, JSON and timestamp extraction, event types, tags, and global visibility. A deterministic fixture has also been tested against Splunk Enterprise 10.4.0 and the CIM add-on 8.7.0; see [the lab validation report](splunk-validation.md) and [field decisions](cim-fields.md).
+`create_dataset.py` is the primary entry point for a single CIM-shaped analyst event package; see [the dataset guide](dataset.md). `create_cim_events.py` remains a projection utility for existing source bundles. Its mapping reference is Splunk CIM **8.8**. The project-owned `splunk/TA-sec-data-cim` add-on supplies a synthetic sourcetype, JSON and timestamp extraction, event types, tags, and global visibility. A deterministic projection fixture has also been tested against Splunk Enterprise 10.4.0 and the CIM add-on 8.7.0; see [the lab validation report](splunk-validation.md) and [field decisions](cim-fields.md).
 
 ## Generate
 
 PowerShell, from the repository root:
 
 ```powershell
-python create_story.py --seed 42 --start-time 2026-10-22T12:00:00Z --output-dir .\output\story-42 --cim-output-dir .\output\story-42-cim
+python create_dataset.py --seed 42 --start-time 2026-10-22T12:00:00Z --output-dir .\output\dataset-42
 ```
 
-For a story already on disk:
+For a source story already on disk, the projection utility remains available:
 
 ```powershell
 python create_cim_events.py --story-dir .\output\story-42 --output-dir .\output\story-42-cim
@@ -25,7 +25,7 @@ python create_recon_events.py --start-time 2026-10-22T12:00:00Z --output .\outpu
 python create_cim_events.py --input-file .\output\recon.jsonl --source recon.jsonl --output-file .\output\recon.cim.jsonl
 ```
 
-The story projection creates one `.cim.jsonl` file per observed source and a `cim-manifest.json` with source and output checksums, counts, unmapped counts, and validation status. All output paths must be new. A small deterministic set of these files is committed under `tests/fixtures/cim-story-42/`.
+The legacy story projection creates one `.cim.jsonl` file per observed source and a `cim-manifest.json` with source and output checksums, counts, unmapped counts, and validation status. All output paths must be new. A small deterministic set of these files is committed under `tests/fixtures/cim-story-42/`; the primary dataset command selects one analyst view from that projection.
 
 ## Mapping coverage
 
@@ -47,7 +47,7 @@ Each row includes `time`, `synthetic`, `sec_data_source`, and `sec_data_cim_data
 
 ## Splunk add-on
 
-Install `splunk/TA-sec-data-cim` as one app on the appropriate Splunk parsing and search tiers. Assign **`secdata:cim:json`** as the sourcetype for the `.cim.jsonl` files in your input or HEC configuration and choose the target index there. Keep the input's `source` as its file or stream identity. Splunk supplies `host`, `source`, `sourcetype`, `index`, and `splunk_server`; the assigned `host` may identify the forwarder or ingesting machine rather than the endpoint described in `src`, `dest`, or `dvc`. Do not set a vendor sourcetype to inherit a vendor add-on's parsing or tags.
+Install `splunk/TA-sec-data-cim` as one app on the appropriate Splunk parsing and search tiers. Assign **`secdata:cim:json`** as the sourcetype for the primary dataset's `events/*.jsonl` files, or the older `.cim.jsonl` projection files, in your input or HEC configuration and choose the target index there. Keep the input's `source` as its file or stream identity. Splunk supplies `host`, `source`, `sourcetype`, `index`, and `splunk_server`; the assigned `host` may identify the forwarder or ingesting machine rather than the endpoint described in `src`, `dest`, or `dvc`. Do not set a vendor sourcetype to inherit a vendor add-on's parsing or tags.
 
 The add-on uses `props.conf` for one-line JSON and UTC millisecond timestamps, `eventtypes.conf` to select the twelve projected datasets by `sec_data_cim_dataset`, `tags.conf` for their CIM tags, and `metadata/default.meta` to expose the knowledge objects to the CIM app. One app handles all generated sources because they share a JSON structure; `sec_data_source` retains each originating generator view. If a future source needs a distinct parser, it can get its own project-owned sourcetype in this add-on. The add-on does not create an input or choose an index because those are deployment-specific.
 
