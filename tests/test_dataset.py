@@ -4,6 +4,7 @@ import hashlib
 import json
 import tempfile
 import unittest
+from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -11,12 +12,39 @@ from create_dataset import export_dataset
 
 
 class DatasetTests(unittest.TestCase):
+    def test_exact_10k_event_package_keeps_session_links(self):
+        with tempfile.TemporaryDirectory(dir=Path(__file__).parent) as temp:
+            target = Path(temp) / "dataset"
+            manifest = export_dataset(42, datetime(2026, 10, 22, 12,
+                                                   tzinfo=timezone.utc),
+                                      60, 1, 23, target, target_events=10000)
+            self.assertEqual(manifest["event_records"], 10000)
+            self.assertEqual(manifest["background_records"], 9726)
+            rows = [json.loads(line) for line in
+                    (target / "events" / "background-session.jsonl")
+                    .read_text(encoding="utf-8").splitlines()]
+            self.assertEqual(len(rows), 9726)
+            self.assertEqual(len({row["event_id"] for row in rows}), 9726)
+            self.assertTrue(all(count >= 2400 for count in Counter(
+                row["sec_data_cim_dataset"] for row in rows).values()))
+            self.assertNotEqual(manifest["run_id"], manifest["story_run_id"])
+            self.assertTrue(rows[0]["session_id"].startswith(
+                "bg-" + manifest["run_id"][-8:]))
+            self.assertEqual([row["sec_data_cim_dataset"] for row in rows[:4]],
+                             ["Network_Resolution.DNS", "Authentication.Authentication",
+                              "Network_Traffic.All_Traffic", "Web.Web"])
+            self.assertEqual(len({row["session_id"] for row in rows[:4]}), 1)
+            self.assertEqual(rows[0]["answer"], [rows[2]["dest"]])
+            self.assertEqual(rows[2]["bytes"],
+                             rows[2]["bytes_in"] + rows[2]["bytes_out"])
+            self.assertEqual(rows[3]["url"].split("/")[0], rows[1]["dest"])
+
     def test_published_events_have_one_cim_view(self):
         with tempfile.TemporaryDirectory(dir=Path(__file__).parent) as temp:
             target = Path(temp) / "dataset"
             manifest = export_dataset(42, datetime(2026, 10, 22, 12,
                                                    tzinfo=timezone.utc),
-                                      60, 1, 23, target)
+                                      60, 1, 23, target, target_events=274)
             events = [json.loads(line)
                       for path in sorted((target / "events").glob("*.jsonl"))
                       for line in path.read_text(encoding="utf-8").splitlines()]

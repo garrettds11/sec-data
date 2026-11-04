@@ -31,10 +31,10 @@ From the repository root, run:
 
 ```powershell
 cd C:\code\Github\sec-data
-.\.venv\Scripts\python.exe .\create_dataset.py --seed 42 --start-time 2026-10-22T12:00:00Z --output-dir .\output\dataset-42
+.\.venv\Scripts\python.exe .\create_dataset.py --seed 42 --start-time 2026-10-22T12:00:00Z --target-events 10000 --output-dir .\output\dataset-42
 ```
 
-The output directory must be new. `events/` contains the single CIM-shaped JSONL view to ingest with sourcetype `secdata:cim:json` and the project add-on. `context/` holds inventory and assessment context; `truth/` holds the answer key and expected alert and case outcomes. Keep those two directories outside the analyst event index. The default run emits 274 analyst events across ten CIM datasets. See [the dataset guide](docs/dataset.md).
+The output directory must be new. `events/` contains the single CIM-shaped JSONL view to ingest with sourcetype `secdata:cim:json` and the project add-on. `context/` holds inventory and assessment context; `truth/` holds the answer key and expected alert and case outcomes. Keep those two directories outside the analyst event index. The default run emits 10,000 analyst events across ten CIM datasets; `--target-events` sets an exact count from 274 upward. See [the dataset guide](docs/dataset.md) for a million-event example.
 
 ## Files
 
@@ -80,7 +80,7 @@ The output directory must be new. `events/` contains the single CIM-shaped JSONL
 - The recon generator writes analyst-facing normalized events separately from a truth manifest. Its optional small Nmap SYN profile is calibrated to a verified public lab capture; other profiles remain uncalibrated. No live Splunk ingestion validation is claimed. See [recon guide](docs/recon.md).
 - Use `--zeek-dns-output .\output\dns.log` with the recon generator for separate synthetic Zeek-shaped DNS JSONL. See [DNS guide](docs/dns.md); Splunk CIM mapping still requires an installed add-on test.
 - Use `create_dataset.py` for one reproducible CIM-shaped analyst event run. Its source observations are generated and validated privately, then discarded after publication. See [dataset guide](docs/dataset.md) and [CIM guide](docs/cim.md).
-- The earlier seed-42 CIM fixture indexed as 291 separate events in local Splunk Enterprise 10.4.0. The single-view dataset selects 274 of those same event records. See [validation results](docs/splunk-validation.md) for checks and limits. Vendor raw-event parsing remains unvalidated.
+- The earlier seed-42 CIM fixture indexed as 291 separate events in local Splunk Enterprise 10.4.0. The single-view dataset selects 274 of those same event records and can add deterministic background sessions to reach the requested count. See [validation results](docs/splunk-validation.md) for checks and limits. Vendor raw-event parsing remains unvalidated.
 
 ## Optional AWS upload (separate operation)
 
