@@ -19,6 +19,8 @@ For seed 42 and the default 60-minute run, the planted investigation contributes
 
 `--target-events` sets the **exact published count**, with a minimum of the linked story's 274 records. The default is 10,000. The difference is streamed into `events/background-session.jsonl` as ordinary benign sessions: DNS resolution, successful authentication, an allowed connection, and an HTTP GET share a session ID and assets from the run's inventory. Seed and start time make the sequence repeatable. A 10,000-event run has 9,726 background records, about 2,430 of each event family.
 
+With the example start time of `2026-10-22T12:00:00Z` and the default 60-minute duration, background events fill `[12:00, 13:00)` UTC. The planted baseline starts at 11:59 and its last event is at 12:47:55. Consequently the default 10,000-event package spans 11:59:00–12:59:59.629 UTC; a measured 100,000-event package spans 11:59:00–12:59:59.963 UTC. `--target-events` changes density, while `--duration-minutes` changes the background time window.
+
 The planted story and high-volume session generator are separate components. Both emit the same common event fields and use the same CIM dataset names, field types, and value directions. A regression check compares representative DNS, authentication, traffic, and web fields against the Splunk-validated story fixture. Source-specific optional fields may differ because the modeled observations differ.
 
 For a high-volume run:

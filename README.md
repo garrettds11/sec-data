@@ -69,6 +69,10 @@ Splunk assigns `host`, `source`, `sourcetype`, `index`, and `splunk_server` at i
 
 An actual 100,000-event package contained 42.5 MB of event JSONL. A million-event run with the same mix is estimated near 425 MB; read the actual `events/` byte totals in its manifest before ingesting it against a 500 MB/day Splunk license. The million-event iterator was checked, while a full million-event file write and Splunk ingest have not been measured. See the [scale guide](docs/scale.md) for measured results and standalone finding options.
 
+### Time coverage
+
+The example uses `--start-time 2026-10-22T12:00:00Z` and the default `--duration-minutes 60`. Background events are spread from **12:00 UTC up to, but before, 13:00 UTC** on October 22. The planted baseline assessment is at **11:59 UTC**, one minute before the start; its last event is at **12:47:55 UTC**. Thus the complete default 10,000-event output spans **11:59:00 through 12:59:59.629 UTC**. The measured 100,000-event output ends at **12:59:59.963 UTC**. Increasing `--target-events` makes events denser within the same window; change `--duration-minutes` to cover a longer or shorter period.
+
 ## Other commands
 
 The standalone vulnerability and compliance commands retain their JSON and JSONL outputs for the optional AWS uploader. They are separate from the CIM event package. Specify `--as-of` when you need repeatable assessment dates; `--target-records` requests an exact applicable finding count or fails if the selected inventory and catalogs cannot supply it.
