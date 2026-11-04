@@ -1,16 +1,16 @@
 # CIM-shaped synthetic observations
 
-`create_cim_events.py` creates separate JSONL files with Splunk CIM field names. It reads the existing synthetic observations without changing their source files or scenario truth. Its mapping reference is Splunk CIM **8.8**. The project-owned `splunk/TA-sec-data-cim` add-on supplies a synthetic sourcetype, JSON and timestamp extraction, event types, tags, and global visibility. A deterministic fixture has also been tested against Splunk Enterprise 10.4.0 and the CIM add-on 8.7.0; see [the lab validation report](splunk-validation.md) and [field decisions](cim-fields.md).
+`create_dataset.py` is the primary entry point for a single CIM-shaped analyst event package; see [the dataset guide](dataset.md). `create_cim_events.py` remains a projection utility for existing source bundles. Its mapping reference is Splunk CIM **8.8**. The project-owned `splunk/TA-sec-data-cim` add-on supplies a synthetic sourcetype, JSON and timestamp extraction, event types, tags, and global visibility. A deterministic projection fixture has also been tested against Splunk Enterprise 10.4.0 and the CIM add-on 8.7.0; see [the lab validation report](splunk-validation.md) and [field decisions](cim-fields.md).
 
 ## Generate
 
 PowerShell, from the repository root:
 
 ```powershell
-python create_story.py --seed 42 --start-time 2026-10-22T12:00:00Z --output-dir .\output\story-42 --cim-output-dir .\output\story-42-cim
+python create_dataset.py --seed 42 --start-time 2026-10-22T12:00:00Z --output-dir .\output\dataset-42
 ```
 
-For a story already on disk:
+For a source story already on disk, the projection utility remains available:
 
 ```powershell
 python create_cim_events.py --story-dir .\output\story-42 --output-dir .\output\story-42-cim
@@ -25,7 +25,7 @@ python create_recon_events.py --start-time 2026-10-22T12:00:00Z --output .\outpu
 python create_cim_events.py --input-file .\output\recon.jsonl --source recon.jsonl --output-file .\output\recon.cim.jsonl
 ```
 
-The story projection creates one `.cim.jsonl` file per observed source and a `cim-manifest.json` with source and output checksums, counts, unmapped counts, and validation status. All output paths must be new. A small deterministic set of these files is committed under `tests/fixtures/cim-story-42/`.
+The legacy story projection creates one `.cim.jsonl` file per observed source and a `cim-manifest.json` with source and output checksums, counts, unmapped counts, and validation status. All output paths must be new. A small deterministic set of these files is committed under `tests/fixtures/cim-story-42/`; the primary dataset command selects one analyst view from that projection.
 
 ## Mapping coverage
 

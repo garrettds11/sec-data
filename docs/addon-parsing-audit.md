@@ -36,8 +36,9 @@ they are to participate in CIM searches.
 
 ## Selected direction
 
-The project will emit a **separate CIM-shaped JSONL projection** from its
-synthetic world model, while retaining the source-shaped evidence. The current
+The primary dataset workflow emits **one CIM-shaped analyst event package** from its
+synthetic world model. Source-shaped evidence is used internally for generation
+and validation; standalone source commands remain for compatibility. The current
 fixture is not already CIM-ready: for example, `dns.log` uses `id.orig_h` and
 `id.resp_h` rather than `src` and `dest`, and the Windows authentication JSONL
 uses `TargetUserName` and `IpAddress` rather than the corresponding CIM fields.

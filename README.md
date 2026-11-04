@@ -25,6 +25,17 @@ cd C:\code
 
 These commands create `C:\code\vuln-findings.json` and `C:\code\compliance-findings.json`, outside the repository. Or use `--dry-run` to inspect output without writing files. A relative `--output` path is resolved against the **current working directory**, not the script's location.
 
+## Generate one CIM event dataset
+
+From the repository root, run:
+
+```powershell
+cd C:\code\Github\sec-data
+.\.venv\Scripts\python.exe .\create_dataset.py --seed 42 --start-time 2026-10-22T12:00:00Z --output-dir .\output\dataset-42
+```
+
+The output directory must be new. `events/` contains the single CIM-shaped JSONL view to ingest with sourcetype `secdata:cim:json` and the project add-on. `context/` holds inventory and assessment context; `truth/` holds the answer key and expected alert and case outcomes. Keep those two directories outside the analyst event index. The default run emits 274 analyst events across ten CIM datasets. See [the dataset guide](docs/dataset.md).
+
 ## Files
 
 | Path | Purpose |
@@ -32,8 +43,9 @@ These commands create `C:\code\vuln-findings.json` and `C:\code\compliance-findi
 | `create_vuln_table.py` | Local vulnerability JSON generator |
 | `create_compliance_table.py` | Local compliance JSON generator |
 | `create_recon_events.py` | Offline, scenario-driven normalized JSONL telemetry generator |
-| `create_story.py` | Linked inventory, finding, recon, DNS, ingress, identity, endpoint, data access, egress, response, and manifest bundle |
-| `create_cim_events.py` | Separate CIM-shaped JSONL projection of generated observations |
+| `create_dataset.py` | Single CIM-shaped analyst event package with separate context and truth |
+| `create_story.py` | Source observation builder used internally and kept for reference fixtures |
+| `create_cim_events.py` | Projection utility for existing source bundles |
 | `splunk/TA-sec-data-cim/` | Project-owned Splunk add-on for JSON extraction, event types, and CIM tags |
 | `upload_to_aws.py` | Optional, separate AWS DynamoDB uploader |
 | `common/assets.py` | Shared synthetic inventory of 23 hosts |
@@ -47,6 +59,7 @@ These commands create `C:\code\vuln-findings.json` and `C:\code\compliance-findi
 | `docs/recon.md` | Recon schemas, evidence, Splunk investigation examples, and limits |
 | `docs/dns.md` | Optional Zeek-shaped DNS JSON export and CIM validation plan |
 | `docs/story.md` | Shared world catalog, run bundle, provenance, and current limits |
+| `docs/dataset.md` | Single-view CIM package layout, exclusions, and ingestion boundary |
 | `docs/identity.md` | Linked authentication fixture, Windows XML projection, and Splunk mapping status |
 | `docs/endpoint.md` | Linked Sysmon fixture, sensor coverage, and Splunk mapping status |
 | `docs/data-access.md` | File auditing, Zeek HTTP/conn, firewall controls, and CIM mapping status |
@@ -66,9 +79,8 @@ These commands create `C:\code\vuln-findings.json` and `C:\code\compliance-findi
 - Both finding generators support `--host-count`, `--findings-per-host`, `--target-records`, `--format jsonl`, and `--snapshots` for larger or historical exports. JSON remains the default. Specify `--as-of` for byte-identical vulnerability output. See [scale guide](docs/scale.md) for count and catalog limits.
 - The recon generator writes analyst-facing normalized events separately from a truth manifest. Its optional small Nmap SYN profile is calibrated to a verified public lab capture; other profiles remain uncalibrated. No live Splunk ingestion validation is claimed. See [recon guide](docs/recon.md).
 - Use `--zeek-dns-output .\output\dns.log` with the recon generator for separate synthetic Zeek-shaped DNS JSONL. See [DNS guide](docs/dns.md); Splunk CIM mapping still requires an installed add-on test.
-- Use `create_story.py --start-time 2026-10-22T12:00:00Z --output-dir .\output\story-42` to export one reproducible linked run. See [story guide](docs/story.md).
-- Add `--cim-output-dir .\output\story-42-cim` to generate a separate CIM-shaped event bundle, or project an existing bundle with `create_cim_events.py`. See [CIM guide](docs/cim.md).
-- Checked-in seed-42 source and CIM bundles, plus a DNS edge-case sample, are in [test fixtures](tests/fixtures/README.md). The project-owned CIM-shaped bundle passed a local Splunk 10.4.0 and CIM 8.7.0 smoke test; see [validation results](docs/splunk-validation.md). Vendor raw-event parsing remains unvalidated.
+- Use `create_dataset.py` for one reproducible CIM-shaped analyst event run. Its source observations are generated and validated privately, then discarded after publication. See [dataset guide](docs/dataset.md) and [CIM guide](docs/cim.md).
+- The earlier seed-42 CIM fixture indexed as 291 separate events in local Splunk Enterprise 10.4.0. The single-view dataset selects 274 of those same event records. See [validation results](docs/splunk-validation.md) for checks and limits. Vendor raw-event parsing remains unvalidated.
 
 ## Optional AWS upload (separate operation)
 
