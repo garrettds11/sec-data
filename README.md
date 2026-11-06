@@ -1,14 +1,15 @@
 # sec-data
 
-Generate synthetic security events for Splunk investigations and detection tests. The primary command combines a fixed, linked investigation with repeatable background activity and publishes one CIM-shaped JSONL event package. Generation runs locally and requires no Splunk instance, AWS account, or network scan.
+Generate synthetic security events for Splunk investigations and detection tests. The primary command combines a linked investigation with repeatable ordinary activity and publishes one CIM-shaped JSONL event package. Use the included reference story or supply a versioned scenario file for a tailored compromise. Generation runs locally and requires no Splunk instance, AWS account, or network scan.
 
 | Task | Entry point | Result |
 | --- | --- | --- |
-| Generate events for Splunk | `create_dataset.py` | `events/` for ingest, `context/` for reference, and `truth/` for validation |
+| Generate events for Splunk | `create_dataset.py` | Source-specific `events/` for ingest, `context/` for reference, and `truth/` for validation |
+| Author a different investigation | `--scenario-file` with `scenarios/file-collection.json` as a model | The same event package with authored steps and ordinary activity |
 | Inspect the source story | `create_story.py` | Source-format observations, shared world data, timeline, and answer key |
 | Export standalone findings | `create_vuln_table.py`, `create_compliance_table.py` | JSON or JSONL for local analysis or the optional AWS uploader |
 
-The seed changes reproducible details, not the investigation plot. This release does not accept a natural-language story prompt or a scenario specification. See the [documentation index](docs/README.md) for the main workflow and source-format references.
+The seed changes reproducible details, not the investigation plot. A scenario JSON file changes the plot without editing generator code. An LLM can author that file using the [scenario contract](docs/scenarios.md); the generator validates and compiles it. It does not accept free-form natural language as a direct CLI argument. See the [documentation index](docs/README.md) for the complete workflow.
 
 ## Quick start: generate a dataset
 
@@ -27,7 +28,7 @@ Inspect the result:
 
 ```powershell
 Get-ChildItem .\output\dataset-42\events\*.jsonl
-Get-Content .\output\dataset-42\events\recon.jsonl -TotalCount 2
+Get-Content .\output\dataset-42\events\web-app.jsonl -TotalCount 2
 Get-Content .\output\dataset-42\dataset-manifest.json
 ```
 
@@ -36,11 +37,19 @@ Generated runs under `output/` and the local `.venv/` are ignored by Git. After 
 | Path in the output directory | What it contains | Index as security events? |
 | --- | --- | --- |
 | `events/*.jsonl` | CIM-shaped DNS, authentication, network, web, endpoint, file-access, and vulnerability observations | Yes |
-| `context/` | Assets, external entities, relationships, policies, compliance assessments, and detection rules | No |
-| `truth/` | Generator answer key, timeline, and expected alert and case outcomes | No |
+| `context/` | Shared assets, external entities, identities, and relationships; reference-mode policies and assessments | No |
+| `truth/` | Private story steps and causal links; reference-mode expected alerts and case outcomes | No |
 | `dataset-manifest.json` | Run ID, exact counts, exclusions, byte sizes, and SHA-256 hashes | No |
 
-The planted story and background activity share inventory, time range, CIM field names, and value types. Background DNS, authentication, connection, and HTTP records share session IDs. The command creates source observations temporarily to validate the story, then publishes the selected CIM-shaped events. Splunk searches can generate alerts or risk events; the generator's expected alerts and case actions remain in `truth/`.
+The planted story and ordinary activity share inventory, time range, CIM field names, and value types. DNS, authentication, network, web, endpoint, and file observations form linked routine sessions. Story events are merged into the corresponding source files in event-time order; there is no separate background source. The fixed story is built and validated privately before publishing its CIM projection. Splunk searches can generate alerts or risk events; the generator's expected alerts and case actions remain in `truth/`.
+
+To author a tailored scenario, copy [the example](scenarios/file-collection.json), edit its ordered steps and inventory references, then run:
+
+```powershell
+python create_dataset.py --seed 42 --start-time 2026-10-22T12:00:00Z --duration-minutes 60 --target-events 10000 --scenario-file .\scenarios\file-collection.json --output-dir .\output\file-collection
+```
+
+The tailored mode builds the shared world directly and writes only its authored story plus ordinary traffic. Its title, causal links, and step descriptions appear in `truth/scenario-truth.json`, never in analyst events. The [scenario guide](docs/scenarios.md) defines supported sources, fields, references, and validation.
 
 ## Use the events in Splunk
 
@@ -69,17 +78,17 @@ index=sec_data sourcetype=secdata:cim:json
 
 Splunk assigns `host`, `source`, `sourcetype`, `index`, and `splunk_server` at ingest; the JSON supplies the modeled observation fields and UTC `time`. The project add-on handles event boundaries, field extraction, event types, tags, and DNS arrays. The [lab report](docs/splunk-validation.md) records checks on the planted fixture in Splunk Enterprise 10.4.0 with CIM 8.7.0. The high-volume background stream has not undergone that live validation.
 
-For an example of the index, sourcetype, and source values to expect after upload, see the [post-ingest source inventory](docs/dataset.md#expected-source-inventory-in-splunk).
+For the index, sourcetype, and source values to expect after upload, see the [post-ingest source inventory](docs/dataset.md#expected-source-inventory-in-splunk).
 
 ## Choose a volume
 
-`--target-events` sets an exact published count. The example 10,000-event run has 274 planted events and 9,726 background events, with roughly 2,400 background records in each of four event families. For a million-event run, use a new directory:
+`--target-events` sets an exact published count. The reference 10,000-event run has 274 planted events and 9,726 ordinary events across web, file, egress, and ingress sessions. The manifest lists counts by source and by origin. For a million-event run, use a new directory:
 
 ```powershell
 .\.venv\Scripts\python.exe .\create_dataset.py --seed 42 --start-time 2026-10-22T12:00:00Z --target-events 1000000 --output-dir .\output\dataset-1m
 ```
 
-An actual 100,000-event package contained 42.5 MB of event JSONL. A million-event run with the same mix is estimated near 425 MB; read the actual `events/` byte totals in its manifest before ingesting it against a 500 MB/day Splunk license. The million-event iterator was checked, while a full million-event file write and Splunk ingest have not been measured. See the [scale guide](docs/scale.md) for measured results and standalone finding options.
+A 10,000-event package with the current mix contained about 4.3 MB of event JSONL. A million-event package may approach a 500 MB/day Splunk license limit; read the actual `events/` byte totals in its manifest before ingest. A full million-event export and live Splunk ingest have not yet been measured for this design. See the [scale guide](docs/scale.md) for measurement details.
 
 ### Time coverage
 
@@ -87,7 +96,7 @@ The example uses `--start-time 2026-10-22T12:00:00Z` and the default `--duration
 
 ### Reproduce a released run
 
-To use this version later, check out the release tag before generating data:
+To reproduce the v0.1.0 release later, check out its tag before generating data:
 
 ```powershell
 git fetch --tags
@@ -105,7 +114,7 @@ The standalone vulnerability and compliance commands retain their JSON and JSONL
 .\.venv\Scripts\python.exe .\create_compliance_table.py --seed 42 --as-of 2026-10-22T12:00:00Z --host-count 3000 --format jsonl --output .\output\compliance.jsonl
 ```
 
-`create_story.py` builds the source story used internally and in the checked-in [reference fixture](tests/fixtures/README.md). `create_recon_events.py` and `create_cim_events.py` remain available for source-format experiments and projection of existing bundles. Use `create_dataset.py` for the single CIM-shaped analyst event package.
+`create_story.py` builds the fixed source story used internally and in the checked-in [reference fixture](tests/fixtures/README.md). `create_recon_events.py` and `create_cim_events.py` remain available for source-format experiments and projection of existing bundles. Use `create_dataset.py` for the single CIM-shaped analyst event package.
 
 Run the checks locally:
 

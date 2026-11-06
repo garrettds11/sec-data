@@ -1,0 +1,164 @@
+{
+  "schema_version": 1,
+  "id": "file-collection-example",
+  "title": "Compromised operator collects and transfers a project file",
+  "description": "Example machine-authored scenario. Narrative and causal links stay in truth, not analyst events.",
+  "background_mix": {"web": 5, "file": 2, "egress": 2, "ingress": 1},
+  "entities": [
+    {
+      "entity_id": "entity-inbound-client",
+      "name": "client.example.net",
+      "ip": "203.0.113.61",
+      "role": "external_client"
+    },
+    {
+      "entity_id": "entity-transfer-destination",
+      "name": "drop.example.net",
+      "ip": "192.0.2.222",
+      "role": "upload_endpoint"
+    }
+  ],
+  "steps": [
+    {
+      "id": "inbound-request",
+      "offset_seconds": 600,
+      "description": "An external client reaches the public web service.",
+      "observations": [
+        {
+          "source": "ingress-zeek-http.jsonl",
+          "dataset": "Web.Web",
+          "fields": {
+            "src": {"ref": "entity:entity-inbound-client:ip"},
+            "dest": {"ref": "asset:prod-web-02:ip"},
+            "dvc": "ingress-zeek-01",
+            "url": "prod-web-02.corp.example.local/login",
+            "http_method": "POST",
+            "status": 200,
+            "bytes_in": 480,
+            "bytes_out": 1300
+          }
+        }
+      ]
+    },
+    {
+      "id": "operator-login",
+      "offset_seconds": 900,
+      "depends_on": ["inbound-request"],
+      "description": "The operator account is used from the web host to reach the file server.",
+      "observations": [
+        {
+          "source": "windows-security.jsonl",
+          "dataset": "Authentication.Authentication",
+          "fields": {
+            "src": {"ref": "asset:prod-web-02:ip"},
+            "dest": {"ref": "asset:prod-file-01:fqdn"},
+            "dvc": "prod-file-01",
+            "user": {"ref": "identity:identity-operator-01:account"},
+            "action": "success",
+            "app": "smb"
+          }
+        }
+      ]
+    },
+    {
+      "id": "collection-process",
+      "offset_seconds": 1200,
+      "depends_on": ["operator-login"],
+      "description": "A process on the file server stages a project archive.",
+      "observations": [
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Processes",
+          "fields": {
+            "dest": {"ref": "asset:prod-file-01:fqdn"},
+            "dvc": "prod-file-01",
+            "user": {"ref": "identity:identity-operator-01:account"},
+            "process": "C:\\Windows\\System32\\robocopy.exe",
+            "process_id": 6152
+          }
+        }
+      ]
+    },
+    {
+      "id": "file-read",
+      "offset_seconds": 1500,
+      "depends_on": ["collection-process"],
+      "description": "The same identity reads a project file.",
+      "observations": [
+        {
+          "source": "windows-file.jsonl",
+          "dataset": "Data_Access.Data_Access",
+          "fields": {
+            "dest": {"ref": "asset:prod-file-01:fqdn"},
+            "dvc": "prod-file-01",
+            "user": {"ref": "identity:identity-operator-01:account"},
+            "object": "Q4-forecast.csv",
+            "object_path": "D:\\Shares\\Projects\\Q4-forecast.csv",
+            "object_category": "file",
+            "action": "read",
+            "access_result": "success",
+            "signature_id": 4663
+          }
+        }
+      ]
+    },
+    {
+      "id": "outbound-transfer",
+      "offset_seconds": 1800,
+      "depends_on": ["file-read"],
+      "description": "The file host connects to an external upload destination; bytes are modeled, contents are not proven.",
+      "observations": [
+        {
+          "source": "egress-firewall.jsonl",
+          "dataset": "Network_Traffic.All_Traffic",
+          "fields": {
+            "src": {"ref": "asset:prod-file-01:ip"},
+            "dest": {"ref": "entity:entity-transfer-destination:ip"},
+            "dvc": "egress-fw-01",
+            "dest_port": 443,
+            "transport": "tcp",
+            "action": "allowed",
+            "bytes_out": 820000,
+            "bytes_in": 2100,
+            "bytes": 822100
+          }
+        },
+        {
+          "source": "zeek-conn.jsonl",
+          "dataset": "Network_Traffic.All_Traffic",
+          "fields": {
+            "src": {"ref": "asset:prod-file-01:ip"},
+            "dest": {"ref": "entity:entity-transfer-destination:ip"},
+            "dvc": "zeek-01",
+            "dest_port": 443,
+            "transport": "tcp",
+            "action": "allowed",
+            "bytes_out": 820000,
+            "bytes_in": 2100,
+            "bytes": 822100
+          }
+        }
+      ]
+    },
+    {
+      "id": "block-destination",
+      "offset_seconds": 2100,
+      "depends_on": ["outbound-transfer"],
+      "description": "An analyst's later network control blocks the destination.",
+      "observations": [
+        {
+          "source": "response-firewall.jsonl",
+          "dataset": "Network_Traffic.All_Traffic",
+          "fields": {
+            "src": {"ref": "asset:prod-file-01:ip"},
+            "dest": {"ref": "entity:entity-transfer-destination:ip"},
+            "dvc": "egress-fw-01",
+            "dest_port": 443,
+            "transport": "tcp",
+            "action": "blocked"
+          }
+        }
+      ]
+    }
+  ]
+}

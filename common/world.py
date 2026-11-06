@@ -7,7 +7,7 @@ from ipaddress import ip_network
 
 from common.assets import iter_hosts
 
-VERSION = "1.0"
+VERSION = "1.1"
 SERVICES = {
     "web": {22, 80, 443}, "app": {22, 8080}, "db": {22, 5432},
     "dc": {53, 88, 389, 445}, "win": {445, 3389}, "bastion": {22},
@@ -28,6 +28,9 @@ ENTITIES = (
      "managed": False, "authorized": False},
     {"entity_id": "entity-backup-provider-01", "kind": "external_service",
      "name": "backup.example.net", "ip": "192.0.2.81", "role": "backup_provider",
+     "managed": False, "authorized": True},
+    {"entity_id": "entity-external-monitor-01", "kind": "external_service",
+     "name": "monitor.example.net", "ip": "203.0.113.75", "role": "external_monitor",
      "managed": False, "authorized": True},
     {"entity_id": "entity-denied-egress-01", "kind": "external_service",
      "name": "blocked.example.net", "ip": "203.0.113.80", "role": "blocked_destination",
