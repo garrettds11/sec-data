@@ -23,6 +23,40 @@ With the example start time of `2026-10-22T12:00:00Z` and the default 60-minute 
 
 The planted story and high-volume session generator are separate components. Both emit the same common event fields and use the same CIM dataset names, field types, and value directions. A regression check compares representative DNS, authentication, traffic, and web fields against the Splunk-validated story fixture. Source-specific optional fields may differ because the modeled observations differ.
 
+## Expected source inventory in Splunk
+
+The table below shows the expected source inventory after uploading the seed-42 dataset to `sec_data`. Each `events/*.jsonl` file becomes a separate `source` when uploaded with the README's `splunk add oneshot` loop. The path prefix reflects the local checkout and will differ on another machine. Splunk assigns the index and sourcetype at ingest; they are not fields in the generated JSON.
+
+| index | sourcetype | source |
+| --- | --- | --- |
+| `sec_data` | `secdata:cim:json` | `C:\GitHub\sec-data\output\dataset-42\events\background-session.jsonl` |
+| `sec_data` | `secdata:cim:json` | `C:\GitHub\sec-data\output\dataset-42\events\edge-proxy.jsonl` |
+| `sec_data` | `secdata:cim:json` | `C:\GitHub\sec-data\output\dataset-42\events\egress-firewall.jsonl` |
+| `sec_data` | `secdata:cim:json` | `C:\GitHub\sec-data\output\dataset-42\events\ingress-firewall.jsonl` |
+| `sec_data` | `secdata:cim:json` | `C:\GitHub\sec-data\output\dataset-42\events\ingress-zeek-conn.jsonl` |
+| `sec_data` | `secdata:cim:json` | `C:\GitHub\sec-data\output\dataset-42\events\ingress-zeek-http.jsonl` |
+| `sec_data` | `secdata:cim:json` | `C:\GitHub\sec-data\output\dataset-42\events\recon.jsonl` |
+| `sec_data` | `secdata:cim:json` | `C:\GitHub\sec-data\output\dataset-42\events\response-firewall.jsonl` |
+| `sec_data` | `secdata:cim:json` | `C:\GitHub\sec-data\output\dataset-42\events\sysmon.jsonl` |
+| `sec_data` | `secdata:cim:json` | `C:\GitHub\sec-data\output\dataset-42\events\vulnerability-followup.jsonl` |
+| `sec_data` | `secdata:cim:json` | `C:\GitHub\sec-data\output\dataset-42\events\vulnerability.jsonl` |
+| `sec_data` | `secdata:cim:json` | `C:\GitHub\sec-data\output\dataset-42\events\web-auth.jsonl` |
+| `sec_data` | `secdata:cim:json` | `C:\GitHub\sec-data\output\dataset-42\events\windows-file.jsonl` |
+| `sec_data` | `secdata:cim:json` | `C:\GitHub\sec-data\output\dataset-42\events\windows-security.jsonl` |
+| `sec_data` | `secdata:cim:json` | `C:\GitHub\sec-data\output\dataset-42\events\zeek-conn.jsonl` |
+| `sec_data` | `secdata:cim:json` | `C:\GitHub\sec-data\output\dataset-42\events\zeek-http.jsonl` |
+| `sec_data` | `secdata:cim:json` | `C:\GitHub\sec-data\output\splunk-lab-upload-v4.jsonl` |
+
+The last row appears only if the earlier combined lab fixture is also uploaded to `sec_data`; it is not a file from `create_dataset.py`. A fresh dataset-only ingest should show the 16 `events/` sources above. To check the source inventory in Splunk, set the time picker to **All Time** and run:
+
+```spl
+index=sec_data sourcetype=secdata:cim:json
+| stats count by index sourcetype source
+| sort source
+```
+
+If the earlier combined upload is still present, its events are additional copies of the planted story. Filter it out or use a clean index when checking the dataset's exact event count.
+
 For a high-volume run:
 
 ```powershell

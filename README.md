@@ -23,6 +23,8 @@ Get-Content .\output\dataset-42\events\recon.jsonl -TotalCount 2
 Get-Content .\output\dataset-42\dataset-manifest.json
 ```
 
+Generated runs under `output/` and the local `.venv/` are ignored by Git. After using a run, remove its output directory to reclaim space; keep `output/reference/` if you downloaded add-ons there for local inspection.
+
 | Path in the output directory | What it contains | Index as security events? |
 | --- | --- | --- |
 | `events/*.jsonl` | CIM-shaped DNS, authentication, network, web, endpoint, file-access, and vulnerability observations | Yes |
@@ -44,7 +46,7 @@ splunk restart
 Create or choose a test index, then ingest **only** `events/*.jsonl` with sourcetype `secdata:cim:json`. With `splunk` on your PATH:
 
 ```powershell
-$indexName = 'sec_data_lab' # Change to your test index
+$indexName = 'sec_data' # Change to your test index
 Get-ChildItem .\output\dataset-42\events\*.jsonl | ForEach-Object {
     splunk add oneshot $_.FullName -index $indexName -sourcetype secdata:cim:json
 }
@@ -53,11 +55,13 @@ Get-ChildItem .\output\dataset-42\events\*.jsonl | ForEach-Object {
 Search **All Time** when checking the example run, because its event time is fixed in October 2026:
 
 ```spl
-index=sec_data_lab sourcetype=secdata:cim:json
+index=sec_data sourcetype=secdata:cim:json
 | stats count by sec_data_cim_dataset
 ```
 
 Splunk assigns `host`, `source`, `sourcetype`, `index`, and `splunk_server` at ingest; the JSON supplies the modeled observation fields and UTC `time`. The add-on handles line boundaries, field extraction, event types, tags, and DNS arrays. The [lab report](docs/splunk-validation.md) shows searches and observed results from Splunk Enterprise 10.4.0 with CIM 8.7.0. The new background volume has not been indexed in that lab test.
+
+For an example of the index, sourcetype, and source values to expect after upload, see the [post-ingest source inventory](docs/dataset.md#expected-source-inventory-in-splunk).
 
 ## Choose a volume
 
