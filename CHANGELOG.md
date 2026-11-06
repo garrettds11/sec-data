@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Make the README's PowerShell run settings explicit variables, use descriptive output directory names, and link other guides to the canonical example and measured dataset snapshot.
 - Route routine events into sensor-specific source files and merge planted observations into those files by event time. The default routine mix now includes web, file, egress, and ingress sessions.
 - Add a versioned JSON scenario contract so a person or LLM can author an ordered investigation, refer to shared assets and identities, add external entities, and generate a tailored CIM-shaped package without changing generator code.
 - Record source counts and planted versus routine counts in the package manifest. Keep scenario descriptions and causal links in `truth/`.

@@ -2,11 +2,7 @@
 
 `create_dataset.py` accepts a versioned JSON scenario. A person or LLM can write this file, and the existing generator turns it into the same CIM-shaped, source-specific event package as the reference investigation. Changing the plot, timing, assets, external destinations, and ordinary traffic mix does not require editing generator code.
 
-Start with [`scenarios/file-collection.json`](../scenarios/file-collection.json). It models an inbound request, use of an operator account, process execution, a file read, an outbound connection, and a later block. The file describes seven planted observations in six ordered steps; `--target-events` fills the rest of the requested count with ordinary activity.
-
-```powershell
-python create_dataset.py --seed 42 --start-time 2026-10-22T12:00:00Z --duration-minutes 60 --target-events 10000 --scenario-file .\scenarios\file-collection.json --output-dir .\output\file-collection
-```
+Start with [`scenarios/file-collection.json`](../scenarios/file-collection.json). It models an inbound request, use of an operator account, process execution, a file read, an outbound connection, and a later block. The file describes seven planted observations in six ordered steps; `--target-events` fills the rest of the requested count with ordinary activity. The [README tailored-scenario command](../README.md#tailored-scenario) shows the named PowerShell variables and generator invocation. Choose a new `$outputDir` for each run.
 
 Index only `events/*.jsonl`. Use `context/` to look up assets, identities, and external entities. Keep `truth/scenario-truth.json` out of the analyst index: it contains the story title, causal links, step descriptions, and event IDs.
 

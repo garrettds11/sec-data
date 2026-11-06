@@ -2,11 +2,7 @@
 
 `create_dataset.py` publishes CIM-shaped JSONL events for Splunk, a shared world catalog, and a separate answer key. The reference mode builds and validates the fixed source story privately, projects it to CIM fields, then adds linked routine sessions. With `--scenario-file`, it builds the world directly and compiles the authored steps instead. Both modes publish observations under `events/`, grouped by modeled source and sorted by event time.
 
-```powershell
-python create_dataset.py --seed 42 --start-time 2026-10-22T12:00:00Z --target-events 10000 --output-dir .\output\dataset-42
-```
-
-The output directory must be new. The seed, UTC start, duration, inventory size, scenario, event target, and background mix determine the run. The manifest records file hashes and counts. For a tailored story, read the [scenario contract](scenarios.md) and add `--scenario-file`.
+Run the [README quick start](../README.md#quick-start-generate-a-dataset) for the canonical PowerShell example. It names the seed, start time, duration, event target, and output directory as variables. Change `$outputDir` for each run; the folder name has no generator semantics. The seed, UTC start, duration, inventory size, scenario, event target, and background mix determine the run. The manifest records file hashes and counts. For a tailored story, read the [scenario contract](scenarios.md) and add `--scenario-file`.
 
 | Directory | Contents | Index as security events? |
 | --- | --- | --- |
@@ -21,7 +17,7 @@ The reference one-campaign run contributes 274 planted CIM observations. The ear
 
 ## Expected source inventory in Splunk
 
-The table shows the reference 10,000-event run with seed 42, 23 hosts, one campaign, a one-hour duration, and the default background mix. It is a **post-ingest example**, not a hardcoded count guarantee for every scenario. Uploading each file with the README's `splunk add oneshot` loop makes its path the Splunk `source`. The prefix is your checkout path; the final file name is stable. Splunk assigns `index` and `sourcetype` at ingest. For this example, use `sec_data` and `secdata:cim:json`.
+The table is a measured snapshot of the [README reference configuration](../README.md#quick-start-generate-a-dataset): seed 42, 23 hosts, one campaign, a one-hour duration, and the default background mix. Seed 42 identifies the reproducible fixture; it does not determine the output folder name. Counts change with other parameters or scenarios. Uploading each file with the README's `splunk add oneshot` loop makes its path the Splunk `source`. The prefix is your checkout path; the final file name is stable. Splunk assigns `index` and `sourcetype` at ingest. This example uses `sec_data` and `secdata:cim:json`.
 
 | index | sourcetype | source filename | events |
 | --- | --- | --- | ---: |

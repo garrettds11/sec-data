@@ -43,17 +43,19 @@ Expect a final `OK`. The suite checks seeded generation, cross-file story links,
 
 ## 4. Generate the CIM event package
 
-From the repository root, choose a new output directory:
+From the repository root, set the named variables shown in the [README quick start](../README.md#quick-start-generate-a-dataset). Then choose a four-hour window and a new output directory:
 
 ```powershell
-.\.venv\Scripts\python.exe .\create_dataset.py --seed 42 `
-  --start-time 2026-10-22T12:00:00Z --duration-minutes 240 `
-  --target-events 10000 --output-dir .\output\dataset-42-4h
-Get-Content .\output\dataset-42-4h\dataset-manifest.json
-Get-Content .\output\dataset-42-4h\events\web-app.jsonl -TotalCount 2
+$durationMinutes = 240
+$outputDir = '.\output\reference-4h'
+& $python .\create_dataset.py --seed $seed --start-time $startTime `
+  --duration-minutes $durationMinutes --target-events $targetEvents `
+  --output-dir $outputDir
+Get-Content -LiteralPath (Join-Path $outputDir 'dataset-manifest.json')
+Get-Content -LiteralPath (Join-Path $outputDir 'events\web-app.jsonl') -TotalCount 2
 ```
 
-The command publishes exactly 10,000 events. `events/*.jsonl` are the only files intended for the analyst event index; `context/` and `truth/` provide reference and validation data. The four-hour setting is explicit; the command-line default remains 60 minutes. See the [dataset guide](dataset.md) for file layout and the [README](../README.md#use-the-events-in-splunk) for ingest instructions. The `output/` directory is ignored by Git. Remove an individual run directory after use to reclaim space.
+With the README's `$targetEvents` value, the command publishes exactly 10,000 events. `events/*.jsonl` are the only files intended for the analyst event index; `context/` and `truth/` provide reference and validation data. The four-hour setting is explicit; the command-line default remains 60 minutes. See the [dataset guide](dataset.md) for file layout and the [README](../README.md#use-the-events-in-splunk) for ingest instructions. The `output/` directory is ignored by Git. Remove an individual run directory after use to reclaim space.
 
 ## 5. Preview standalone finding generators
 

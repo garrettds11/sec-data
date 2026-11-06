@@ -4,11 +4,7 @@
 
 ## Generate
 
-PowerShell, from the repository root:
-
-```powershell
-python create_dataset.py --seed 42 --start-time 2026-10-22T12:00:00Z --output-dir .\output\dataset-42
-```
+For the primary event package, run the [README quick start](../README.md#quick-start-generate-a-dataset). Its named variables control the seed, time window, count, and output path.
 
 For a source story already on disk, the projection utility remains available:
 

@@ -16,20 +16,31 @@ The seed changes reproducible details, not the investigation plot. A scenario JS
 The examples use Windows PowerShell. Install Python 3.12 and Git; see the [Windows setup guide](docs/windows-software-requirements.md). The generator itself uses the Python standard library and is also tested in Linux CI.
 
 ```powershell
-git clone https://github.com/garrettds11/sec-data.git C:\GitHub\sec-data
-cd C:\GitHub\sec-data
+$repoDir = 'C:\GitHub\sec-data'
+git clone https://github.com/garrettds11/sec-data.git $repoDir
+Set-Location $repoDir
 py -3.12 -m venv .venv
-.\.venv\Scripts\python.exe .\create_dataset.py --seed 42 --start-time 2026-10-22T12:00:00Z --target-events 10000 --output-dir .\output\dataset-42
+
+$python = '.\.venv\Scripts\python.exe'
+$seed = 42
+$startTime = '2026-10-22T12:00:00Z'
+$durationMinutes = 60
+$targetEvents = 10000
+$outputDir = '.\output\reference-investigation'
+
+& $python .\create_dataset.py --seed $seed --start-time $startTime `
+  --duration-minutes $durationMinutes --target-events $targetEvents `
+  --output-dir $outputDir
 ```
 
-Choose an output directory that does not already exist. This command writes **exactly 10,000 events**. Change the seed or UTC start time for another repeatable run. `--target-events` changes the published count; 274 is the minimum for the one-campaign example shown here. More campaigns may require a higher minimum.
+Seed `42` and the UTC start time match the checked-in reference fixtures; neither is a special generator mode. Choose a descriptive `$outputDir` that does not already exist. Its name does not affect the generated events or manifest run ID, although Splunk will show the path as `source` after ingest. This command writes exactly `$targetEvents` events; see the [dataset guide](docs/dataset.md) for the reference run's planted count and source breakdown.
 
 Inspect the result:
 
 ```powershell
-Get-ChildItem .\output\dataset-42\events\*.jsonl
-Get-Content .\output\dataset-42\events\web-app.jsonl -TotalCount 2
-Get-Content .\output\dataset-42\dataset-manifest.json
+Get-ChildItem -LiteralPath (Join-Path $outputDir 'events') -Filter '*.jsonl'
+Get-Content -LiteralPath (Join-Path $outputDir 'events\web-app.jsonl') -TotalCount 2
+Get-Content -LiteralPath (Join-Path $outputDir 'dataset-manifest.json')
 ```
 
 Generated runs under `output/` and the local `.venv/` are ignored by Git. After using a run, remove its directory to reclaim space. Keep `output/reference/` if you downloaded add-ons there for local inspection.
@@ -43,10 +54,16 @@ Generated runs under `output/` and the local `.venv/` are ignored by Git. After 
 
 The planted story and ordinary activity share inventory, time range, CIM field names, and value types. DNS, authentication, network, web, endpoint, and file observations form linked routine sessions. Story events are merged into the corresponding source files in event-time order; there is no separate background source. The fixed story is built and validated privately before publishing its CIM projection. Splunk searches can generate alerts or risk events; the generator's expected alerts and case actions remain in `truth/`.
 
-To author a tailored scenario, copy [the example](scenarios/file-collection.json), edit its ordered steps and inventory references, then run:
+### Tailored scenario
+
+To author a tailored scenario, copy [the example](scenarios/file-collection.json), edit its ordered steps and inventory references, then reuse the variables from the quick start above:
 
 ```powershell
-python create_dataset.py --seed 42 --start-time 2026-10-22T12:00:00Z --duration-minutes 60 --target-events 10000 --scenario-file .\scenarios\file-collection.json --output-dir .\output\file-collection
+$scenarioFile = '.\scenarios\file-collection.json'
+$outputDir = '.\output\file-collection'
+& $python .\create_dataset.py --seed $seed --start-time $startTime `
+  --duration-minutes $durationMinutes --target-events $targetEvents `
+  --scenario-file $scenarioFile --output-dir $outputDir
 ```
 
 The tailored mode builds the shared world directly and writes only its authored story plus ordinary traffic. Its title, causal links, and step descriptions appear in `truth/scenario-truth.json`, never in analyst events. The [scenario guide](docs/scenarios.md) defines supported sources, fields, references, and validation.
@@ -60,12 +77,11 @@ Copy-Item .\splunk\TA-sec-data-cim 'C:\Program Files\Splunk\etc\apps' -Recurse -
 splunk restart
 ```
 
-Create or choose a test index, then ingest **only** `events/*.jsonl` with sourcetype `secdata:cim:json`. With `splunk` on your PATH:
+Create or choose a test index, then ingest **only** `events/*.jsonl` with sourcetype `secdata:cim:json`. The following uses the current `$outputDir` from the generation block; set it to the run you want if you opened a new PowerShell session. With `splunk` on your PATH:
 
 ```powershell
-$indexName = 'sec_data'            # Change to your test index
-$runDir    = '.\output\dataset-42'  # Change to your --output-dir
-Get-ChildItem "$runDir\events\*.jsonl" | ForEach-Object {
+$indexName = 'sec_data'
+Get-ChildItem -LiteralPath (Join-Path $outputDir 'events') -Filter '*.jsonl' -File | ForEach-Object {
     splunk add oneshot $_.FullName -index $indexName -sourcetype secdata:cim:json
 }
 ```
@@ -83,17 +99,21 @@ For the index, sourcetype, and source values to expect after upload, see the [po
 
 ## Choose a volume
 
-`--target-events` sets an exact published count. The reference 10,000-event run has 274 planted events and 9,726 ordinary events across web, file, egress, and ingress sessions. The manifest lists counts by source and by origin. For a million-event run, use a new directory:
+`--target-events` sets an exact published count. The manifest lists counts by source and by planted or ordinary origin; the [dataset guide](docs/dataset.md) records the reference run's measured distribution. To make a million-event run, set a new directory and rerun the generation command above:
 
 ```powershell
-.\.venv\Scripts\python.exe .\create_dataset.py --seed 42 --start-time 2026-10-22T12:00:00Z --target-events 1000000 --output-dir .\output\dataset-1m
+$targetEvents = 1000000
+$outputDir = '.\output\reference-volume-1m'
+& $python .\create_dataset.py --seed $seed --start-time $startTime `
+  --duration-minutes $durationMinutes --target-events $targetEvents `
+  --output-dir $outputDir
 ```
 
-A 10,000-event package with the current mix contained about 4.3 MB of event JSONL. A million-event package may approach a 500 MB/day Splunk license limit; read the actual `events/` byte totals in its manifest before ingest. A full million-event export and live Splunk ingest have not yet been measured for this design. See the [scale guide](docs/scale.md) for measurement details.
+A million-event package may approach a 500 MB/day Splunk license limit; read the actual `events/` byte totals in its manifest before ingest. A full million-event export and live Splunk ingest have not yet been measured for this design. See the [scale guide](docs/scale.md) for measurement details.
 
 ### Time coverage
 
-The example uses `--start-time 2026-10-22T12:00:00Z` and the default `--duration-minutes 60`. Background events occupy **12:00–13:00 UTC** on October 22, excluding the end of that interval. The baseline assessment occurs at **11:59 UTC**, and the last planted event at **12:47:55 UTC**. The complete 10,000-event package spans **11:59:00–12:59:59.629 UTC**. Increasing `--target-events` makes events denser within the same interval. Set `--duration-minutes 240` for a four-hour window; this also spaces the planted operations farther apart. Each JSON event includes its own UTC timestamp for Splunk event-time extraction.
+`$startTime` and `$durationMinutes` define the routine-event window. The reference story also includes a baseline assessment before that window. Increasing `$targetEvents` makes events denser within the same interval; set `$durationMinutes = 240` for a four-hour window that also spaces the planted operations farther apart. Each JSON event includes its own UTC timestamp for Splunk event-time extraction. The [dataset guide](docs/dataset.md#time-scale-and-interpretation) records the measured time span of the reference run.
 
 ### Reproduce a released run
 
@@ -111,8 +131,15 @@ Record the tag, seed, UTC start time, duration, campaign count, host count, and 
 The standalone vulnerability and compliance commands retain their JSON and JSONL outputs for the optional AWS uploader. They are separate from the CIM event package. Specify `--as-of` when you need repeatable assessment dates; `--target-records` requests an exact applicable finding count or fails if the selected inventory and catalogs cannot supply it.
 
 ```powershell
-.\.venv\Scripts\python.exe .\create_vuln_table.py --seed 42 --as-of 2026-10-22T12:00:00Z --host-count 3000 --target-records 10000 --format jsonl --output .\output\vuln-10k.jsonl
-.\.venv\Scripts\python.exe .\create_compliance_table.py --seed 42 --as-of 2026-10-22T12:00:00Z --host-count 3000 --format jsonl --output .\output\compliance.jsonl
+$findingHostCount = 3000
+$findingTarget = 10000
+$vulnOutput = '.\output\vuln-10k.jsonl'
+$complianceOutput = '.\output\compliance.jsonl'
+& $python .\create_vuln_table.py --seed $seed --as-of $startTime `
+  --host-count $findingHostCount --target-records $findingTarget `
+  --format jsonl --output $vulnOutput
+& $python .\create_compliance_table.py --seed $seed --as-of $startTime `
+  --host-count $findingHostCount --format jsonl --output $complianceOutput
 ```
 
 `create_story.py` builds the fixed source story used internally and in the checked-in [reference fixture](tests/fixtures/README.md). `create_recon_events.py` and `create_cim_events.py` remain available for source-format experiments and projection of existing bundles. Use `create_dataset.py` for the single CIM-shaped analyst event package.
@@ -129,11 +156,12 @@ For field decisions, output layout, and investigation limits, read the [dataset 
 
 All records are synthetic. The generated Zeek-shaped and Windows-shaped reference files are not exact vendor raw events, and the project does not scan systems or provide official CIS Benchmark content. Five source observations and one TLS metadata observation lack a sound CIM mapping in the current dataset. The planted read and later upload support a correlation exercise; they do not prove which file bytes were transferred.
 
-Only the separate [AWS uploader](upload_to_aws.py) contacts AWS. It accepts the standalone vulnerability and compliance outputs, requires `boto3` and configured credentials, and may create or upsert DynamoDB items with associated cost. For example, after generating `vuln-10k.jsonl`:
+Only the separate [AWS uploader](upload_to_aws.py) contacts AWS. It accepts the standalone vulnerability and compliance outputs, requires `boto3` and configured credentials, and may create or upsert DynamoDB items with associated cost. For example, after generating `$vulnOutput`:
 
 ```powershell
-.\.venv\Scripts\python.exe -m pip install boto3
-.\.venv\Scripts\python.exe .\upload_to_aws.py --dataset vuln --input .\output\vuln-10k.jsonl --region us-east-1
+& $python -m pip install boto3
+$awsRegion = 'us-east-1'
+& $python .\upload_to_aws.py --dataset vuln --input $vulnOutput --region $awsRegion
 ```
 
 The uploader prompts for a profile when one is not supplied and requires an explicit `UPLOAD` confirmation before writing. See the [Windows work instructions](docs/work-instructions-windows-vscode.md) for credentials and table details.
