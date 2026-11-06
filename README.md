@@ -33,7 +33,7 @@ $outputDir = '.\output\reference-investigation'
   --output-dir $outputDir
 ```
 
-Seed `42` and the UTC start time match the checked-in reference fixtures; neither is a special generator mode. Choose a descriptive `$outputDir` that does not already exist. Its name does not affect the generated events or manifest run ID, although Splunk will show the path as `source` after ingest. This command writes exactly `$targetEvents` events; see the [dataset guide](docs/dataset.md) for the reference run's planted count and source breakdown.
+Set `$seed` and `$startTime` for the run you want. Choose a descriptive `$outputDir` that does not already exist. Its name does not affect the generated events or manifest run ID, although Splunk will show the path as `source` after ingest. This command writes exactly `$targetEvents` events; see the [dataset guide](docs/dataset.md) for the reference run's planted count and source breakdown.
 
 Inspect the result:
 
@@ -77,7 +77,7 @@ Copy-Item .\splunk\TA-sec-data-cim 'C:\Program Files\Splunk\etc\apps' -Recurse -
 splunk restart
 ```
 
-Create or choose a test index, then ingest **only** `events/*.jsonl` with sourcetype `secdata:cim:json`. The following uses the current `$outputDir` from the generation block; set it to the run you want if you opened a new PowerShell session. With `splunk` on your PATH:
+Create the `sec_data` index in Splunk before ingesting. Splunk can report that `add oneshot` queued a file even when it later drops the events because the index does not exist. Ingest **only** `events/*.jsonl` with sourcetype `secdata:cim:json`. The following uses the current `$outputDir` from the generation block; set it to the run you want if you opened a new PowerShell session. With `splunk` on your PATH:
 
 ```powershell
 $indexName = 'sec_data'
