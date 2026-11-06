@@ -1,6 +1,6 @@
 # Linked identity and authentication fixture
 
-The story bundle now exports a small identity sequence against the shared asset catalog. The source records contain observations; `identity-truth.json` and `identity-state.jsonl` contain the policy, sessions, effective state, and links to recon operations. Keep those truth files out of analyst-facing indexes.
+The story bundle exports a small identity sequence against the shared asset catalog. This guide documents source-format fixtures; use the [primary dataset](dataset.md) for CIM-shaped analyst events. The source records contain observations; `identity-truth.json` and `identity-state.jsonl` contain policy, session, effective-state, and reconnaissance links. Keep those truth files out of analyst-facing indexes.
 
 | File | Purpose |
 | --- | --- |
@@ -20,4 +20,4 @@ The Windows records use documented event IDs [4624](https://learn.microsoft.com/
 
 For local inspection, a pinned TA-Windows **10.0.1** archive was retrieved from [Splunk's Attack Range binary manifest](https://github.com/splunk/security_content/blob/develop/contentctl.yml) into ignored `output/reference/`. SHA-256: `444a0894c6a954f4453cf398e1414a29852de23bb7ea9121dd7c4144903a86c6`. Its `eventtypes.conf` and `tags.conf` define Authentication event types for 4624/4625; `props.conf` includes XML Security field evaluations and 4728 handling. The current Splunkbase listing may offer a newer version, so pin and retest before using it as a production mapping.
 
-**Live CIM inclusion remains unverified.** The XML projection has not been ingested into a running Splunk instance with TA-Windows and CIM installed. In that test, verify `_time`, `EventCode`, `user`, `src`, `dest`, `action`, `tag=authentication`, 4728 Change tagging, and data-model membership. The JSON projection must not be labeled `XmlWinEventLog:Security`; use the XML view for that test. The web app requires its own parsing and CIM mapping, with `Authentication` as the candidate model.
+**Vendor Windows XML parsing and CIM inclusion remain unverified.** The XML projection has not been ingested with TA-Windows and CIM installed. In that test, verify `_time`, `EventCode`, `user`, `src`, `dest`, `action`, `tag=authentication`, 4728 Change tagging, and data-model membership. Do not label the JSON projection `XmlWinEventLog:Security`; use the XML view for that test. The web app source format needs its own parsing and CIM mapping, with Authentication as the candidate model. The [project-owned CIM projection](splunk-validation.md) has separate lab results.

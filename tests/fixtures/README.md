@@ -1,6 +1,6 @@
 # Generated story fixtures
 
-`story-seed42/` is a complete, deterministic output bundle from `create_story.py`.
+`story-seed42/` is a complete, deterministic source bundle from `create_story.py`.
 It contains 43 files (about 380 KiB), including the source records, supporting
 inventory, separate generator truth, and a `run-manifest.json` with record counts
 and SHA-256 hashes. The fixture is complete so cross-file references and the
@@ -42,9 +42,10 @@ It is not part of the one-campaign bundle or its manifest.
 - The 23 assets, 89 normalized recon events, 8 DNS rows, and the linked
   ingress, authentication, endpoint, data-access, alert, and response records
   pass the repository's chronology, reference, and source-projection checks.
-- The source-shaped Zeek JSON and Windows XML projections have no scenario
-  labels. The normalized `recon.jsonl` intentionally has a `synthetic` flag;
-  use source-shaped files when evaluating add-on parsing. Keep `*-truth.json`,
+- The Zeek-shaped JSON and Windows XML projections have no scenario labels.
+  The normalized `recon.jsonl` intentionally has a `synthetic` flag. Use the
+  source-format files only for parser experiments; the [static audit](../../docs/addon-parsing-audit.md)
+  documents mismatches with pinned vendor add-ons. Keep `*-truth.json`,
   `identities.jsonl`, `access-policies.jsonl`, and other generator context out
   of analyst-facing indexes unless an investigation explicitly uses them.
 - The one-campaign DNS file does not exercise query-only/timeout and retry

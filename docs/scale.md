@@ -2,7 +2,7 @@
 
 ## Linked CIM event volume
 
-The primary `create_dataset.py` command accepts `--target-events N` for an exact published event count from the 274-record planted story upward. It keeps the planted investigation and streams additional benign DNS, authentication, network, and web records linked by session ID and inventory assets. The default is 10,000 events, with roughly 2,400 background records per family. For a million-event run:
+The primary `create_dataset.py` command accepts `--target-events N` for an exact published event count. The seed-42, one-campaign example has 274 planted records; additional campaigns can raise that minimum. The command keeps the planted investigation and streams benign DNS, authentication, network, and web records linked by session ID and inventory assets. The default is 10,000 events. For a million-event run:
 
 ```powershell
 python .\create_dataset.py --seed 42 --start-time 2026-10-22T12:00:00Z --target-events 1000000 --output-dir .\output\dataset-1m

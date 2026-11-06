@@ -1,14 +1,14 @@
-# Windows software requirements — sec-data
+# Windows software requirements
 
 ## Purpose and scope
 
-Minimum workstation software to run the two local JSON generators, develop/debug them in VS Code, run unit tests, and *optionally* upload generated files to AWS DynamoDB. Data generation is offline and does not need AWS credentials.
+Use this guide to prepare a Windows workstation for the primary CIM-shaped dataset, standalone finding exports, and local tests. Generation is offline and needs no Splunk or AWS credentials. The Python code also runs in Linux CI; the commands here use PowerShell.
 
 ## Required for local data generation
 
 | Component | Requirement | Notes |
 | --- | --- | --- |
-| Windows | Windows 10 or Windows 11 | PowerShell instructions and examples target Windows. |
+| Windows | Windows 10 or Windows 11 | Required for the workstation instructions in this guide, not for the Python generator itself. |
 | Python | **Python 3.12**, 64-bit recommended | Project CI targets 3.12. Other releases are not formally validated. |
 | Shell | Windows PowerShell 5.1 or PowerShell 7+ | Use PowerShell syntax in the instructions. |
 | Source checkout | Git for Windows | Needed to clone/update source; not required after files are already present. |
@@ -38,7 +38,7 @@ Create a virtual environment with `py -3.12 -m venv .venv` and select `.venv\Scr
 
 ## Not required
 
-- EC2, Docker, Linux/WSL, a running vulnerability scanner, an actual CIS assessment engine, or official CIS Benchmark licensing for the **illustrative** bundled controls.
+- Splunk, EC2, Docker, a running vulnerability scanner, an actual CIS assessment engine, or official CIS Benchmark licensing for the **illustrative** bundled controls. Splunk is needed only when you choose to ingest or validate events.
 
 ## Validate installed versions
 

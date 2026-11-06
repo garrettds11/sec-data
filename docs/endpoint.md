@@ -1,6 +1,6 @@
 # Linked endpoint fixture
 
-The story bundle models Sysmon coverage on `prod-file-01` only. `sensor-coverage.jsonl` records the source and enabled event IDs for the first 23 assets; Linux and other Windows hosts have no Sysmon observations in this fixture. This coverage file and `endpoint-truth.json` are generator context, not analyst events.
+The story bundle models Sysmon coverage on `prod-file-01` only. This guide documents the source-format fixture; use the [primary dataset](dataset.md) for CIM-shaped analyst events. `sensor-coverage.jsonl` records the source and enabled event IDs for the first 23 assets. Linux and other Windows hosts have no Sysmon observations in this fixture. The coverage file and `endpoint-truth.json` are generator context, not analyst events.
 
 | File | Meaning |
 | --- | --- |
@@ -16,4 +16,4 @@ The analyst's Windows logon on `prod-file-01` precedes a process tree (`wsmprovh
 
 [Splunk Add-on for Sysmon](https://splunkbase.splunk.com/app/5709) is the candidate add-on with source `XmlWinEventLog:Microsoft-Windows-Sysmon/Operational`. A pinned **5.0.0** archive was retrieved from [Splunk's Attack Range binary manifest](https://github.com/splunk/security_content/blob/develop/contentctl.yml) into ignored `output/reference/`; SHA-256: `3b42abf255fbd794cdfa588c3ad152e63f4b62e5665aad0b2c8dd7a23a3b5818`. Its `eventtypes.conf` selects event 3 for network, 1/5 for process, 11 for file, and 13 for registry; `props.conf` supplies CIM field evaluations. The current Splunkbase listing may offer a newer version.
 
-**Live CIM inclusion remains unverified.** In a running Splunk test with the pinned add-on and CIM, verify `_time`, `ProcessGuid`, parent fields, `user`, network addresses/ports, file path, registry path/value, tags, and the Endpoint, Network Traffic, and Change data models. Do not label `sysmon.jsonl` as XML Windows events; use `sysmon.xml` with appropriate event boundaries and source settings. The fixture does not test Malware CIM because it emits no AV/EDR observation.
+**Vendor Sysmon parsing and CIM inclusion remain unverified.** In an isolated Splunk test with the pinned add-on and CIM, verify `_time`, `ProcessGuid`, parent fields, `user`, network addresses and ports, file path, registry path and value, tags, and the Endpoint, Network Traffic, and Change data models. Do not label `sysmon.jsonl` as XML Windows events; use `sysmon.xml` with appropriate event boundaries and source settings. The fixture does not test Malware CIM because it emits no AV or EDR observation. The [project-owned CIM projection](splunk-validation.md) has separate lab results.

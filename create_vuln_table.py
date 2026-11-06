@@ -1,25 +1,10 @@
 #!/usr/bin/env python3
-"""
-Generate synthetic vulnerability-scan findings locally; no AWS connection.
+"""Generate synthetic vulnerability findings as JSON or JSONL.
 
-Table design (one item = one finding on one asset):
-  PK  host_name      FQDN of the scanned asset         (ECS: host.name)
-  SK  finding_id     "<vulnerability_id>#<proto>/<port>"
-  GSI severity-lastseen-index : vulnerability_severity (PK) + last_seen (SK)
-  GSI vuln-host-index         : vulnerability_id (PK)       + host_name (SK)
-
-Attribute names follow the ECS vulnerability field set, flattened with "_"
-instead of "." (vulnerability.score.base -> vulnerability_score_base).
-Fields ECS does not define (title, CWE, CVSS vector, EPSS, exploit flag,
-plugin id, scan type/network, port/service, MAC, OS) use plain names.
-
-Data notes:
-  * CVE IDs/titles are real; CVSS scores are computed from the vector
-    (CVSS 3.1 formula); EPSS values are illustrative, not live.
-  * A few findings are deliberately "planted" so test questions have
-    known answers. The summary printed at the end reports them.
-
-Usage:\n  python create_vuln_table.py --output output/vuln-findings.json\n  python create_vuln_table.py --dry-run
+Runs locally without AWS. Records use flattened ECS-style fields and include
+planted findings for repeatable investigations. CVE identifiers and titles are
+catalog references; EPSS values are illustrative, not live measurements.
+See docs/scale.md for output size, history, and optional upload behavior.
 """
 import argparse
 import math
@@ -391,7 +376,8 @@ def main():
     ap.add_argument("--seed", type=int, default=42)
     ap.add_argument("--host-count", type=int, default=DEFAULT_HOST_COUNT)
     ap.add_argument("--findings-per-host", type=int)
-    ap.add_argument("--target-records", type=int, help="Maximum exact exported record count; fails if unavailable")
+    ap.add_argument("--target-records", type=int,
+                    help="Exact record count to export; fail if the catalogs cannot supply it")
     ap.add_argument("--as-of", help="UTC or offset assessment time; required for reproducible dates")
     ap.add_argument("--snapshots", nargs="+", help="Ascending, unique ISO 8601 assessment times")
     ap.add_argument("--format", choices=("json", "jsonl"), default="json")

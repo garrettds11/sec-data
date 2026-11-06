@@ -1,6 +1,6 @@
 # CIM-shaped synthetic observations
 
-`create_dataset.py` is the primary entry point for a single CIM-shaped analyst event package; see [the dataset guide](dataset.md). `create_cim_events.py` remains a projection utility for existing source bundles. Its mapping reference is Splunk CIM **8.8**. The project-owned `splunk/TA-sec-data-cim` add-on supplies a synthetic sourcetype, JSON and timestamp extraction, event types, tags, and global visibility. A deterministic projection fixture has also been tested against Splunk Enterprise 10.4.0 and the CIM add-on 8.7.0; see [the lab validation report](splunk-validation.md) and [field decisions](cim-fields.md).
+`create_dataset.py` is the primary entry point for a single CIM-shaped analyst event package; see the [dataset guide](dataset.md). `create_cim_events.py` projects an existing source bundle or individual source file. The mapping was designed against Splunk CIM **8.8** documentation and tested in a local Splunk Enterprise 10.4.0 instance with CIM **8.7.0**. The project-owned `splunk/TA-sec-data-cim` add-on supplies the sourcetype, JSON and timestamp extraction, event types, tags, and knowledge-object visibility. See the [lab validation report](splunk-validation.md) and [field decisions](cim-fields.md) for the tested scope.
 
 ## Generate
 
@@ -25,7 +25,7 @@ python create_recon_events.py --start-time 2026-10-22T12:00:00Z --output .\outpu
 python create_cim_events.py --input-file .\output\recon.jsonl --source recon.jsonl --output-file .\output\recon.cim.jsonl
 ```
 
-The legacy story projection creates one `.cim.jsonl` file per observed source and a `cim-manifest.json` with source and output checksums, counts, unmapped counts, and validation status. All output paths must be new. A small deterministic set of these files is committed under `tests/fixtures/cim-story-42/`; the primary dataset command selects one analyst view from that projection.
+The source-bundle projection creates one `.cim.jsonl` file per observed source and a `cim-manifest.json` with checksums, counts, unmapped counts, and validation status. Output paths must be new. A deterministic fixture is committed under `tests/fixtures/cim-story-42/`; the primary dataset command selects one analyst view from that projection, excluding duplicate DNS and scripted alert or case records.
 
 ## Mapping coverage
 
@@ -41,7 +41,7 @@ The legacy story projection creates one `.cim.jsonl` file per observed source an
 | vulnerability baseline/follow-up | Vulnerabilities | Only actual CVE IDs populate `cve`; scanner-only plugins still have a signature. |
 | alerts and case actions | Alerts and Ticket_Management | Describes detector output and case history, not raw activity. |
 
-Inventory, entities, identities, policies, compliance assessment snapshots, timeline, state changes, and truth manifests remain outside the CIM event projection. A compliance snapshot has no direct event mapping here; the status remains available in the source bundle for context.
+Inventory, entities, identities, policies, compliance assessment snapshots, timeline, state changes, and truth manifests remain outside the CIM event projection. Compliance status remains available as context, not as a mapped event.
 
 Each row includes `time`, `synthetic`, `sec_data_source`, and `sec_data_cim_dataset`. The last field is project metadata for routing and audit; it does **not** cause Splunk data-model membership. `tag` is intentionally absent because Splunk generates that field through its knowledge objects. Source timestamps are preserved as ISO UTC strings; DNS and Zeek epoch timestamps are rendered in UTC. DNS response times and recon durations are in seconds. The projection does not imply that these concise events match vendor raw formats or that vendor add-ons will parse them.
 

@@ -134,14 +134,20 @@ def export_dataset(seed, start, duration_minutes, campaign_count, host_count, ou
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--seed", type=int, default=42)
-    parser.add_argument("--start-time", required=True)
-    parser.add_argument("--duration-minutes", type=int, default=60)
-    parser.add_argument("--campaign-count", type=int, default=1)
-    parser.add_argument("--host-count", type=int, default=DEFAULT_HOST_COUNT)
+    parser.add_argument("--seed", type=int, default=42,
+                        help="Repeatable run seed (default: 42)")
+    parser.add_argument("--start-time", required=True,
+                        help="ISO 8601 start time with timezone, for example 2026-10-22T12:00:00Z")
+    parser.add_argument("--duration-minutes", type=int, default=60,
+                        help="Event window in minutes; also spaces planted operations (default: 60)")
+    parser.add_argument("--campaign-count", type=int, default=1,
+                        help="Sets of four planted reconnaissance operations (default: 1)")
+    parser.add_argument("--host-count", type=int, default=DEFAULT_HOST_COUNT,
+                        help=f"Inventory size, at least {DEFAULT_HOST_COUNT} (default: {DEFAULT_HOST_COUNT})")
     parser.add_argument("--target-events", type=int, default=10000,
-                        help="Exact published event count; default 10000")
-    parser.add_argument("--output-dir", required=True)
+                        help="Exact published event count, at least the planted count (default: 10000)")
+    parser.add_argument("--output-dir", required=True,
+                        help="New directory for events, context, truth, and manifest")
     args = parser.parse_args()
     try:
         start = datetime.fromisoformat(parse_times([args.start_time])[0].replace("Z", "+00:00"))

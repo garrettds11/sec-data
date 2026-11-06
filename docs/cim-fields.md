@@ -1,6 +1,6 @@
 # CIM projection field decisions
 
-This is the field profile of the deterministic seed-42 fixture in `tests/fixtures/cim-story-42/`. "Core" means required by this fixture profile because it is present on every row of that dataset; it is not a promise that every future source will observe the field. "Conditional" fields are optional and appear only when the source supports them. The notes identify derived or normalized fields. All projected rows contain `time`, `synthetic`, `sec_data_source`, and `sec_data_cim_dataset`. The installed CIM 8.7.0 definitions for these twelve datasets mark no field as `required=true`; their membership constraints use tags. The project add-on supplies those tags at search time.
+This table profiles the deterministic seed-42 fixture in `tests/fixtures/cim-story-42/`. A **core** field appears on every row of the named fixture dataset; it is not guaranteed for every future source. **Conditional** fields appear only when the modeled observation supports them. The notes identify derived or normalized values. Every projected row includes `time`, `synthetic`, `sec_data_source`, and `sec_data_cim_dataset`. The installed CIM 8.7.0 definitions mark no field as `required=true` in these twelve datasets; membership depends on tags supplied at search time by the project add-on.
 
 | Dataset | Core fields in fixture | Conditional fields and derived values |
 | --- | --- | --- |

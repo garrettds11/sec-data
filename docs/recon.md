@@ -1,6 +1,6 @@
 # Offline reconnaissance telemetry
 
-`create_recon_events.py` uses the default 23-host inventory in `common/assets.py`. It never scans a network, executes a tool, contacts a reference URL, or uses AWS. It builds four modeled operations per campaign set plus ordinary browsing sessions, then projects them into normalized sensor observations. The four families are external service discovery with web follow-up, internal service/share discovery, monitored Nmap-like SYN probing, and an approved scanner control. The web paths are inert strings; responses contain no secrets.
+`create_recon_events.py` uses the default 23-host inventory in `common/assets.py`. This guide documents its normalized source-format output; use the [primary dataset](dataset.md) for CIM-shaped Splunk events. The command does not scan a network, execute a tool, contact a reference URL, or use AWS. It builds four modeled operations per campaign set plus ordinary browsing sessions. The families are external service discovery with web follow-up, internal service and share discovery, monitored Nmap-like SYN probing, and an approved scanner control. Web paths are inert strings, and responses contain no secrets.
 
 ```powershell
 python .\create_recon_events.py --seed 42 `
@@ -44,7 +44,7 @@ python .\tools\inspect_pcapng.py .\reference-ss-scan.pcapng `
 
 ## Investigation and Splunk smoke test
 
-Ingest `recon-events.jsonl` only into a test index, using a dedicated sourcetype such as `sec_data_recon_jsonl`. Configure JSON field extraction and map the ISO 8601 `timestamp` to Splunk `_time`; verify a sample's `_time` and `event_id` after ingestion. This repository has **not** run a live Splunk ingest test. The following searches are starting points, not validated CIM mappings:
+If testing this standalone source format, ingest `recon-events.jsonl` into an isolated index with a dedicated sourcetype such as `sec_data_recon_jsonl`. Configure JSON field extraction and map the ISO 8601 `timestamp` to Splunk `_time`; verify `_time` and `event_id` on a sample. This standalone path has **not** undergone live Splunk validation. The searches below are starting points, not validated CIM mappings. The [primary CIM fixture](splunk-validation.md) has separate lab results.
 
 ```spl
 index=<test-index> sourcetype=sec_data_recon_jsonl event_type=network_connection
@@ -68,4 +68,4 @@ Check the truth file only after forming an analyst hypothesis. The approved scan
 
 ## Limits and next validation
 
-The current normalized model does not emulate Zeek connection expiration, UDP ambiguity, passive HTTPS decryption, endpoint coverage variation by individual host, or large-scale temporal merging. The internal and default Nmap profiles use project-chosen small target sets. A future workflow should calibrate richer profiles against selected, verified CIC-IDS2017 or project-owned windows and record tool/sensor versions where available. Splunk ingestion, extraction, investigation searches, and throughput still need validation in an actual test instance.
+The normalized source model does not emulate Zeek connection expiration, UDP ambiguity, passive HTTPS decryption, per-host endpoint coverage variation, or large-scale temporal merging. The internal and default Nmap profiles use project-chosen small target sets. Richer profiles would need verified captures and documented tool and sensor versions. The standalone source-format ingestion path and its search throughput remain untested in Splunk.

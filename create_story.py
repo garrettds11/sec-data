@@ -395,11 +395,15 @@ def export_story(seed, start, duration_minutes, campaign_count, host_count, outp
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument("--seed", type=int, default=42,
+                        help="Repeatable run seed (default: 42)")
     parser.add_argument("--start-time", required=True, help="ISO 8601 timestamp with timezone")
-    parser.add_argument("--duration-minutes", type=int, default=60)
-    parser.add_argument("--campaign-count", type=int, default=1)
-    parser.add_argument("--host-count", type=int, default=DEFAULT_HOST_COUNT)
+    parser.add_argument("--duration-minutes", type=int, default=60,
+                        help="Event window in minutes (default: 60)")
+    parser.add_argument("--campaign-count", type=int, default=1,
+                        help="Sets of four planted reconnaissance operations (default: 1)")
+    parser.add_argument("--host-count", type=int, default=DEFAULT_HOST_COUNT,
+                        help=f"Inventory size, at least {DEFAULT_HOST_COUNT} (default: {DEFAULT_HOST_COUNT})")
     parser.add_argument("--output-dir", required=True, help="New directory for this run")
     parser.add_argument("--cim-output-dir", help="Optional new directory for CIM-shaped observation files")
     args = parser.parse_args()

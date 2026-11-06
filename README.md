@@ -1,19 +1,27 @@
 # sec-data
 
-Generate synthetic security events for Splunk investigations and detection tests. A run combines a planted investigation with repeatable background activity, then writes one CIM-shaped JSONL view for analyst ingest. It runs locally; generating data does not require Splunk, AWS, or a network scan.
+Generate synthetic security events for Splunk investigations and detection tests. The primary command combines a fixed, linked investigation with repeatable background activity and publishes one CIM-shaped JSONL event package. Generation runs locally and requires no Splunk instance, AWS account, or network scan.
+
+| Task | Entry point | Result |
+| --- | --- | --- |
+| Generate events for Splunk | `create_dataset.py` | `events/` for ingest, `context/` for reference, and `truth/` for validation |
+| Inspect the source story | `create_story.py` | Source-format observations, shared world data, timeline, and answer key |
+| Export standalone findings | `create_vuln_table.py`, `create_compliance_table.py` | JSON or JSONL for local analysis or the optional AWS uploader |
+
+The seed changes reproducible details, not the investigation plot. This release does not accept a natural-language story prompt or a scenario specification. See the [documentation index](docs/README.md) for the main workflow and source-format references.
 
 ## Quick start: generate a dataset
 
-Requirements: Windows 10/11, Python 3.12, PowerShell, and Git. See the [Windows setup guide](docs/windows-software-requirements.md) for tooling details.
+The examples use Windows PowerShell. Install Python 3.12 and Git; see the [Windows setup guide](docs/windows-software-requirements.md). The generator itself uses the Python standard library and is also tested in Linux CI.
 
 ```powershell
-git clone https://github.com/garrettds11/sec-data.git C:\code\Github\sec-data
-cd C:\code\Github\sec-data
+git clone https://github.com/garrettds11/sec-data.git C:\GitHub\sec-data
+cd C:\GitHub\sec-data
 py -3.12 -m venv .venv
 .\.venv\Scripts\python.exe .\create_dataset.py --seed 42 --start-time 2026-10-22T12:00:00Z --target-events 10000 --output-dir .\output\dataset-42
 ```
 
-Choose an output directory that does not already exist. The command writes **exactly 10,000 events**. Use another seed or UTC start time for a different run. For a larger file set, change `--target-events`; the minimum is the 274-event planted story, and the default is 10,000.
+Choose an output directory that does not already exist. This command writes **exactly 10,000 events**. Change the seed or UTC start time for another repeatable run. `--target-events` changes the published count; 274 is the minimum for the one-campaign example shown here. More campaigns may require a higher minimum.
 
 Inspect the result:
 
@@ -23,7 +31,7 @@ Get-Content .\output\dataset-42\events\recon.jsonl -TotalCount 2
 Get-Content .\output\dataset-42\dataset-manifest.json
 ```
 
-Generated runs under `output/` and the local `.venv/` are ignored by Git. After using a run, remove its output directory to reclaim space; keep `output/reference/` if you downloaded add-ons there for local inspection.
+Generated runs under `output/` and the local `.venv/` are ignored by Git. After using a run, remove its directory to reclaim space. Keep `output/reference/` if you downloaded add-ons there for local inspection.
 
 | Path in the output directory | What it contains | Index as security events? |
 | --- | --- | --- |
@@ -32,7 +40,7 @@ Generated runs under `output/` and the local `.venv/` are ignored by Git. After 
 | `truth/` | Generator answer key, timeline, and expected alert and case outcomes | No |
 | `dataset-manifest.json` | Run ID, exact counts, exclusions, byte sizes, and SHA-256 hashes | No |
 
-The planted story and background activity share inventory, time range, CIM field names, and value types. Background DNS, authentication, connection, and HTTP records share session IDs. The script creates source observations privately to validate the story, then publishes only the CIM-shaped analyst events. Splunk searches can produce their own alerts or risk events; the generator's expected alerts and case actions stay in `truth/`.
+The planted story and background activity share inventory, time range, CIM field names, and value types. Background DNS, authentication, connection, and HTTP records share session IDs. The command creates source observations temporarily to validate the story, then publishes the selected CIM-shaped events. Splunk searches can generate alerts or risk events; the generator's expected alerts and case actions remain in `truth/`.
 
 ## Use the events in Splunk
 
@@ -59,13 +67,13 @@ index=sec_data sourcetype=secdata:cim:json
 | stats count by sec_data_cim_dataset
 ```
 
-Splunk assigns `host`, `source`, `sourcetype`, `index`, and `splunk_server` at ingest; the JSON supplies the modeled observation fields and UTC `time`. The add-on handles line boundaries, field extraction, event types, tags, and DNS arrays. The [lab report](docs/splunk-validation.md) shows searches and observed results from Splunk Enterprise 10.4.0 with CIM 8.7.0. The new background volume has not been indexed in that lab test.
+Splunk assigns `host`, `source`, `sourcetype`, `index`, and `splunk_server` at ingest; the JSON supplies the modeled observation fields and UTC `time`. The project add-on handles event boundaries, field extraction, event types, tags, and DNS arrays. The [lab report](docs/splunk-validation.md) records checks on the planted fixture in Splunk Enterprise 10.4.0 with CIM 8.7.0. The high-volume background stream has not undergone that live validation.
 
 For an example of the index, sourcetype, and source values to expect after upload, see the [post-ingest source inventory](docs/dataset.md#expected-source-inventory-in-splunk).
 
 ## Choose a volume
 
-`--target-events` sets an exact published count. The default 10,000-event run has 274 planted events and 9,726 background events, with roughly 2,400 background records in each of four event families. For a million-event run, use a new directory:
+`--target-events` sets an exact published count. The example 10,000-event run has 274 planted events and 9,726 background events, with roughly 2,400 background records in each of four event families. For a million-event run, use a new directory:
 
 ```powershell
 .\.venv\Scripts\python.exe .\create_dataset.py --seed 42 --start-time 2026-10-22T12:00:00Z --target-events 1000000 --output-dir .\output\dataset-1m
@@ -75,7 +83,18 @@ An actual 100,000-event package contained 42.5 MB of event JSONL. A million-even
 
 ### Time coverage
 
-The example uses `--start-time 2026-10-22T12:00:00Z` and the default `--duration-minutes 60`. Background events are spread from **12:00 UTC up to, but before, 13:00 UTC** on October 22. The planted baseline assessment is at **11:59 UTC**, one minute before the start; its last event is at **12:47:55 UTC**. Thus the complete default 10,000-event output spans **11:59:00 through 12:59:59.629 UTC**. The measured 100,000-event output ends at **12:59:59.963 UTC**. Increasing `--target-events` makes events denser within the same window; change `--duration-minutes` to cover a longer or shorter period.
+The example uses `--start-time 2026-10-22T12:00:00Z` and the default `--duration-minutes 60`. Background events occupy **12:00–13:00 UTC** on October 22, excluding the end of that interval. The baseline assessment occurs at **11:59 UTC**, and the last planted event at **12:47:55 UTC**. The complete 10,000-event package spans **11:59:00–12:59:59.629 UTC**. Increasing `--target-events` makes events denser within the same interval. Set `--duration-minutes 240` for a four-hour window; this also spaces the planted operations farther apart. Each JSON event includes its own UTC timestamp for Splunk event-time extraction.
+
+### Reproduce a released run
+
+To use this version later, check out the release tag before generating data:
+
+```powershell
+git fetch --tags
+git checkout v0.1.0
+```
+
+Record the tag, seed, UTC start time, duration, campaign count, host count, and target event count with the output. The `dataset-manifest.json` file records run parameters and hashes for every published file. Use those hashes to verify a regenerated package. Standalone finding exports also need an explicit `--as-of` or `--snapshots` value for repeatable assessment dates.
 
 ## Other commands
 
@@ -111,4 +130,4 @@ The uploader prompts for a profile when one is not supplied and requires an expl
 
 ## License
 
-See [LICENSE](LICENSE).
+See [LICENSE](LICENSE) and the [release notes](CHANGELOG.md).

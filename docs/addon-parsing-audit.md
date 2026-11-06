@@ -1,9 +1,6 @@
 # Static add-on parsing audit for generated fixtures
 
-This audit compares the checked-in `tests/fixtures/story-seed42/` records with
-the pinned add-on configuration already inspected for issue #22. It is a
-configuration review, **not** a Splunk ingest or CIM inclusion result. The
-archives are kept in ignored `output/reference/` and are not redistributed.
+This audit compares the checked-in `tests/fixtures/story-seed42/` source-format records with pinned vendor add-on configurations. It is a static configuration review, **not** a Splunk ingest or CIM inclusion result for those source files. The downloaded archives are kept locally in ignored `output/reference/` and are not redistributed.
 
 | Add-on | Inspected version | SHA-256 |
 | --- | --- | --- |
@@ -34,31 +31,11 @@ project-owned normalized recon, edge, web-auth, alert, and case-action JSONL
 have no claimed vendor add-on; they need explicit sourcetypes and mapping if
 they are to participate in CIM searches.
 
-## Selected direction
+## Implemented ingestion path
 
-The primary dataset workflow emits **one CIM-shaped analyst event package** from its
-synthetic world model. Source-shaped evidence is used internally for generation
-and validation; standalone source commands remain for compatibility. The current
-fixture is not already CIM-ready: for example, `dns.log` uses `id.orig_h` and
-`id.resp_h` rather than `src` and `dest`, and the Windows authentication JSONL
-uses `TargetUserName` and `IpAddress` rather than the corresponding CIM fields.
-The new projection should use CIM names and value semantics where the modeled
-source supports them, without inventing unavailable observations or leaking
-generator truth.
+`create_dataset.py` publishes one CIM-shaped analyst event package from the shared synthetic world. Source-format records are used to construct and validate it; the standalone source commands remain available for inspection and compatibility. The source files are not themselves CIM-ready: `dns.log` uses `id.orig_h` and `id.resp_h`, for example, and Windows authentication JSONL uses `TargetUserName` and `IpAddress`.
 
-Give the CIM-shaped files project-owned sourcetypes and explicit event-time
-parsing. A small project-owned Splunk add-on can then provide event types,
-tags, and any remaining calculated fields or aliases. The vendor technology
-add-ons are optional schema references, not runtime dependencies. The Splunk
-Common Information Model add-on remains the target for testing data-model
-membership in a live Splunk instance. Keep generator truth files out of the
-analyst index. The XML projections and vendor-shaped Zeek JSON can remain as
-source-format examples; their resemblance to a vendor log does not make them
-compatible with that vendor's add-on.
-
-Run a focused live ingest test of the project-owned mapping and record
-`_time`, event boundaries, extracted fields, tags, and data-model membership.
-Static inspection cannot prove the effective Splunk configuration.
+The published `events/*.jsonl` files use `secdata:cim:json`. The project-owned `TA-sec-data-cim` add-on supplies UTC event-time parsing, JSON extraction, event types, tags, and DNS array mappings. The vendor add-ons are schema references, not runtime dependencies for this path. Keep `context/` and `truth/` out of the analyst event index. The [local Splunk validation](splunk-validation.md) measured event boundaries, `_time`, selected fields, tags, and data-model membership for the planted fixture; it did not test vendor source parsing or the high-volume background stream.
 
 If a future test specifically needs to exercise a vendor add-on, obtain a
 genuine sample through its documented collection path, match its event framing
@@ -66,4 +43,4 @@ and raw syntax, then compare the generated record against the add-on's
 `props.conf`, `transforms.conf`, `eventtypes.conf`, and `tags.conf`. That is
 separate vendor-fidelity work, not a prerequisite for the synthetic CIM dataset.
 
-Track the live result and any generator or mapping changes in issue #22.
+Record any future vendor-format test separately, including the exact add-on version, raw sample, sourcetype, effective configuration, and observed field extraction.

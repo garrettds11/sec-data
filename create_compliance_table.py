@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Generate illustrative CIS-inspired configuration assessments locally.
+"""Generate synthetic compliance assessments as JSON or JSONL.
 
-Synthetic, independently authored checks only; NOT an official CIS assessment.
-Example: python create_compliance_table.py --dry-run --seed 42
-         python create_compliance_table.py --region us-east-1 --append
+The checks are independently authored and illustrative; this is not an
+official CIS Benchmark assessment. Generation runs locally without AWS.
+See docs/scale.md for output size, history, and optional upload behavior.
 """
 import argparse
 import hashlib
@@ -151,7 +151,8 @@ def main():
     parser.add_argument("--snapshots", nargs="+", help="Ascending, unique ISO 8601 assessment times")
     parser.add_argument("--host-count", type=int, default=DEFAULT_HOST_COUNT)
     parser.add_argument("--findings-per-host", type=int)
-    parser.add_argument("--target-records", type=int)
+    parser.add_argument("--target-records", type=int,
+                        help="Exact record count to export; fail if the catalogs cannot supply it")
     parser.add_argument("--format", choices=("json", "jsonl"), default="json")
     parser.add_argument("--catalog-dir", type=Path, default=CATALOG_DIR,
                         help="Directory of project-owned illustrative compliance catalog JSON files")
