@@ -63,8 +63,9 @@ splunk restart
 Create or choose a test index, then ingest **only** `events/*.jsonl` with sourcetype `secdata:cim:json`. With `splunk` on your PATH:
 
 ```powershell
-$indexName = 'sec_data' # Change to your test index
-Get-ChildItem .\output\dataset-42\events\*.jsonl | ForEach-Object {
+$indexName = 'sec_data'            # Change to your test index
+$runDir    = '.\output\dataset-42'  # Change to your --output-dir
+Get-ChildItem "$runDir\events\*.jsonl" | ForEach-Object {
     splunk add oneshot $_.FullName -index $indexName -sourcetype secdata:cim:json
 }
 ```
