@@ -2,13 +2,9 @@
 
 ## Linked CIM event volume
 
-The primary `create_dataset.py` command accepts `--target-events N` for an exact published event count. The seed-42 reference story has 274 planted records; additional campaigns can raise that minimum. A tailored scenario instead uses the number of observations in its JSON file. The remaining count consists of routine web, file, ingress, and egress sessions linked by session ID and inventory assets. Events from both origins are merged by event time into source-specific files. The default is 10,000 events. For a million-event run:
+The primary `create_dataset.py` command accepts `--target-events N` for an exact published event count. The reference story has a planted minimum that rises with additional campaigns; a tailored scenario instead uses the number of observations in its JSON file. The remaining count consists of routine web, file, ingress, and egress sessions linked by session ID and inventory assets. Events from both origins are merged by event time into source-specific files. The [README volume example](../README.md#choose-a-volume) shows how to set `$targetEvents` and a new `$outputDir` for a million-event run.
 
-```powershell
-python .\create_dataset.py --seed 42 --start-time 2026-10-22T12:00:00Z --target-events 1000000 --output-dir .\output\dataset-1m
-```
-
-The current 10,000-event reference package contained 4,295,193 event bytes. The earlier v0.1.0 design measured 42,520,967 bytes for 100,000 events, but its single background source and event mix differ, so that figure is not a measurement of the current layout. The million-event command's full disk-write time and Splunk ingest behavior have not been measured. Read the actual event byte total from `dataset-manifest.json` before indexing against a daily license limit. During generation, source spools and atomic output files temporarily use more disk space than the final package; allow roughly three times the expected event bytes. The [dataset guide](dataset.md) explains the package layout and source distribution.
+The [dataset guide](dataset.md#time-scale-and-interpretation) records the current reference package's measured event bytes. The earlier v0.1.0 design measured 42,520,967 bytes for 100,000 events, but its single background source and event mix differ, so that figure is not a measurement of the current layout. The million-event command's full disk-write time and Splunk ingest behavior have not been measured. Read the actual event byte total from `dataset-manifest.json` before indexing against a daily license limit. During generation, source spools and atomic output files temporarily use more disk space than the final package; allow roughly three times the expected event bytes.
 
 ## Standalone finding volume
 
