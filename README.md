@@ -77,7 +77,7 @@ Copy-Item .\splunk\TA-sec-data-cim 'C:\Program Files\Splunk\etc\apps' -Recurse -
 splunk restart
 ```
 
-Create the `sec_data` index in Splunk before ingesting. Splunk can report that `add oneshot` queued a file even when it later drops the events because the index does not exist. Ingest **only** `events/*.jsonl` with sourcetype `secdata:cim:json`. The following uses the current `$outputDir` from the generation block; set it to the run you want if you opened a new PowerShell session. With `splunk` on your PATH:
+Create the `sec_data` index before ingesting: in Splunk Web, select **Settings → Indexes → New Index**, or run `splunk add index sec_data` once from the CLI. Splunk can report that `add oneshot` queued a file even when it later drops the events because the index does not exist. Ingest **only** `events/*.jsonl` with sourcetype `secdata:cim:json`. The following uses the current `$outputDir` from the generation block; set it to the run you want if you opened a new PowerShell session. With `splunk` on your PATH:
 
 ```powershell
 $indexName = 'sec_data'
@@ -86,7 +86,22 @@ Get-ChildItem -LiteralPath (Join-Path $outputDir 'events') -Filter '*.jsonl' -Fi
 }
 ```
 
-Search **All Time** when checking the example run, because its event time is fixed in October 2026:
+Confirm the ingest before investigating. In PowerShell, read the expected count from this run's manifest:
+
+```powershell
+(Get-Content -LiteralPath (Join-Path $outputDir 'dataset-manifest.json') -Raw | ConvertFrom-Json).event_records
+```
+
+In Splunk, select **All Time** and run:
+
+```spl
+index=sec_data earliest=0
+| stats count
+```
+
+The two counts must match when the index contains only this run. If you have indexed earlier runs into `sec_data`, use a fresh index for an exact comparison and update the index name in both the ingest command and search. A successful `add oneshot` message alone does not confirm that Splunk indexed the events.
+
+To inspect the example run by CIM dataset, search **All Time** because its event time is fixed in October 2026:
 
 ```spl
 index=sec_data sourcetype=secdata:cim:json
