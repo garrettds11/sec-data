@@ -5,6 +5,7 @@ Start with the repository [README](../README.md) to generate and ingest a CIM-sh
 | Guide | Use it for |
 | --- | --- |
 | [Dataset](dataset.md) | Output layout, event counts, source inventory, time span, and scaling limits |
+| [Tailored scenarios](scenarios.md) | Versioned JSON contract for LLM-authored story steps and source observations |
 | [CIM mapping](cim.md) and [field decisions](cim-fields.md) | Event structure, sourcetype, tags, and field semantics |
 | [Splunk validation](splunk-validation.md) | Measured fixture results, example searches, and the limits of the lab test |
 | [Scale and history](scale.md) | Large datasets and standalone finding exports |

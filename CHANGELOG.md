@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+- Route routine events into sensor-specific source files and merge planted observations into those files by event time. The default routine mix now includes web, file, egress, and ingress sessions.
+- Add a versioned JSON scenario contract so a person or LLM can author an ordered investigation, refer to shared assets and identities, add external entities, and generate a tailored CIM-shaped package without changing generator code.
+- Record source counts and planted versus routine counts in the package manifest. Keep scenario descriptions and causal links in `truth/`.
+- The new event layout is not yet validated in a live Splunk ingest. The v0.1.0 lab results below remain evidence for the earlier planted fixture.
+
 ## v0.1.0 — 2026-11-06
 
 First tagged release of the deterministic synthetic security dataset generator.

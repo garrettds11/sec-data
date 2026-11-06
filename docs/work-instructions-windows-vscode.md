@@ -50,7 +50,7 @@ From the repository root, choose a new output directory:
   --start-time 2026-10-22T12:00:00Z --duration-minutes 240 `
   --target-events 10000 --output-dir .\output\dataset-42-4h
 Get-Content .\output\dataset-42-4h\dataset-manifest.json
-Get-Content .\output\dataset-42-4h\events\recon.jsonl -TotalCount 2
+Get-Content .\output\dataset-42-4h\events\web-app.jsonl -TotalCount 2
 ```
 
 The command publishes exactly 10,000 events. `events/*.jsonl` are the only files intended for the analyst event index; `context/` and `truth/` provide reference and validation data. The four-hour setting is explicit; the command-line default remains 60 minutes. See the [dataset guide](dataset.md) for file layout and the [README](../README.md#use-the-events-in-splunk) for ingest instructions. The `output/` directory is ignored by Git. Remove an individual run directory after use to reclaim space.

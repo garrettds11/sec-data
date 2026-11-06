@@ -10,7 +10,7 @@ The files were combined in chronological order for a one-time upload to a tempor
 
 ![Splunk Statistics view listing the index, CIM sourcetype, and uploaded JSONL source files](images/splunk-source-inventory.png)
 
-This screenshot uses an earlier temporary index name. Use `sec_data` for new uploads. It shows the 16 `dataset-42/events/` files and a separate combined fixture upload. A fresh dataset-only ingest has 16 event-file sources. See the [current source inventory](dataset.md#expected-source-inventory-in-splunk) for the expected index and filenames. The image illustrates the Splunk view; the measurements below came from the isolated 291-event fixture.
+This screenshot uses an earlier temporary index name. Use `sec_data` for new uploads. It shows the 16 event files in the earlier dataset design and a separate combined fixture upload. The current reference run produces 19 source files; see the [current source inventory](dataset.md#expected-source-inventory-in-splunk). The image illustrates the Splunk view, while the measurements below came from the isolated 291-event fixture.
 
 | CIM data model dataset | Expected | Indexed | Model search |
 | --- | ---: | ---: | ---: |

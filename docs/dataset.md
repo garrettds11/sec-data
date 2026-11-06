@@ -1,53 +1,53 @@
 # One CIM event dataset per run
 
-`create_dataset.py` publishes one analyst-facing event representation. It builds and validates source observations in a private temporary directory, projects supported observations to CIM-shaped JSONL, then publishes only the selected event view. The temporary source records are removed after publication. Standalone vulnerability and compliance commands retain their current output contracts for the optional AWS uploader.
+`create_dataset.py` publishes CIM-shaped JSONL events for Splunk, a shared world catalog, and a separate answer key. The reference mode builds and validates the fixed source story privately, projects it to CIM fields, then adds linked routine sessions. With `--scenario-file`, it builds the world directly and compiles the authored steps instead. Both modes publish observations under `events/`, grouped by modeled source and sorted by event time.
 
 ```powershell
 python create_dataset.py --seed 42 --start-time 2026-10-22T12:00:00Z --target-events 10000 --output-dir .\output\dataset-42
 ```
 
-The output directory must be new. The package contains:
+The output directory must be new. The seed, UTC start, duration, inventory size, scenario, event target, and background mix determine the run. The manifest records file hashes and counts. For a tailored story, read the [scenario contract](scenarios.md) and add `--scenario-file`.
 
-| Directory | Contents | Splunk ingest? |
+| Directory | Contents | Index as security events? |
 | --- | --- | --- |
-| `events/` | CIM-shaped JSONL for DNS, traffic, web, authentication, account change, endpoint, file access, and vulnerabilities | Yes, with `secdata:cim:json` and the project add-on |
-| `context/` | Assets, external entities, relationships, identities, policies, data objects, compliance assessments, and detection rule definitions | No; use as separate investigation context |
-| `truth/` | Scenario timeline, causal links, sensor coverage, modeled state changes, and expected alert/case outcomes | No; this is the answer key |
-| `dataset-manifest.json` | Run ID, event count, omissions, file sizes, and SHA-256 hashes | No |
+| `events/` | CIM-shaped observations, one JSONL file per modeled sensor or source | Yes, with `secdata:cim:json` and the project add-on |
+| `context/` | Assets, entities, identities, and relationships; the reference mode also includes policies, data objects, compliance, and detection rules | No |
+| `truth/` | Private story steps and causal links; the reference mode also includes expected alerts and case outcomes | No |
+| `dataset-manifest.json` | Run parameters, counts, omissions, bytes, and SHA-256 hashes | No |
 
-For seed 42, one campaign, and the default 60-minute window, the planted investigation contributes **274 records in 15 files across ten CIM datasets**. The earlier projection fixture has 291 records; this package omits eight duplicate DNS records and nine scripted alert or case records. Expected alerts and case outcomes remain in `truth/` for comparison with Splunk detections. Five source observations have no sound CIM mapping, and one TLS metadata observation is not mapped. The manifest records these omissions.
+The reference one-campaign run contributes 274 planted CIM observations. The earlier projection fixture contains 291: this package omits eight duplicate DNS records and nine scripted alert or case outcomes. Five source observations have no sound CIM projection, and one TLS metadata observation is not mapped. The manifest records these exclusions. A tailored scenario includes only its authored observations and routine activity, with no fixed-story events.
 
-`--target-events` sets the **exact published count**; the minimum is the number of planted events for the chosen campaign count. The default is 10,000. Additional events stream into `events/background-session.jsonl` as benign sessions: DNS resolution, successful authentication, an allowed connection, and an HTTP GET share a session ID and inventory assets. For the one-campaign example, 10,000 events include 9,726 background records, about 2,430 from each event family.
-
-With the example start time of `2026-10-22T12:00:00Z` and the default 60-minute duration, background events fill `[12:00, 13:00)` UTC. The planted baseline starts at 11:59 and its last event is at 12:47:55. The 10,000-event package therefore spans 11:59:00–12:59:59.629 UTC. `--target-events` changes density; `--duration-minutes` changes the background window and spaces the planted operations. Use `--duration-minutes 240` for a four-hour window. The background stream is evenly distributed and does not model a daily activity cycle.
-
-The planted story and high-volume session generator are separate components. Both emit the same common event fields and use the same CIM dataset names, field types, and value directions. A regression check compares representative DNS, authentication, traffic, and web fields against the Splunk-validated story fixture. Source-specific optional fields may differ because the modeled observations differ.
+`--target-events` is an exact published count and must be at least the planted count. The default is 10,000. The reference example therefore adds 9,726 routine observations. The default mix uses linked web, file, egress, and ingress sessions. DNS, authentication, traffic, web, process, and file observations share session IDs where they describe one modeled activity. Some cross-sensor views intentionally describe the same connection. A final partial session is possible when an exact target cuts across a session boundary.
 
 ## Expected source inventory in Splunk
 
-The table below shows the expected source inventory after uploading the seed-42 dataset to `sec_data`. Each `events/*.jsonl` file becomes a separate `source` when uploaded with the README's `splunk add oneshot` loop. The path prefix reflects the local checkout and will differ on another machine. Splunk assigns the index and sourcetype at ingest; they are not fields in the generated JSON.
+The table shows the reference 10,000-event run with seed 42, 23 hosts, one campaign, a one-hour duration, and the default background mix. It is a **post-ingest example**, not a hardcoded count guarantee for every scenario. Uploading each file with the README's `splunk add oneshot` loop makes its path the Splunk `source`. The prefix is your checkout path; the final file name is stable. Splunk assigns `index` and `sourcetype` at ingest. For this example, use `sec_data` and `secdata:cim:json`.
 
-| index | sourcetype | source |
-| --- | --- | --- |
-| `sec_data` | `secdata:cim:json` | `C:\GitHub\sec-data\output\dataset-42\events\background-session.jsonl` |
-| `sec_data` | `secdata:cim:json` | `C:\GitHub\sec-data\output\dataset-42\events\edge-proxy.jsonl` |
-| `sec_data` | `secdata:cim:json` | `C:\GitHub\sec-data\output\dataset-42\events\egress-firewall.jsonl` |
-| `sec_data` | `secdata:cim:json` | `C:\GitHub\sec-data\output\dataset-42\events\ingress-firewall.jsonl` |
-| `sec_data` | `secdata:cim:json` | `C:\GitHub\sec-data\output\dataset-42\events\ingress-zeek-conn.jsonl` |
-| `sec_data` | `secdata:cim:json` | `C:\GitHub\sec-data\output\dataset-42\events\ingress-zeek-http.jsonl` |
-| `sec_data` | `secdata:cim:json` | `C:\GitHub\sec-data\output\dataset-42\events\recon.jsonl` |
-| `sec_data` | `secdata:cim:json` | `C:\GitHub\sec-data\output\dataset-42\events\response-firewall.jsonl` |
-| `sec_data` | `secdata:cim:json` | `C:\GitHub\sec-data\output\dataset-42\events\sysmon.jsonl` |
-| `sec_data` | `secdata:cim:json` | `C:\GitHub\sec-data\output\dataset-42\events\vulnerability-followup.jsonl` |
-| `sec_data` | `secdata:cim:json` | `C:\GitHub\sec-data\output\dataset-42\events\vulnerability.jsonl` |
-| `sec_data` | `secdata:cim:json` | `C:\GitHub\sec-data\output\dataset-42\events\web-auth.jsonl` |
-| `sec_data` | `secdata:cim:json` | `C:\GitHub\sec-data\output\dataset-42\events\windows-file.jsonl` |
-| `sec_data` | `secdata:cim:json` | `C:\GitHub\sec-data\output\dataset-42\events\windows-security.jsonl` |
-| `sec_data` | `secdata:cim:json` | `C:\GitHub\sec-data\output\dataset-42\events\zeek-conn.jsonl` |
-| `sec_data` | `secdata:cim:json` | `C:\GitHub\sec-data\output\dataset-42\events\zeek-http.jsonl` |
-| `sec_data` | `secdata:cim:json` | `C:\GitHub\sec-data\output\splunk-lab-upload-v4.jsonl` |
+| index | sourcetype | source filename | events |
+| --- | --- | --- | ---: |
+| `sec_data` | `secdata:cim:json` | `eastwest-firewall.jsonl` | 1,399 |
+| `sec_data` | `secdata:cim:json` | `edge-proxy.jsonl` | 273 |
+| `sec_data` | `secdata:cim:json` | `egress-firewall.jsonl` | 544 |
+| `sec_data` | `secdata:cim:json` | `endpoint-lab.jsonl` | 3 |
+| `sec_data` | `secdata:cim:json` | `ingress-firewall.jsonl` | 274 |
+| `sec_data` | `secdata:cim:json` | `ingress-zeek-conn.jsonl` | 273 |
+| `sec_data` | `secdata:cim:json` | `ingress-zeek-http.jsonl` | 272 |
+| `sec_data` | `secdata:cim:json` | `perimeter-firewall.jsonl` | 14 |
+| `sec_data` | `secdata:cim:json` | `resolver-dns.jsonl` | 1,360 |
+| `sec_data` | `secdata:cim:json` | `response-firewall.jsonl` | 1 |
+| `sec_data` | `secdata:cim:json` | `sysmon.jsonl` | 556 |
+| `sec_data` | `secdata:cim:json` | `vulnerability-followup.jsonl` | 68 |
+| `sec_data` | `secdata:cim:json` | `vulnerability.jsonl` | 68 |
+| `sec_data` | `secdata:cim:json` | `web-app.jsonl` | 1,363 |
+| `sec_data` | `secdata:cim:json` | `web-auth.jsonl` | 1,357 |
+| `sec_data` | `secdata:cim:json` | `windows-file.jsonl` | 543 |
+| `sec_data` | `secdata:cim:json` | `windows-security.jsonl` | 546 |
+| `sec_data` | `secdata:cim:json` | `zeek-conn.jsonl` | 543 |
+| `sec_data` | `secdata:cim:json` | `zeek-http.jsonl` | 543 |
 
-The last row appears only if the earlier combined lab fixture is also uploaded to `sec_data`; it is not a file from `create_dataset.py`. A fresh dataset-only ingest should show the 16 `events/` sources above. To check the source inventory in Splunk, set the time picker to **All Time** and run:
+The small endpoint-lab, perimeter, response, and vulnerability streams reflect event types whose frequency is tied to the reference story or assessment schedule. They should not be interpreted as independently calibrated, enterprise-scale source volumes. A tailored scenario can put its observations in any supported source from the [scenario guide](scenarios.md). Use the manifest's `source_counts` and `origin_counts` to inspect the actual distribution before ingest.
+
+Check a newly indexed run with the Splunk time picker set to **All Time**:
 
 ```spl
 index=sec_data sourcetype=secdata:cim:json
@@ -55,14 +55,12 @@ index=sec_data sourcetype=secdata:cim:json
 | sort source
 ```
 
-If the earlier combined upload is still present, its events are additional copies of the planted story. Filter it out or use a clean index when checking the dataset's exact event count.
+If the same events were indexed before, the search includes duplicates. Use a fresh index or filter by the new source path when comparing counts to a manifest. The screenshot in the [Splunk lab report](splunk-validation.md) shows an earlier validation upload and uses the old `sec_data_lab` index; it remains a historical lab artifact.
 
-For a high-volume run:
+## Time, scale, and interpretation
 
-```powershell
-python create_dataset.py --seed 42 --start-time 2026-10-22T12:00:00Z --target-events 1000000 --output-dir .\output\dataset-1m
-```
+With `--start-time 2026-10-22T12:00:00Z` and the default 60-minute duration, routine events occupy `[12:00, 13:00)` UTC. The fixed baseline assessment occurs at 11:59 UTC, and its last planted event is at 12:47:55 UTC. The complete 10,000-event reference package spans 11:59:00–12:59:59.629 UTC. Use `--duration-minutes 240` for a four-hour background window and a more spacious planted timeline. The background scheduler is even across the window; it does not model a daily business cycle.
 
-The background writer and file hashing stream records rather than loading a million-event file into memory. A count-only iterator yielded one million background records in 14.49 seconds on the local test machine; this excludes serialization and disk writes. A measured 100,000-event package contained 42,520,967 event bytes. That suggests roughly 425 MB for a million events with the same mix, but a complete million-event export has not been measured. Read the actual event byte total in `dataset-manifest.json` before indexing against a daily license limit. The live Splunk checks used the planted fixture; background sessions need their own ingest test before they can support high-volume search claims.
+A current 10,000-event reference package contained 4,295,193 event bytes. A million-event run may approach the 500 MB/day license limit, so inspect the actual `events/` byte total in its manifest before indexing. The writer spools by source and merges in bounded memory. A full million-event export and Splunk ingest have not been measured for this design.
 
-The source observations remain the internal evidence used to construct and validate the story. No published event file claims to be exact Zeek, Windows, or Sysmon raw output. The planted CIM fields were tested in the [local Splunk lab](splunk-validation.md); the 274-record core is a selected subset of that 291-record fixture. The project add-on provides one-line JSON framing, UTC timestamp extraction, event types, tags, and DNS array aliases. The `sec_data_cim_dataset` field is a routing hint; Splunk data-model membership comes from the add-on's tags. The dataset is intended for investigation and detection testing, with Splunk searches free to produce their own alerts or risk events.
+These are CIM-shaped observations, not exact vendor raw messages. The local [Splunk validation](splunk-validation.md) established field extraction and tagging for the earlier planted fixture; the expanded source streams and authored scenario mode still require a live ingest check. `sec_data_cim_dataset` is an event routing hint; data-model membership depends on the project add-on's event types and tags. The generator's narrative and expected outcomes stay in `truth/`; Splunk searches remain free to create their own alerts or risk events.
