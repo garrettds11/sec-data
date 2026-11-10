@@ -2,6 +2,8 @@
 
 `create_dataset.py` accepts a versioned JSON scenario. A person or LLM can write this file, and the existing generator turns it into the same CIM-shaped, source-specific event package as the reference investigation. Changing the plot, timing, assets, external destinations, and ordinary traffic mix does not require editing generator code.
 
+Choose a CISA-oriented, AI-generated or human-generated source using [general authoring](scenario-authoring.md). Human and machine authors follow the same procedure; see [AI assistance](ai-authoring.md) and [CISA authoring](cisa-scenario-authoring.md).
+
 Start with [`scenarios/file-collection.json`](../scenarios/file-collection.json). It models an inbound request, use of an operator account, process execution, a file read, an outbound connection, and a later block. The file describes seven planted observations in six ordered steps; `--target-events` fills the rest of the requested count with ordinary activity. The [README tailored-scenario command](../README.md#tailored-scenario) shows the named PowerShell variables and generator invocation. Choose a new `$outputDir` for each run.
 
 Index only `events/*.jsonl`. Use `context/` to look up assets, identities, and external entities. Keep `truth/scenario-truth.json` out of the analyst index: it contains the story title, causal links, step descriptions, and event IDs.
@@ -40,8 +42,20 @@ The compiler checks each source/dataset pair, required fields, field types, time
 
 `background_mix` requires integer weights from 0 to 100 for `web`, `file`, `egress`, and `ingress`; at least one must be positive. The default is `{"web":5,"file":2,"egress":2,"ingress":1}`. Weights select whole linked sessions, then the generator distributes the requested event count across the time window. A final partial session is possible when the exact count is not divisible by session size. Scenario observations and ordinary records are merged by `time` into their respective source files. The run manifest reports both per-source counts and the planted/background split; the split is metadata, never an analyst event field.
 
+## Validate and inspect authoring inputs
+
+Before generating, run the validation-only CLI with your intended settings:
+
+~~~powershell
+.\.venv\Scripts\python.exe .\validate_scenario.py --scenario-file .\scenarios\file-collection.json --seed 42 --host-count 23 --duration-minutes 60 --target-events 1000
+.\.venv\Scripts\python.exe .\validate_scenario.py --describe-contract
+.\.venv\Scripts\python.exe .\validate_scenario.py --describe-context --seed 42 --host-count 23
+~~~
+
+The field inspection lists the complete allow-list from the compiler. Context inspection lists valid inventory references and services. Validation shares checks with compilation but creates no event package; it reports prescribed counts and minimum duration. Check source fidelity, privileges and plausible sensor coverage separately. There is no structured provenance/IOC/ATT&CK metadata extension to schema version 1: use private descriptions and companion notes instead of adding unsupported keys.
+
 ## Using an LLM as the story author
 
-Give the LLM this guide, the example scenario, and a clear investigation objective. Ask it to return only a schema-version-1 JSON file with the causal steps and sensor observations it expects an analyst to find. Review the proposed source/dataset pairs and run the command above. A validation error identifies an invalid source, field, reference, or time, so the file can be revised without changing Python code. Keep sensitive real-world names and addresses out of prompts and scenarios.
+Give the LLM this guide, the example scenario, and a clear investigation objective. Ask it to propose ordered steps, assumptions, unsupported observations and run settings for review first. After review it can author one schema-version-1 JSON and companion notes. Validate the file before approving generation. See [the consumer prompts and chat handoff](ai-authoring.md). A validation error identifies an invalid source, field, reference, or time, so the file can be revised without changing Python code. Keep sensitive real-world names and addresses out of prompts and scenarios.
 
 The fixed reference story remains available by omitting `--scenario-file`. `--campaign-count` applies only to that reference story. A tailored run generates its world directly and publishes only the authored steps plus ordinary traffic; it does not silently add the fixed compromise story or its expected alerts.

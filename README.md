@@ -11,6 +11,32 @@ Generate synthetic security events for Splunk investigations and detection tests
 
 The seed changes reproducible details, not the investigation plot. A scenario JSON file changes the plot without editing generator code. An LLM can author that file using the [scenario contract](docs/scenarios.md); the generator validates and compiles it. It does not accept free-form natural language as a direct CLI argument. See the [documentation index](docs/README.md) for the complete workflow.
 
+## Choose your workflow
+
+**Story source and authoring assistance are independent choices.** Choose CISA-oriented, AI-generated, or human-generated content, then author/customize its one scenario JSON manually or with AI help. The generator itself uses no AI service.
+
+| Story source | Without AI assistance | With AI assistance |
+| --- | --- | --- |
+| CISA-oriented | Read the full advisory, follow the [CISA authoring guide](docs/cisa-scenario-authoring.md), and edit the JSON yourself. | Use the CISA prompt below; the agent follows that same guide and identifies fictional additions. |
+| AI-generated | Manually review/edit a previously AI-proposed story or scenario; subsequent generation needs no AI. | Use the generic prompt below to request a plausible fictional story. |
+| Human-generated | Write your narrative and follow [manual authoring/customization](docs/scenario-authoring.md). | Supply your narrative and ask AI to translate it into the current contract. |
+
+To **run without AI**, follow the quick start below for the reference story or use the [manual workflow](docs/scenario-authoring.md) for a custom input. To **author with AI**, follow [AI authoring](docs/ai-authoring.md), including the attachment checklist for chats without checkout access. Both paths converge on validation, generation and the same Splunk ingest instructions.
+
+Generic AI prompt (defaults to an AI-generated plausible story):
+
+~~~text
+create a threat story and generate synthetic data using the capabilities provide by this repo, https://github.com/garrettds11/sec-data
+~~~
+
+CISA-focused AI prompt (replace [ID]):
+
+~~~text
+create a threat story and generate synthetic data using one scenario JSON file based on CISA advisory [ID]. Follow the repo’s current scenario contract. Preserve documented facts, identify fictional additions separately, and propose the ordered story steps before generating data. Explain any details the current generator cannot represent. Details from the CISA publication should be used, including the IOCs, tactics, techniques, software, and weaknesses.
+~~~
+
+A repository-aware agent should read AGENTS.md, propose steps/settings and wait for your approval before generating a dataset. An ordinary chat needs the contract, example and inventory/field references attached; a local clone is not automatically visible to it. A CISA catalog row helps select a publication but does not replace its full text and revision. See the [Black Basta worked example](docs/examples/aa24-131a-black-basta-notes.md).
+
 ## Quick start: generate a dataset
 
 The examples use Windows PowerShell. Install Python 3.12 and Git; see the [Windows setup guide](docs/windows-software-requirements.md). The generator itself uses the Python standard library and is also tested in Linux CI.
@@ -61,10 +87,14 @@ To author a tailored scenario, copy [the example](scenarios/file-collection.json
 ```powershell
 $scenarioFile = '.\scenarios\file-collection.json'
 $outputDir = '.\output\file-collection'
+& $python .\validate_scenario.py --scenario-file $scenarioFile `
+  --seed $seed --duration-minutes $durationMinutes --target-events $targetEvents
 & $python .\create_dataset.py --seed $seed --start-time $startTime `
   --duration-minutes $durationMinutes --target-events $targetEvents `
   --scenario-file $scenarioFile --output-dir $outputDir
 ```
+
+The validator writes no event package and reports prescribed counts and minimum duration. A valid result establishes structural compatibility, not source fidelity or causal plausibility. For supported fields and seeded assets, use `validate_scenario.py --describe-contract` and `--describe-context --seed 42 --host-count 23`.
 
 The tailored mode builds the shared world directly and writes only its authored story plus ordinary traffic. Its title, causal links, and step descriptions appear in `truth/scenario-truth.json`, never in analyst events. The [scenario guide](docs/scenarios.md) defines supported sources, fields, references, and validation.
 
