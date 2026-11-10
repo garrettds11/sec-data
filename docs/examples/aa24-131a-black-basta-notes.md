@@ -29,7 +29,7 @@ After a spam-related fake-support pretext, an operator accepts remote assistance
 
 | Setting | Proposal for approval |
 | --- | --- |
-| Seed | 42 |
+| Seed | 2 |
 | Start | 2024-11-12T08:00:00Z, a fictional historical exercise date after all listed IOC first-seen dates |
 | Duration | 120 minutes |
 | Hosts | 23 default assets |
@@ -45,7 +45,7 @@ prod-rdp-01 is an interactive Windows Server/RDP host, not a newly invented empl
 
 LAB\\operator accepts remote assistance and is assumed to have local administrator rights on the entry host. Successful credential recovery after the Mimikatz process is an explicit author assumption; later LAB\\admin use does not prove how credentials were obtained. LAB\\svc_backup performs the benign comparison. NT AUTHORITY\\SYSTEM is the standard local service identity for the PsExec service, not an added domain account.
 
-Seed 42 yields Windows Server 2019 on dc-01/prod-rdp-01 and Windows Server 2022 on both file hosts. Installed tools, elevated consent, audit coverage, file permissions, paths, process ancestry, timings and response actions are fictional. The compiler does not install tools or enforce these privileges.
+Seed 2 yields Windows Server 2019 on dc-01/prod-file-01 and Windows Server 2022 on prod-rdp-01/prod-file-02. Installed tools, elevated consent, audit coverage, file permissions, paths, process ancestry, timings and response actions are fictional. The compiler does not install tools or enforce these privileges.
 
 ## Ordered steps for review
 
@@ -177,7 +177,7 @@ After approving the sequence and settings, place the JSON under scenarios/cisa/ 
 $python = '.\.venv\Scripts\python.exe'
 & $python .\create_dataset.py `
   --scenario-file .\scenarios\cisa\aa24-131a-black-basta.json `
-  --seed 42 `
+  --seed 2 `
   --host-count 23 `
   --start-time '2024-11-12T08:00:00Z' `
   --duration-minutes 120 `
@@ -204,7 +204,7 @@ Only events/*.jsonl should later be ingested with sourcetype secdata:cim:json. K
 The companion input is now tracked at scenarios/cisa/aa24-131a-black-basta.json. Validate it with:
 
 ~~~powershell
-.\.venv\Scripts\python.exe .\validate_scenario.py --scenario-file .\scenarios\cisa\aa24-131a-black-basta.json --seed 42 --host-count 23 --duration-minutes 120 --target-events 10000
+.\.venv\Scripts\python.exe .\validate_scenario.py --scenario-file .\scenarios\cisa\aa24-131a-black-basta.json --seed 2 --host-count 23 --duration-minutes 120 --target-events 10000
 ~~~
 
 The repository test suite validates all tracked scenario examples and exports this example into a temporary directory to reconcile prescribed/background counts and truth separation. These automated checks do not establish Splunk ingest or detection effectiveness, or approve an operational exercise. Earlier validation details above describe the original proposal; the shared validator replaces its one-off static check for new users.

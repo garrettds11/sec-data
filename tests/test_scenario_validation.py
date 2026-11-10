@@ -118,7 +118,7 @@ class ScenarioValidationTests(unittest.TestCase):
     def test_cisa_example_publishes_reconciled_package_without_truth_leaks(self):
         with tempfile.TemporaryDirectory() as temp:
             target = Path(temp) / "package"
-            manifest = export_dataset(42, START, 120, 1, 23, target,
+            manifest = export_dataset(2, START, 120, 1, 23, target,
                                       target_events=10000, scenario_file=CISA)
             self.assertEqual(manifest["event_records"], 10000)
             self.assertEqual(manifest["planted_records"], 43)
