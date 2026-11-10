@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "id": "human-generated-file-read",
+  "title": "A fictional administrator reads a planning document",
+  "description": "Human-generated starting template. The file path and account access are authored assumptions; a successful read alone does not establish malicious intent.",
+  "steps": [
+    {
+      "id": "planning-file-read",
+      "offset_seconds": 300,
+      "description": "An assumed authorized administrator session reads an invented document. Customize this observation and review the permissions and sensor assumptions.",
+      "observations": [
+        {
+          "source": "windows-file.jsonl",
+          "dataset": "Data_Access.Data_Access",
+          "fields": {
+            "dest": {"ref": "asset:prod-file-01:fqdn"},
+            "dvc": "prod-file-01",
+            "user": {"ref": "identity:identity-admin-01:account"},
+            "object": "planning.txt",
+            "object_path": "D:\\Shares\\Projects\\planning.txt",
+            "object_category": "file",
+            "action": "read",
+            "access_result": "success",
+            "signature_id": 4663
+          }
+        }
+      ]
+    }
+  ]
+}

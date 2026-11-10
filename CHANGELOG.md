@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Added manual and AI-assisted authoring paths for CISA-oriented, AI-generated and human-generated stories, with shared source fidelity and review instructions.
+- Added validation-only and contract/context inspection commands, a minimal manual template and the source-documented Black Basta example.
+- Shared scenario validation with compilation, including entity collision checks, finite numeric values and boolean authorization metadata.
+
 - Make the README's PowerShell run settings explicit variables, use descriptive output directory names, and link other guides to the canonical example and measured dataset snapshot.
 - Route routine events into sensor-specific source files and merge planted observations into those files by event time. The default routine mix now includes web, file, egress, and ingress sessions.
 - Add a versioned JSON scenario contract so a person or LLM can author an ordered investigation, refer to shared assets and identities, add external entities, and generate a tailored CIM-shaped package without changing generator code.

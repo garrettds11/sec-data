@@ -18,7 +18,7 @@ from common.cim import CIM_VERSION, SOURCES
 from common.event_streams import publish_events
 from common.export import export_records, parse_times
 from common.identity import iter_identities
-from common.scenario import compile_scenario, load_scenario
+from common.scenario import compile_scenario, load_scenario, merge_scenario_entities
 from common.world import iter_assets, iter_entities, iter_relationships, run_id
 from create_cim_events import export_cim
 from create_story import export_story, sha256_file
@@ -117,19 +117,10 @@ def export_dataset(seed, start, duration_minutes, campaign_count, host_count, ou
             entities_path = source / "entities.jsonl"
             existing = [json.loads(line) for line in entities_path.read_text(
                 encoding="utf-8").splitlines()]
-            custom = [{
-                "kind": "external_service", "managed": False,
-                "authorized": False, **row, "synthetic": True,
-            } for row in spec.get("entities", [])]
-            known_ids = {row["entity_id"] for row in existing}
-            if any(row["entity_id"] in known_ids for row in custom):
-                raise ValueError("Scenario entity_id conflicts with world inventory")
-            known_ips = {row["ip"] for row in existing}
-            known_ips.update(json.loads(line)["ip"] for line in
-                             (source / "assets.jsonl").read_text(
-                                 encoding="utf-8").splitlines())
-            if any(row["ip"] in known_ips for row in custom):
-                raise ValueError("Scenario entity IP conflicts with world inventory")
+            assets = [json.loads(line) for line in
+                      (source / "assets.jsonl").read_text(encoding="utf-8").splitlines()]
+            merged = merge_scenario_entities(spec, assets, existing)
+            custom = merged[len(existing):]
             if custom:
                 with entities_path.open("a", encoding="utf-8", newline="\n") as stream:
                     for row in custom:

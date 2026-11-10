@@ -57,6 +57,8 @@ Get-Content -LiteralPath (Join-Path $outputDir 'events\web-app.jsonl') -TotalCou
 
 With the README's `$targetEvents` value, the command publishes exactly 10,000 events. `events/*.jsonl` are the only files intended for the analyst event index; `context/` and `truth/` provide reference and validation data. The four-hour setting is explicit; the command-line default remains 60 minutes. See the [dataset guide](dataset.md) for file layout and the [README](../README.md#use-the-events-in-splunk) for ingest instructions. The `output/` directory is ignored by Git. Remove an individual run directory after use to reclaim space.
 
+For a new story, choose CISA-oriented, AI-generated or human-generated content in the [authoring guide](scenario-authoring.md). You can edit any scenario manually or use [AI assistance](ai-authoring.md). Validate with validate_scenario.py before using --scenario-file in the generation command. The same sequence applies to humans and machines; a CISA story also follows the [advisory guide](cisa-scenario-authoring.md).
+
 ## 5. Preview standalone finding generators
 
 From the repository root:
