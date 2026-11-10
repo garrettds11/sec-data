@@ -3,6 +3,7 @@
 import hashlib
 import ipaddress
 import json
+import math
 from datetime import timedelta, timezone
 from pathlib import Path
 
@@ -71,7 +72,7 @@ def _validate_fields(fields, dataset):
         elif name in INTEGER_FIELDS:
             valid = type(value) is int and value >= 0
         elif name in NUMBER_FIELDS:
-            valid = type(value) in {int, float} and value >= 0
+            valid = type(value) in {int, float} and math.isfinite(value) and value >= 0
         elif name in {"signature_id", "status"}:
             valid = type(value) in {str, int} and bool(value)
         elif name in ARRAY_FIELDS:
@@ -146,9 +147,11 @@ def load_scenario(path):
     for item in entities:
         _keys(item, {"entity_id", "name", "ip", "role"},
               {"kind", "authorized"}, "Scenario entity")
-        if not all(isinstance(item[key], str) and item[key] for key in item):
+        if not all(isinstance(item[key], str) and item[key]
+                   for key in ("entity_id", "name", "ip", "role")):
             raise ValueError("Scenario entity values must be nonempty strings")
-        if item.get("kind", "external_service") not in {
+        kind = item.get("kind", "external_service")
+        if not isinstance(kind, str) or kind not in {
                 "external_service", "external_host"} or type(
                 item.get("authorized", False)) is not bool:
             raise ValueError("Scenario entities must be external hosts or services")
@@ -160,21 +163,25 @@ def load_scenario(path):
     return spec
 
 
-def compile_scenario(spec, start, duration_minutes, assets, entities, identities, run_id):
-    """Return observations and private truth; validate order and inventory links."""
+def _validated_steps(spec, duration_minutes, assets, entities, identities):
+    """Resolve and check observations without creating events or timestamps."""
+    if (type(duration_minutes) not in {int, float}
+            or not math.isfinite(duration_minutes) or duration_minutes <= 0):
+        raise ValueError("Scenario needs a positive finite duration")
     catalogs = {
         "asset": {row["short_name"]: row for row in assets},
         "entity": {row["entity_id"]: row for row in entities},
         "identity": {row["identity_id"]: row for row in identities},
     }
-    seen, events, truth = {}, [], []
+    seen, prepared = {}, []
     for step in spec["steps"]:
         _keys(step, {"id", "offset_seconds", "observations"},
               {"description", "depends_on"}, "Scenario step")
         sid, offset = step["id"], step["offset_seconds"]
         if not isinstance(sid, str) or not sid or sid in seen:
             raise ValueError("Scenario step IDs must be unique nonempty strings")
-        if (type(offset) not in {int, float} or not 0 <= offset < duration_minutes * 60
+        if (type(offset) not in {int, float} or not math.isfinite(offset)
+                or not 0 <= offset < duration_minutes * 60
                 or (seen and offset < max(seen.values()))):
             raise ValueError(f"Step {sid} has an out-of-order or out-of-window offset")
         parents = step.get("depends_on", [])
@@ -186,12 +193,15 @@ def compile_scenario(spec, start, duration_minutes, assets, entities, identities
         observations = step["observations"]
         if not isinstance(observations, list) or not observations:
             raise ValueError(f"Step {sid} needs observations")
-        event_ids = []
+        if "description" in step and not isinstance(step["description"], str):
+            raise ValueError(f"Step {sid} description must be a string")
+        entries = []
         for position, observation in enumerate(observations):
             _keys(observation, {"source", "dataset", "fields"},
                   {"delay_ms"}, "Scenario observation")
             source, dataset = observation["source"], observation["dataset"]
-            if source not in SOURCE_DATASETS or dataset not in SOURCE_DATASETS[source]:
+            if (not isinstance(source, str) or not isinstance(dataset, str)
+                    or source not in SOURCE_DATASETS or dataset not in SOURCE_DATASETS[source]):
                 raise ValueError(f"Unsupported source/dataset pair: {source} / {dataset}")
             fields = observation["fields"]
             if not isinstance(fields, dict) or not all(
@@ -207,6 +217,47 @@ def compile_scenario(spec, start, duration_minutes, assets, entities, identities
             delay = observation.get("delay_ms", position)
             if type(delay) is not int or delay < 0 or offset * 1000 + delay >= duration_minutes * 60000:
                 raise ValueError(f"Observation in {sid} has invalid delay_ms")
+            entries.append((position, source, dataset, resolved, delay))
+        prepared.append((step, entries))
+        seen[sid] = offset
+    return prepared
+
+
+def validate_scenario(spec, duration_minutes, assets, entities, identities):
+    """Validate a loaded specification against resolved context, without emitting data."""
+    prepared = _validated_steps(spec, duration_minutes, assets, entities, identities)
+    last_seconds = max(step["offset_seconds"] + entry[4] / 1000
+                       for step, entries in prepared for entry in entries)
+    return {"scenario_id": spec["id"], "steps": len(prepared),
+            "prescribed_observations": sum(len(entries) for _, entries in prepared),
+            "minimum_duration_minutes": math.floor(last_seconds / 60) + 1}
+
+
+def merge_scenario_entities(spec, assets, entities):
+    """Apply the same custom external-entity constraints for validation and generation."""
+    existing = list(entities)
+    known_ids = {row["entity_id"] for row in existing}
+    known_ips = {row["ip"] for row in existing}
+    known_ips.update(row["ip"] for row in assets)
+    custom = [{"kind": "external_service", "managed": False, "authorized": False,
+               **row, "synthetic": True} for row in spec.get("entities", [])]
+    if any(row["entity_id"] in known_ids for row in custom):
+        raise ValueError("Scenario entity_id conflicts with world inventory")
+    if any(row["ip"] in known_ips for row in custom):
+        raise ValueError("Scenario entity IP conflicts with world inventory")
+    return existing + custom
+
+
+def compile_scenario(spec, start, duration_minutes, assets, entities, identities, run_id):
+    """Return observations and private truth using the validation-only checks."""
+    if start.tzinfo is None:
+        raise ValueError("Scenario needs a timezone-aware start")
+    prepared = _validated_steps(spec, duration_minutes, assets, entities, identities)
+    events, truth = [], []
+    for step, entries in prepared:
+        sid, offset = step["id"], step["offset_seconds"]
+        event_ids = []
+        for position, source, dataset, resolved, delay in entries:
             event_id = _digest(run_id, sid, position)
             event_ids.append(event_id)
             event = {
@@ -223,7 +274,6 @@ def compile_scenario(spec, start, duration_minutes, assets, entities, identities
             events.append(event)
         truth.append({"step_id": sid, "offset_seconds": offset,
                       "description": step.get("description", ""),
-                      "depends_on": parents, "event_ids": event_ids})
-        seen[sid] = offset
+                      "depends_on": step.get("depends_on", []), "event_ids": event_ids})
     events.sort(key=lambda event: (event["time"], event["event_id"]))
     return events, truth

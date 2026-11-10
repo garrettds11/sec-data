@@ -1,0 +1,1056 @@
+{
+  "schema_version": 1,
+  "id": "cisa-aa24-131a-black-basta-composite-v1",
+  "title": "Black Basta-inspired remote support abuse, data theft and ransomware artifacts",
+  "description": "PROPOSAL FOR REVIEW; NOT A RECONSTRUCTION OF ONE VICTIM. SOURCE: AA24-131A, revision 2024-11-08; https://www.ic3.gov/CSA/2024/240511.pdf. Uses that published November 2024 revision, not a claim about current Black Basta activity. Documented facts, source page/table references and fictional assumptions are labeled separately in each step description. All four Table 7 IPs and both Table 8 domain indicators are preserved for offline matching. The domains are not mapped to those IPs; authored NXDOMAIN answers avoid an invented attribution of DNS resolution. All contacts, ports, identities, organization, installed tools, process ancestry, timing, filenames, byte counts, telemetry and response are synthetic. Known CISA facts describe multiple affiliate activities: the selected chain is an authored composite. Narrative-only prerequisite: email bombing and fake IT/Teams contact persuade an operator to allow elevated remote assistance. The chosen entry path is AnyDesk-assisted social engineering; ScreenConnect CVE-2024-1709 (CWE-288), Qakbot delivery, Quick Assist, Splashtop, BITSAdmin and WinSCP are documented alternatives, not additional attacks silently added to this run. Source weakness catalog: CVE-2024-1709/CWE-288; ZeroLogon CVE-2020-1472/CWE-330; NoPac CVE-2021-42278/CWE-20 and CVE-2021-42287/CWE-269; PrintNightmare CVE-2021-34527/CWE-269. Only PrintNightmare is represented as a fictional baseline finding; none of these vulnerabilities is claimed exploited by the selected story. Privileged credential acquisition is an authored assumption after the Mimikatz process. Recommended review envelope: seed 42, 23 default hosts, start 2024-11-12T08:00:00Z, duration 120 minutes, proposed 10000 total records. Offsets are fixed and do not stretch with a longer duration; minimum whole-minute duration is 111. No event dataset was generated to author this proposal. Full rationale, source coverage and modeling limits are in docs/examples/aa24-131a-black-basta-notes.md.",
+  "entities": [
+    {
+      "entity_id": "bb-support-relay",
+      "name": "support-relay.example.net",
+      "ip": "192.0.2.191",
+      "role": "remote_support_relay"
+    },
+    {
+      "entity_id": "bb-c2-primary",
+      "name": "historical-ip-01.example.net",
+      "ip": "170.130.165.73",
+      "role": "historical_indicator"
+    },
+    {
+      "entity_id": "bb-c2-secondary",
+      "name": "historical-ip-02.example.net",
+      "ip": "45.11.181.44",
+      "role": "historical_indicator"
+    },
+    {
+      "entity_id": "bb-c2-filehost",
+      "name": "historical-ip-03.example.net",
+      "ip": "79.132.130.211",
+      "role": "historical_indicator"
+    },
+    {
+      "entity_id": "bb-exfil",
+      "name": "historical-ip-04.example.net",
+      "ip": "66.42.118.54",
+      "role": "historical_indicator"
+    }
+  ],
+  "background_mix": {
+    "web": 5,
+    "file": 3,
+    "egress": 3,
+    "ingress": 1
+  },
+  "steps": [
+    {
+      "id": "context-printnightmare-finding",
+      "offset_seconds": 60,
+      "description": "DOCUMENTED: p.3 lists PrintNightmare CVE-2021-34527 (CWE-269) among privilege escalation weaknesses reported for affiliates. FICTIONAL: an assessment flags dc-01 as unpatched; no exploitation of this CVE is asserted in this branch. Seed 42 yields Windows Server 2019. This contextual finding is independent of the selected social-engineering entry path; a scanner claim alone does not establish exploitability.",
+      "observations": [
+        {
+          "source": "vulnerability.jsonl",
+          "dataset": "Vulnerabilities.Vulnerabilities",
+          "fields": {
+            "dest": {
+              "ref": "asset:dc-01:fqdn"
+            },
+            "dvc": "assessment-01",
+            "cve": "CVE-2021-34527",
+            "signature": "Windows Print Spooler PrintNightmare vulnerability",
+            "severity": "high",
+            "vendor_product": "Synthetic vulnerability assessment"
+          }
+        }
+      ]
+    },
+    {
+      "id": "benign-rclone-backup-control",
+      "offset_seconds": 120,
+      "description": "DOCUMENTED: pp.4-5 caution that legitimate tools alone are not malicious. FICTIONAL BENIGN CONTROL: an approved svc_backup session runs Rclone on prod-file-02 and transfers data to the pre-existing authorized backup provider. This is a comparison case, not an attack stage.",
+      "observations": [
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Processes",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-02:fqdn"
+            },
+            "dvc": "prod-file-02",
+            "user": {
+              "ref": "identity:identity-backup-01:account"
+            },
+            "process": "C:\\Program Files\\rclone\\rclone.exe",
+            "process_id": 900,
+            "process_guid": "{605d1915-b181-5d58-ba3e-36b3e8680bf0}",
+            "process_cmdline": "rclone.exe copy D:\\Backups approved-backup:daily"
+          }
+        },
+        {
+          "source": "egress-firewall.jsonl",
+          "dataset": "Network_Traffic.All_Traffic",
+          "fields": {
+            "src": {
+              "ref": "asset:prod-file-02:ip"
+            },
+            "dest": {
+              "ref": "entity:entity-backup-provider-01:ip"
+            },
+            "dest_port": 443,
+            "transport": "tcp",
+            "action": "allowed",
+            "bytes_out": 8000000,
+            "bytes_in": 15000,
+            "bytes": 8015000,
+            "dvc": "egress-fw-01"
+          }
+        }
+      ]
+    },
+    {
+      "id": "remote-support-execution",
+      "offset_seconds": 300,
+      "description": "DOCUMENTED: pp.2-3 and Table 1 describe email bombing followed by fake IT support through calls/Teams, and user execution of AnyDesk or Quick Assist (T1566.004, T1204). FICTIONAL: LAB\\operator on prod-rdp-01 accepts an AnyDesk session. The email flood and Teams conversation are narrative prerequisites only; no email/Teams or consent telemetry is emitted. This branch uses AnyDesk, not a ScreenConnect exploit.",
+      "observations": [
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Processes",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-rdp-01:fqdn"
+            },
+            "dvc": "prod-rdp-01",
+            "user": {
+              "ref": "identity:identity-operator-01:account"
+            },
+            "process": "C:\\Program Files (x86)\\AnyDesk\\AnyDesk.exe",
+            "process_id": 1001,
+            "process_guid": "{60875101-b055-5d37-abd1-7312cc953fc3}",
+            "parent_process": "C:\\Windows\\explorer.exe"
+          }
+        },
+        {
+          "source": "egress-firewall.jsonl",
+          "dataset": "Network_Traffic.All_Traffic",
+          "fields": {
+            "src": {
+              "ref": "asset:prod-rdp-01:ip"
+            },
+            "dest": {
+              "ref": "entity:bb-support-relay:ip"
+            },
+            "dest_port": 443,
+            "transport": "tcp",
+            "action": "allowed",
+            "bytes_out": 6400,
+            "bytes_in": 12500,
+            "bytes": 18900,
+            "dvc": "egress-fw-01"
+          }
+        }
+      ]
+    },
+    {
+      "id": "historical-domain-lookups",
+      "offset_seconds": 420,
+      "description": "DOCUMENTED: Table 8 (p.7) lists Moereng[.]com and Exckicks[.]com as suspected Black Basta Cobalt Strike domains. FICTIONAL: this host queries both and receives NXDOMAIN. No domain-to-IP mapping is invented, and these DNS results are not a historical claim about the domains.",
+      "depends_on": [
+        "remote-support-execution"
+      ],
+      "observations": [
+        {
+          "source": "resolver-dns.jsonl",
+          "dataset": "Network_Resolution.DNS",
+          "fields": {
+            "src": {
+              "ref": "asset:prod-rdp-01:ip"
+            },
+            "dest": {
+              "ref": "entity:entity-enterprise-resolver-01:ip"
+            },
+            "dvc": "enterprise-resolver-01",
+            "query": "moereng.com",
+            "query_type": "A",
+            "answer": [],
+            "ttl": [],
+            "answer_count": 0,
+            "query_count": 1,
+            "message_type": "Response",
+            "reply_code": "NXDOMAIN",
+            "reply_code_id": 3,
+            "transport": "udp",
+            "dest_port": 53
+          }
+        },
+        {
+          "source": "resolver-dns.jsonl",
+          "dataset": "Network_Resolution.DNS",
+          "fields": {
+            "src": {
+              "ref": "asset:prod-rdp-01:ip"
+            },
+            "dest": {
+              "ref": "entity:entity-enterprise-resolver-01:ip"
+            },
+            "dvc": "enterprise-resolver-01",
+            "query": "exckicks.com",
+            "query_type": "A",
+            "answer": [],
+            "ttl": [],
+            "answer_count": 0,
+            "query_count": 1,
+            "message_type": "Response",
+            "reply_code": "NXDOMAIN",
+            "reply_code_id": 3,
+            "transport": "udp",
+            "dest_port": 53
+          }
+        }
+      ]
+    },
+    {
+      "id": "primary-c2-indicator-contact",
+      "offset_seconds": 480,
+      "description": "DOCUMENTED: Table 7 (p.6) lists 170.130.165[.]73 as likely Cobalt Strike infrastructure, first seen 2024-10-14. FICTIONAL: an allowed TLS-sized flow from prod-rdp-01 to that historical IP on TCP/443. Neither the port nor flow sizes are source facts; this flow alone does not prove Cobalt Strike.",
+      "depends_on": [
+        "remote-support-execution"
+      ],
+      "observations": [
+        {
+          "source": "egress-firewall.jsonl",
+          "dataset": "Network_Traffic.All_Traffic",
+          "fields": {
+            "src": {
+              "ref": "asset:prod-rdp-01:ip"
+            },
+            "dest": {
+              "ref": "entity:bb-c2-primary:ip"
+            },
+            "dest_port": 443,
+            "transport": "tcp",
+            "action": "allowed",
+            "bytes_out": 2100,
+            "bytes_in": 4400,
+            "bytes": 6500,
+            "dvc": "egress-fw-01"
+          }
+        }
+      ]
+    },
+    {
+      "id": "softperfect-network-discovery",
+      "offset_seconds": 900,
+      "description": "DOCUMENTED: p.3 and Table 1 name SoftPerfect netscan.exe for discovery. FICTIONAL: the utility scans three named assets and five inventory-declared TCP services. Allowed flows show visibility, not completion of LDAP/SMB enumeration.",
+      "depends_on": [
+        "remote-support-execution"
+      ],
+      "observations": [
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Processes",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-rdp-01:fqdn"
+            },
+            "dvc": "prod-rdp-01",
+            "user": {
+              "ref": "identity:identity-operator-01:account"
+            },
+            "process": "C:\\ProgramData\\Support\\netscan.exe",
+            "process_id": 1101,
+            "process_guid": "{18d2e6b4-32c2-5031-90b7-c15bf13f3873}",
+            "parent_process": "C:\\Program Files (x86)\\AnyDesk\\AnyDesk.exe",
+            "parent_process_id": 1001
+          }
+        },
+        {
+          "source": "eastwest-firewall.jsonl",
+          "dataset": "Network_Traffic.All_Traffic",
+          "fields": {
+            "src": {
+              "ref": "asset:prod-rdp-01:ip"
+            },
+            "dest": {
+              "ref": "asset:dc-01:ip"
+            },
+            "dest_port": 389,
+            "transport": "tcp",
+            "action": "allowed",
+            "bytes_out": 240,
+            "bytes_in": 180,
+            "bytes": 420,
+            "dvc": "eastwest-fw-01"
+          }
+        },
+        {
+          "source": "eastwest-firewall.jsonl",
+          "dataset": "Network_Traffic.All_Traffic",
+          "fields": {
+            "src": {
+              "ref": "asset:prod-rdp-01:ip"
+            },
+            "dest": {
+              "ref": "asset:dc-01:ip"
+            },
+            "dest_port": 445,
+            "transport": "tcp",
+            "action": "allowed",
+            "bytes_out": 240,
+            "bytes_in": 180,
+            "bytes": 420,
+            "dvc": "eastwest-fw-01"
+          }
+        },
+        {
+          "source": "eastwest-firewall.jsonl",
+          "dataset": "Network_Traffic.All_Traffic",
+          "fields": {
+            "src": {
+              "ref": "asset:prod-rdp-01:ip"
+            },
+            "dest": {
+              "ref": "asset:prod-file-01:ip"
+            },
+            "dest_port": 445,
+            "transport": "tcp",
+            "action": "allowed",
+            "bytes_out": 240,
+            "bytes_in": 180,
+            "bytes": 420,
+            "dvc": "eastwest-fw-01"
+          }
+        },
+        {
+          "source": "eastwest-firewall.jsonl",
+          "dataset": "Network_Traffic.All_Traffic",
+          "fields": {
+            "src": {
+              "ref": "asset:prod-rdp-01:ip"
+            },
+            "dest": {
+              "ref": "asset:prod-file-01:ip"
+            },
+            "dest_port": 3389,
+            "transport": "tcp",
+            "action": "allowed",
+            "bytes_out": 240,
+            "bytes_in": 180,
+            "bytes": 420,
+            "dvc": "eastwest-fw-01"
+          }
+        },
+        {
+          "source": "eastwest-firewall.jsonl",
+          "dataset": "Network_Traffic.All_Traffic",
+          "fields": {
+            "src": {
+              "ref": "asset:prod-rdp-01:ip"
+            },
+            "dest": {
+              "ref": "asset:prod-file-02:ip"
+            },
+            "dest_port": 445,
+            "transport": "tcp",
+            "action": "allowed",
+            "bytes_out": 240,
+            "bytes_in": 180,
+            "bytes": 420,
+            "dvc": "eastwest-fw-01"
+          }
+        }
+      ]
+    },
+    {
+      "id": "masqueraded-discovery-utility",
+      "offset_seconds": 1080,
+      "description": "DOCUMENTED: p.3 and Table 4 describe discovery utilities with innocuous Intel or Dell names in C:\\ (T1036). FICTIONAL: C:\\Intel.exe runs on prod-rdp-01; its exact binary, path suffix, parentage and identity are authored. Filename alone does not identify the executable.",
+      "depends_on": [
+        "softperfect-network-discovery"
+      ],
+      "observations": [
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Processes",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-rdp-01:fqdn"
+            },
+            "dvc": "prod-rdp-01",
+            "user": {
+              "ref": "identity:identity-operator-01:account"
+            },
+            "process": "C:\\Intel.exe",
+            "process_id": 1102,
+            "process_guid": "{0947cb1f-cf94-57ef-b242-0d100ac591eb}",
+            "parent_process": "C:\\Program Files (x86)\\AnyDesk\\AnyDesk.exe",
+            "parent_process_id": 1001
+          }
+        }
+      ]
+    },
+    {
+      "id": "secondary-c2-indicator-contact",
+      "offset_seconds": 1200,
+      "description": "DOCUMENTED: Table 7 lists 45.11.181[.]44 as likely Cobalt Strike infrastructure, first seen 2024-10-24. FICTIONAL: a second connection from the same host; distinct addresses are combined for IOC correlation practice and are not asserted to belong to one real intrusion.",
+      "depends_on": [
+        "primary-c2-indicator-contact"
+      ],
+      "observations": [
+        {
+          "source": "egress-firewall.jsonl",
+          "dataset": "Network_Traffic.All_Traffic",
+          "fields": {
+            "src": {
+              "ref": "asset:prod-rdp-01:ip"
+            },
+            "dest": {
+              "ref": "entity:bb-c2-secondary:ip"
+            },
+            "dest_port": 443,
+            "transport": "tcp",
+            "action": "allowed",
+            "bytes_out": 1700,
+            "bytes_in": 2800,
+            "bytes": 4500,
+            "dvc": "egress-fw-01"
+          }
+        }
+      ]
+    },
+    {
+      "id": "credential-access-process",
+      "offset_seconds": 1500,
+      "description": "DOCUMENTED: p.3 and Table 1 identify Mimikatz for credential access associated with privilege escalation. FICTIONAL: operator has local administrator rights on this RDP host and elevated remote support has delivered the tool; neither local rights nor successful secret recovery is modeled by the compiler. The subsequent LAB\\admin use is an explicit authored outcome, not something established by the process observation.",
+      "depends_on": [
+        "masqueraded-discovery-utility"
+      ],
+      "observations": [
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Processes",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-rdp-01:fqdn"
+            },
+            "dvc": "prod-rdp-01",
+            "user": {
+              "ref": "identity:identity-operator-01:account"
+            },
+            "process": "C:\\ProgramData\\Support\\mimikatz.exe",
+            "process_id": 1201,
+            "process_guid": "{2414e6d3-8450-51ec-81f1-8faceb489edf}",
+            "parent_process": "C:\\Program Files (x86)\\AnyDesk\\AnyDesk.exe",
+            "parent_process_id": 1001
+          }
+        }
+      ]
+    },
+    {
+      "id": "privileged-account-use",
+      "offset_seconds": 1800,
+      "description": "DOCUMENTED: p.2 reports valid-account abuse; p.3 describes credential access. FICTIONAL: the actor obtains LAB\\admin credentials in the preceding gap and authenticates from the RDP host to dc-01 over SMB. This chosen privilege path does not exploit the contextual PrintNightmare finding.",
+      "depends_on": [
+        "credential-access-process"
+      ],
+      "observations": [
+        {
+          "source": "windows-security.jsonl",
+          "dataset": "Authentication.Authentication",
+          "fields": {
+            "src": {
+              "ref": "asset:prod-rdp-01:ip"
+            },
+            "dest": {
+              "ref": "asset:dc-01:fqdn"
+            },
+            "dvc": "dc-01",
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "action": "success",
+            "app": "smb",
+            "signature_id": 4624
+          }
+        },
+        {
+          "source": "eastwest-firewall.jsonl",
+          "dataset": "Network_Traffic.All_Traffic",
+          "fields": {
+            "src": {
+              "ref": "asset:prod-rdp-01:ip"
+            },
+            "dest": {
+              "ref": "asset:dc-01:ip"
+            },
+            "dest_port": 445,
+            "transport": "tcp",
+            "action": "allowed",
+            "bytes_out": 5600,
+            "bytes_in": 8900,
+            "bytes": 14500,
+            "dvc": "eastwest-fw-01"
+          }
+        }
+      ]
+    },
+    {
+      "id": "psexec-lateral-execution",
+      "offset_seconds": 2100,
+      "description": "DOCUMENTED: p.3 and Table 1 report PsExec-assisted lateral movement. FICTIONAL: LAB\\admin uses PsExec to execute on prod-file-01. PSEXESVC and a cmd.exe child represent authored service/process visibility. SYSTEM is the well-known local service identity; it is not an added domain account.",
+      "depends_on": [
+        "privileged-account-use"
+      ],
+      "observations": [
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Processes",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-rdp-01:fqdn"
+            },
+            "dvc": "prod-rdp-01",
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "process": "C:\\ProgramData\\Support\\PsExec.exe",
+            "process_id": 2001,
+            "process_guid": "{0c9bf9b1-e5af-5c81-991f-7b9678f75174}",
+            "process_cmdline": "PsExec.exe \\\\prod-file-01 cmd.exe"
+          }
+        },
+        {
+          "source": "eastwest-firewall.jsonl",
+          "dataset": "Network_Traffic.All_Traffic",
+          "fields": {
+            "src": {
+              "ref": "asset:prod-rdp-01:ip"
+            },
+            "dest": {
+              "ref": "asset:prod-file-01:ip"
+            },
+            "dest_port": 445,
+            "transport": "tcp",
+            "action": "allowed",
+            "bytes_out": 14200,
+            "bytes_in": 6100,
+            "bytes": 20300,
+            "dvc": "eastwest-fw-01"
+          }
+        },
+        {
+          "source": "windows-security.jsonl",
+          "dataset": "Authentication.Authentication",
+          "fields": {
+            "src": {
+              "ref": "asset:prod-rdp-01:ip"
+            },
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "dvc": "prod-file-01",
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "action": "success",
+            "app": "smb",
+            "signature_id": 4624
+          }
+        },
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Processes",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "dvc": "prod-file-01",
+            "user": "NT AUTHORITY\\SYSTEM",
+            "process": "C:\\Windows\\PSEXESVC.exe",
+            "process_id": 3001,
+            "process_guid": "{737421b5-d539-51f2-ae8f-cb7cdcc1a852}",
+            "parent_process": "C:\\Windows\\System32\\services.exe"
+          }
+        },
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Processes",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "dvc": "prod-file-01",
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "process": "C:\\Windows\\System32\\cmd.exe",
+            "process_id": 3002,
+            "process_guid": "{fbb47947-8eb2-52d4-bf3f-a1282a3b3a26}",
+            "parent_process": "C:\\Windows\\PSEXESVC.exe",
+            "parent_process_id": 3001
+          }
+        }
+      ]
+    },
+    {
+      "id": "rdp-lateral-session",
+      "offset_seconds": 2400,
+      "description": "DOCUMENTED: p.3 names RDP as another lateral movement mechanism. FICTIONAL: admin connects from prod-rdp-01 to prod-file-02. This is an additional composite branch, not evidence that every affiliate used both RDP and PsExec.",
+      "depends_on": [
+        "privileged-account-use"
+      ],
+      "observations": [
+        {
+          "source": "eastwest-firewall.jsonl",
+          "dataset": "Network_Traffic.All_Traffic",
+          "fields": {
+            "src": {
+              "ref": "asset:prod-rdp-01:ip"
+            },
+            "dest": {
+              "ref": "asset:prod-file-02:ip"
+            },
+            "dest_port": 3389,
+            "transport": "tcp",
+            "action": "allowed",
+            "bytes_out": 7800,
+            "bytes_in": 12500,
+            "bytes": 20300,
+            "dvc": "eastwest-fw-01"
+          }
+        },
+        {
+          "source": "windows-security.jsonl",
+          "dataset": "Authentication.Authentication",
+          "fields": {
+            "src": {
+              "ref": "asset:prod-rdp-01:ip"
+            },
+            "dest": {
+              "ref": "asset:prod-file-02:fqdn"
+            },
+            "dvc": "prod-file-02",
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "action": "success",
+            "app": "rdp",
+            "signature_id": 4624
+          }
+        }
+      ]
+    },
+    {
+      "id": "file-host-c2-indicator-contact",
+      "offset_seconds": 2700,
+      "description": "DOCUMENTED: Table 7 lists 79.132.130[.]211 as likely Cobalt Strike infrastructure, first seen 2024-10-24. FICTIONAL: prod-file-01 reaches this historical indicator on TCP/443 after lateral execution. A Cobalt Strike beacon's memory behavior, configuration and protocol are not represented.",
+      "depends_on": [
+        "psexec-lateral-execution"
+      ],
+      "observations": [
+        {
+          "source": "egress-firewall.jsonl",
+          "dataset": "Network_Traffic.All_Traffic",
+          "fields": {
+            "src": {
+              "ref": "asset:prod-file-01:ip"
+            },
+            "dest": {
+              "ref": "entity:bb-c2-filehost:ip"
+            },
+            "dest_port": 443,
+            "transport": "tcp",
+            "action": "allowed",
+            "bytes_out": 3200,
+            "bytes_in": 6200,
+            "bytes": 9400,
+            "dvc": "egress-fw-01"
+          }
+        }
+      ]
+    },
+    {
+      "id": "powershell-defense-impairment-attempt",
+      "offset_seconds": 3000,
+      "description": "DOCUMENTED: p.3 and Tables 4-5 report PowerShell used to disable antivirus (T1059.001, T1562.001). FICTIONAL: an admin runs an assumed delivered maintenance.ps1 on prod-file-01. Script contents and AV state are absent, so analyst events establish a process launch only, not successful impairment.",
+      "depends_on": [
+        "psexec-lateral-execution"
+      ],
+      "observations": [
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Processes",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "dvc": "prod-file-01",
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "process": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+            "process_id": 3101,
+            "process_guid": "{09a24d58-9bcd-556b-b86c-3e5c189857e4}",
+            "parent_process": "C:\\Windows\\System32\\cmd.exe",
+            "parent_process_id": 3002,
+            "process_cmdline": "powershell.exe -File C:\\ProgramData\\Support\\maintenance.ps1"
+          }
+        }
+      ]
+    },
+    {
+      "id": "backstab-defense-impairment-attempt",
+      "offset_seconds": 3120,
+      "description": "DOCUMENTED: p.3 and Table 4 name Backstab as an EDR-disabling tool. FICTIONAL: backstab.exe launches as admin on prod-file-01 after delivery through remote administration. The path and basename are authored representations of the named software, not file IOCs. No successful EDR shutdown or sensor coverage loss is asserted; telemetry continues.",
+      "depends_on": [
+        "psexec-lateral-execution"
+      ],
+      "observations": [
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Processes",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "dvc": "prod-file-01",
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "process": "C:\\ProgramData\\Support\\backstab.exe",
+            "process_id": 3102,
+            "process_guid": "{44e0d858-d4e4-5fb6-87cc-d32520e8f58e}",
+            "parent_process": "C:\\Windows\\System32\\cmd.exe",
+            "parent_process_id": 3002
+          }
+        }
+      ]
+    },
+    {
+      "id": "sensitive-file-reads",
+      "offset_seconds": 3600,
+      "description": "DOCUMENTED: pp.2-3 describe theft before encryption; specific victims/files are not provided here. FICTIONAL: LAB\\admin reads three invented business files on prod-file-01. Audit policy is assumed enabled. Paths, users and a temporal join support collection investigation but contain no file contents or patient data.",
+      "depends_on": [
+        "psexec-lateral-execution"
+      ],
+      "observations": [
+        {
+          "source": "windows-file.jsonl",
+          "dataset": "Data_Access.Data_Access",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "dvc": "prod-file-01",
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "object": "billing-export.csv",
+            "object_path": "D:\\Shares\\Finance\\billing-export.csv",
+            "object_category": "file",
+            "action": "read",
+            "access_result": "success",
+            "signature_id": 4663
+          }
+        },
+        {
+          "source": "windows-file.jsonl",
+          "dataset": "Data_Access.Data_Access",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "dvc": "prod-file-01",
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "object": "network-inventory.xlsx",
+            "object_path": "D:\\Shares\\IT\\network-inventory.xlsx",
+            "object_category": "file",
+            "action": "read",
+            "access_result": "success",
+            "signature_id": 4663
+          }
+        },
+        {
+          "source": "windows-file.jsonl",
+          "dataset": "Data_Access.Data_Access",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "dvc": "prod-file-01",
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "object": "operations-plan.docx",
+            "object_path": "D:\\Shares\\Operations\\operations-plan.docx",
+            "object_category": "file",
+            "action": "read",
+            "access_result": "success",
+            "signature_id": 4663
+          }
+        }
+      ]
+    },
+    {
+      "id": "rclone-transfer-process",
+      "offset_seconds": 3900,
+      "description": "DOCUMENTED: p.3 and Table 1 report Rclone-assisted exfiltration before encryption. FICTIONAL: admin starts Rclone with an invented remote configuration name. No credentials, runnable payloads or actual transfer are included.",
+      "depends_on": [
+        "sensitive-file-reads"
+      ],
+      "observations": [
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Processes",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "dvc": "prod-file-01",
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "process": "C:\\ProgramData\\Support\\rclone.exe",
+            "process_id": 3201,
+            "process_guid": "{e7e303af-e57d-5256-b253-0631100556c1}",
+            "parent_process": "C:\\Windows\\System32\\cmd.exe",
+            "parent_process_id": 3002,
+            "process_cmdline": "rclone.exe copy D:\\Shares bb-archive:collection"
+          }
+        }
+      ]
+    },
+    {
+      "id": "historical-exfiltration-indicator-flow",
+      "offset_seconds": 3960,
+      "description": "DOCUMENTED: Table 7 identifies 66.42.118[.]54 as an exfiltration server, first seen 2024-10-15. FICTIONAL: two sensors observe one TLS-sized transfer of 2400000 outbound bytes from prod-file-01 to TCP/443 at this historical IP. The two records are two views of one transfer, not two exfiltrations. Rclone-to-destination association and which file bytes moved are not proven by these fields.",
+      "depends_on": [
+        "rclone-transfer-process"
+      ],
+      "observations": [
+        {
+          "source": "egress-firewall.jsonl",
+          "dataset": "Network_Traffic.All_Traffic",
+          "fields": {
+            "src": {
+              "ref": "asset:prod-file-01:ip"
+            },
+            "dest": {
+              "ref": "entity:bb-exfil:ip"
+            },
+            "dest_port": 443,
+            "transport": "tcp",
+            "action": "allowed",
+            "bytes_out": 2400000,
+            "bytes_in": 14400,
+            "bytes": 2414400,
+            "dvc": "egress-fw-01"
+          }
+        },
+        {
+          "source": "zeek-conn.jsonl",
+          "dataset": "Network_Traffic.All_Traffic",
+          "fields": {
+            "src": {
+              "ref": "asset:prod-file-01:ip"
+            },
+            "dest": {
+              "ref": "entity:bb-exfil:ip"
+            },
+            "dest_port": 443,
+            "transport": "tcp",
+            "action": "allowed",
+            "bytes_out": 2400000,
+            "bytes_in": 14400,
+            "bytes": 2414400,
+            "dvc": "zeek-01",
+            "duration": 45.0
+          }
+        }
+      ]
+    },
+    {
+      "id": "shadow-copy-deletion-attempt",
+      "offset_seconds": 4500,
+      "description": "DOCUMENTED: p.3 and Table 6 report vssadmin.exe used to delete volume shadow copies (T1490). FICTIONAL: this command line is an authored process observation under admin after the transfer; execution success and backup availability are not modeled.",
+      "depends_on": [
+        "historical-exfiltration-indicator-flow"
+      ],
+      "observations": [
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Processes",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "dvc": "prod-file-01",
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "process": "C:\\Windows\\System32\\vssadmin.exe",
+            "process_id": 3301,
+            "process_guid": "{5d02548b-3cbc-5979-b19d-743e6be17c9c}",
+            "parent_process": "C:\\Windows\\System32\\cmd.exe",
+            "parent_process_id": 3002,
+            "process_cmdline": "vssadmin.exe delete shadows /all /quiet"
+          }
+        }
+      ]
+    },
+    {
+      "id": "encryptor-delivery-and-launch",
+      "offset_seconds": 4800,
+      "description": "DOCUMENTED: p.3 reports encryption by Black Basta (T1486). FICTIONAL: a file named wup.exe is delivered through the already established remote administration path and launched on prod-file-01. This filename/path is invented, no hash or malware bytes are supplied, and it is not a published IOC.",
+      "depends_on": [
+        "shadow-copy-deletion-attempt"
+      ],
+      "observations": [
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Filesystem",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "dvc": "prod-file-01",
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "file_path": "C:\\ProgramData\\Support\\wup.exe",
+            "action": "created"
+          }
+        },
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Processes",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "dvc": "prod-file-01",
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "process": "C:\\ProgramData\\Support\\wup.exe",
+            "process_id": 4001,
+            "process_guid": "{a1f0f46a-f1eb-5975-8d77-dd1d3dffea05}",
+            "parent_process": "C:\\Windows\\System32\\cmd.exe",
+            "parent_process_id": 3002
+          }
+        }
+      ]
+    },
+    {
+      "id": "basta-extension-artifacts",
+      "offset_seconds": 4920,
+      "description": "DOCUMENTED: p.3 describes .basta or random extensions and ChaCha20/RSA-4096 encryption. FICTIONAL: filesystem observations show the three invented documents with .basta suffixes; process attribution is authored. Extension creation does not establish encryption, cryptographic algorithm, file entropy, or inability to recover.",
+      "depends_on": [
+        "encryptor-delivery-and-launch"
+      ],
+      "observations": [
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Filesystem",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "dvc": "prod-file-01",
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "file_path": "D:\\Shares\\Finance\\billing-export.csv.basta",
+            "action": "created",
+            "process_guid": "{a1f0f46a-f1eb-5975-8d77-dd1d3dffea05}"
+          }
+        },
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Filesystem",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "dvc": "prod-file-01",
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "file_path": "D:\\Shares\\IT\\network-inventory.xlsx.basta",
+            "action": "created",
+            "process_guid": "{a1f0f46a-f1eb-5975-8d77-dd1d3dffea05}"
+          }
+        },
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Filesystem",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "dvc": "prod-file-01",
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "file_path": "D:\\Shares\\Operations\\operations-plan.docx.basta",
+            "action": "created",
+            "process_guid": "{a1f0f46a-f1eb-5975-8d77-dd1d3dffea05}"
+          }
+        }
+      ]
+    },
+    {
+      "id": "ransom-note-artifact",
+      "offset_seconds": 5040,
+      "description": "DOCUMENTED: p.3 names readme.txt; p.2 describes a unique code, .onion contact and a typical 10-12 day payment window. FICTIONAL: readme.txt appears on prod-file-01. Only filename metadata is emitted; no ransom text, onion connection, demand, data leak, payment or actual service outage is simulated.",
+      "depends_on": [
+        "basta-extension-artifacts"
+      ],
+      "observations": [
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Filesystem",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "dvc": "prod-file-01",
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "file_path": "D:\\Shares\\readme.txt",
+            "action": "created",
+            "process_guid": "{a1f0f46a-f1eb-5975-8d77-dd1d3dffea05}"
+          }
+        }
+      ]
+    },
+    {
+      "id": "fictional-containment-and-blocked-retry",
+      "offset_seconds": 6600,
+      "description": "FICTIONAL RESPONSE EXTENSION: an investigator changes the egress rule and a later retry to the historical exfiltration indicator is blocked. This step is not a CISA-reported response outcome. Rule deployment itself and eradication are not modeled; this is one observed blocked flow, not proof of complete containment, recovery or prevention of earlier theft.",
+      "depends_on": [
+        "ransom-note-artifact"
+      ],
+      "observations": [
+        {
+          "source": "response-firewall.jsonl",
+          "dataset": "Network_Traffic.All_Traffic",
+          "fields": {
+            "src": {
+              "ref": "asset:prod-file-01:ip"
+            },
+            "dest": {
+              "ref": "entity:bb-exfil:ip"
+            },
+            "dest_port": 443,
+            "transport": "tcp",
+            "action": "blocked",
+            "dvc": "egress-fw-01",
+            "rule": "IR-egress-deny-01"
+          }
+        }
+      ]
+    }
+  ]
+}
