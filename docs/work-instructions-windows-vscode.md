@@ -17,11 +17,13 @@ code .
 
 If you already have a modified local branch or uncommitted changes, review `git status` before switching branches or pulling; do not discard local changes. Install Microsoft's VS Code **Python**, **Python Debugger**, and **Pylance** extensions.
 
-## 2. Select Python 3.12
+## 2. Select Python 3.15
+
+Use the latest patched 3.15 release. These commands create a new environment; for an existing `.venv`, follow the [transition guide](python-version.md) first.
 
 ```powershell
 cd C:\GitHub\sec-data
-py -3.12 -m venv .venv
+py -3.15 -m venv .venv
 .\.venv\Scripts\python.exe --version
 ```
 
@@ -157,7 +159,7 @@ Without `--profile`, select a profile interactively. Review the uploader's **AWS
 
 | Symptom | Check |
 | --- | --- |
-| `python` not recognized | Use `.venv\Scripts\python.exe` directly or `py -3.12`. |
+| `python` not recognized | Use `.venv\Scripts\python.exe` directly or `py -3.15`. |
 | Output directory already exists | Choose a new `--output-dir`; `create_dataset.py` does not overwrite a previous run. |
 | `No module named common` | Execute the actual script file from within the checked-out repository (as shown); do not copy only the generator elsewhere. |
 | Compliance has few hosts | Current catalogs cover only exact Windows Server 2022 / Ubuntu 22.04 matches. |
