@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Add Gunra AA26-222A v1 with the original uploaded STIX snapshot, 15 steps/60 observations and 45 coverage assertions. Preserve compound filename/hash matching on one event and support generic recovered-file domain/email/contact/account enrichment without inventing Tor DNS or email transport.
+
 - Add SafePay AA26-293A v1 with the user-supplied original STIX snapshot, source reconciliation, 14 steps/85 observations and 62 typed coverage assertions. Support SHA-1/hostname coverage and case-sensitive SSDEEP filesystem metadata; document independent historical fixtures and fictional exercise settings.
 - Require actual published STIX JSON review for CISA scenario authoring, with source hashes/object provenance, publication reconciliation, explicit omissions and exported-evidence coverage. Block source-dependent finalization when an attachment is inaccessible instead of silently substituting publication tables.
 

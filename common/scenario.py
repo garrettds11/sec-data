@@ -50,7 +50,8 @@ FORBIDDEN = {"attack", "attacker", "malicious", "compromised", "ground_truth",
 STRING_FIELDS = {
     "access_reason", "access_result", "action", "app", "asset_id", "category",
     "change_id", "connection_result", "connection_state", "cve", "description",
-    "dest", "dest_ip", "dvc", "file_path", "file_hash", "file_hash_ssdeep", "process_hash", "finding_id", "http_method",
+    "dest", "dest_ip", "dvc", "file_path", "file_domain", "file_email", "file_contact_id",
+    "file_account", "file_hash", "file_hash_ssdeep", "process_hash", "finding_id", "http_method",
     "message_type", "object", "object_category", "object_path", "parent_process",
     "probe_type", "process", "process_cmdline", "process_guid", "query",
     "query_type", "reason", "record_type", "registry_path",
@@ -95,6 +96,16 @@ def _validate_fields(fields, dataset):
             r"[1-9][0-9]*:[A-Za-z0-9/+]{1,64}:[A-Za-z0-9/+]{1,64}", fields["file_hash_ssdeep"])):
         raise ValueError("file_hash_ssdeep requires a blocksize:signature:signature value "
                          "in Endpoint.Filesystem only")
+    artifact_patterns = {
+        "file_email": r"[^\s@]+@[^\s@]+\.[^\s@]+",
+        "file_domain": r"[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)+",
+        "file_contact_id": r"[A-Za-z0-9]{1,128}",
+        "file_account": r"[^\s]{1,256}",
+    }
+    for field, pattern in artifact_patterns.items():
+        if field in fields and (dataset != "Endpoint.Filesystem"
+                                or not re.fullmatch(pattern, fields[field])):
+            raise ValueError(f"{field} requires extracted artifact metadata in Endpoint.Filesystem")
     if all(key in fields for key in ("bytes", "bytes_in", "bytes_out")):
         if fields["bytes"] != fields["bytes_in"] + fields["bytes_out"]:
             raise ValueError("Network bytes must equal bytes_in + bytes_out")
@@ -233,6 +244,9 @@ def _validated_steps(spec, duration_minutes, assets, entities, identities):
             if not REQUIRED[dataset] <= resolved.keys():
                 raise ValueError(f"{source} missing fields: {sorted(REQUIRED[dataset] - resolved.keys())}")
             _validate_fields(resolved, dataset)
+            if (resolved.keys() & {"file_email", "file_domain", "file_contact_id", "file_account"}
+                    and source != "endpoint-lab.jsonl"):
+                raise ValueError("Extracted file artifact metadata requires endpoint-lab.jsonl")
             delay = observation.get("delay_ms", position)
             if type(delay) is not int or delay < 0 or offset * 1000 + delay >= duration_minutes * 60000:
                 raise ValueError(f"Observation in {sid} has invalid delay_ms")

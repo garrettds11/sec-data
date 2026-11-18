@@ -3,3 +3,5 @@
 tests/fixtures/** text eol=lf
 
 /catalogs/intelligence/sources/AA26-293A-stix.json -text
+
+/catalogs/intelligence/sources/AA26-222A-stix.json -text

