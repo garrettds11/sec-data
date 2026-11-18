@@ -25,7 +25,7 @@ def describe_contract():
                         "nonempty_string_or_nonzero_integer": ["signature_id", "status"],
                         "array": {key: value.__name__ for key, value in ARRAY_FIELDS.items()}},
         "reserved_fields": sorted(RESERVED), "truth_only_fields": sorted(FORBIDDEN),
-        "additional_rules": ["Authentication action: success or failure",
+        "additional_rules": ["file_hash_ssdeep: blocksize:signature:signature in Endpoint.Filesystem only; case-sensitive exact metadata","Authentication action: success or failure",
                              "Network action: allowed or blocked",
                              "When all byte fields are supplied, bytes = bytes_in + bytes_out",
                              "file_hash: hexadecimal MD5/SHA-1/SHA-256/SHA-512 in Endpoint.Filesystem only",
