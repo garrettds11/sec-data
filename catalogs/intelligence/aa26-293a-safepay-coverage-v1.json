@@ -1,0 +1,1526 @@
+{
+  "schema_version": 1,
+  "scenario_id": "cisa-aa26-293a-safepay-composite-v1",
+  "scope": "All 22 atomic values from the uploaded STIX JSON (19 indicator objects, including every SharpShares OR alternative), plus PDF Table 3 filename alternatives and four hostnames. Exact value coverage is not a general STIX evaluator or detection validation.",
+  "source_file": {
+    "path": "catalogs/intelligence/sources/AA26-293A-stix.json",
+    "official_url": "https://www.cisa.gov/sites/default/files/2026-10/AA26-293A-stix.json",
+    "retrieval": "User-uploaded original attachment; direct environment retrieval returned HTTP 403.",
+    "sha256": "73cbd07da8d74a322aa0c76a08933c8731045590e8abdee3409639f7ef40f5d0",
+    "bytes": 38394,
+    "bundle_id": "bundle--4be1cbd1-727b-4ed9-9c0f-61ed46ca27f5",
+    "object_counts": {
+      "attack-pattern": 23,
+      "indicator": 19,
+      "malware": 12,
+      "report": 1,
+      "vulnerability": 5,
+      "marking-definition": 1,
+      "location": 1,
+      "relationship": 1
+    },
+    "unresolved_references": [
+      "extension-definition--3a65884d-005a-4290-8335-cb2d778a83ce",
+      "identity--8ce3f695-d5a4-4dc8-9e93-a65af453a31a",
+      "identity--b1160532-b8f3-4cfa-9b7d-423e253fbc59",
+      "identity--b3bca3c2-1f3d-4b54-b44f-dac42c3a8f01",
+      "marking-definition--bab4a63c-aed9-4cf5-a766-dfca5abac2bb"
+    ]
+  },
+  "publication": {
+    "url": "https://www.ic3.gov/CSA/2026/261020.pdf",
+    "published": "2026-10-20",
+    "sha256": "d5162f75b2be8edfae2f7437dfbd6804f4f48fe687e313011c02d998e1e05725",
+    "file_rows": [
+      [
+        "1 - Copy.bat"
+      ],
+      [
+        "CCleaner.exe",
+        "CCleaner64.exe"
+      ],
+      [
+        "CCleaner*.exe",
+        "*.dll"
+      ],
+      [
+        "dcsync.exe"
+      ],
+      [
+        "domains.txt"
+      ],
+      [
+        "DYRasWtb.exe"
+      ],
+      [
+        "libsmb2.dll"
+      ],
+      [
+        "Libwa*.dll"
+      ],
+      [
+        "License.txt"
+      ],
+      [
+        "locker.dll"
+      ],
+      [
+        "netscan.exe"
+      ],
+      [
+        "netscan.lic",
+        "netscan.xml"
+      ],
+      [
+        "netscanNEW.zip"
+      ],
+      [
+        "nltest.exe"
+      ],
+      [
+        "oui.txt"
+      ],
+      [
+        "ping.txt"
+      ],
+      [
+        "portable.dat"
+      ],
+      [
+        "scan.xml"
+      ],
+      [
+        "sharefinder.ps1"
+      ],
+      [
+        "Socks.exe"
+      ],
+      [
+        "Socks_werfault.exe"
+      ],
+      [
+        "subs.txt"
+      ],
+      [
+        "svchost.exe"
+      ],
+      [
+        "wa_3rd_party_host_*.exe"
+      ],
+      [
+        "winrar.exe"
+      ],
+      [
+        "AnyDesk.exe"
+      ],
+      [
+        "SharpShares.exe"
+      ],
+      [
+        "AcronisDiskDirector-12.5",
+        "acro.exe",
+        "DiskDirector.exe",
+        "Acronis.exe"
+      ],
+      [
+        "b2.exe"
+      ],
+      [
+        "nxc.exe"
+      ]
+    ],
+    "hostnames": [
+      "WIN-SBOE3CPNAL",
+      "WIN-3IUUOFVTQAR",
+      "WIN-DK18BI83M0S",
+      "WIN-I1HRRJHCEIV"
+    ]
+  },
+  "stix_indicators": [
+    {
+      "object_id": "indicator--0f3ca867-3d0e-496b-a6b8-87051b2e2b81",
+      "created": "2026-09-15T19:30:46.157Z",
+      "modified": "2026-10-16T06:48:42.826Z",
+      "valid_from": "2026-09-15T19:30:46.157Z",
+      "pattern": "[ipv4-addr:value = '77.37.49.40']",
+      "description": null,
+      "operator": "single",
+      "assertions": [
+        {
+          "kind": "ipv4",
+          "value": "77.37.49.40",
+          "field": "dest"
+        }
+      ],
+      "revoked": false
+    },
+    {
+      "object_id": "indicator--32565be8-95a2-4a56-83dd-0d22f05f7d23",
+      "created": "2024-07-05T18:28:33.291Z",
+      "modified": "2026-10-16T06:48:42.886Z",
+      "valid_from": "2024-07-05T18:28:33.291Z",
+      "pattern": "[ipv4-addr:value = '88.119.167.239']",
+      "description": "88.119.167.239",
+      "operator": "single",
+      "assertions": [
+        {
+          "kind": "ipv4",
+          "value": "88.119.167.239",
+          "field": "dest"
+        }
+      ],
+      "revoked": false
+    },
+    {
+      "object_id": "indicator--35a221b8-7283-4ac3-9f99-3eefdaa2830c",
+      "created": "2026-09-15T19:30:45.116Z",
+      "modified": "2026-10-16T06:48:42.805Z",
+      "valid_from": "2026-09-15T19:30:45.116Z",
+      "pattern": "[file:hashes.'SHA-256' = '921DF888AAABCD828A3723F4C9F5FE8B8379C6B7067D16B2EA10152300417EAE']",
+      "description": null,
+      "operator": "single",
+      "assertions": [
+        {
+          "kind": "sha256",
+          "value": "921DF888AAABCD828A3723F4C9F5FE8B8379C6B7067D16B2EA10152300417EAE",
+          "field": "file_hash"
+        }
+      ],
+      "revoked": false
+    },
+    {
+      "object_id": "indicator--4e7417c6-a5b5-4dfd-a1ba-a771e4eb1bec",
+      "created": "2026-05-27T06:29:45.668Z",
+      "modified": "2026-10-16T06:48:42.936Z",
+      "valid_from": "2026-05-27T06:29:45.668Z",
+      "pattern": "[ipv4-addr:value = '173.194.194.94']",
+      "description": null,
+      "operator": "single",
+      "assertions": [
+        {
+          "kind": "ipv4",
+          "value": "173.194.194.94",
+          "field": "dest"
+        }
+      ],
+      "revoked": false
+    },
+    {
+      "object_id": "indicator--69848ec8-2448-4a61-ab76-ba5a7a06efd2",
+      "created": "2026-09-15T19:30:45.587Z",
+      "modified": "2026-10-16T06:48:42.793Z",
+      "valid_from": "2026-09-15T19:30:45.587Z",
+      "pattern": "[file:hashes.'SHA-1' = '07353237350C35D6DC2C8F143B649CD07C71F62B']",
+      "description": null,
+      "operator": "single",
+      "assertions": [
+        {
+          "kind": "sha1",
+          "value": "07353237350C35D6DC2C8F143B649CD07C71F62B",
+          "field": "file_hash"
+        }
+      ],
+      "revoked": false
+    },
+    {
+      "object_id": "indicator--6fa1e502-47da-447b-94d6-f8ec88a8dac8",
+      "created": "2026-09-15T19:30:45.212Z",
+      "modified": "2026-10-16T06:48:42.781Z",
+      "valid_from": "2026-09-15T19:30:45.212Z",
+      "pattern": "[file:hashes.'SHA-256' = 'E79608CF1D6B51324C14BEF8883054C1238ED5F080222CC464810E6E14ADC346']",
+      "description": null,
+      "operator": "single",
+      "assertions": [
+        {
+          "kind": "sha256",
+          "value": "E79608CF1D6B51324C14BEF8883054C1238ED5F080222CC464810E6E14ADC346",
+          "field": "file_hash"
+        }
+      ],
+      "revoked": false
+    },
+    {
+      "object_id": "indicator--772056db-95b4-4160-a615-559b442bb7ac",
+      "created": "2026-09-15T19:30:46.745Z",
+      "modified": "2026-10-16T06:48:42.756Z",
+      "valid_from": "2026-09-15T19:30:46.745Z",
+      "pattern": "[ipv4-addr:value = '37.10.71.188']",
+      "description": null,
+      "operator": "single",
+      "assertions": [
+        {
+          "kind": "ipv4",
+          "value": "37.10.71.188",
+          "field": "dest"
+        }
+      ],
+      "revoked": false
+    },
+    {
+      "object_id": "indicator--81cd8281-f5b6-40a0-ad2b-2378a2ca0a4a",
+      "created": "2026-09-15T19:30:45.656Z",
+      "modified": "2026-10-16T06:48:42.906Z",
+      "valid_from": "2026-09-15T19:30:45.656Z",
+      "pattern": "[file:hashes.'SHA-1' = 'B498A2683640C983BB069FA2EA9E67CEF4A3797D']",
+      "description": null,
+      "operator": "single",
+      "assertions": [
+        {
+          "kind": "sha1",
+          "value": "B498A2683640C983BB069FA2EA9E67CEF4A3797D",
+          "field": "file_hash"
+        }
+      ],
+      "revoked": false
+    },
+    {
+      "object_id": "indicator--8cf93b3c-54c6-4826-a77a-3b24358b1cab",
+      "created": "2025-03-22T13:26:12.606Z",
+      "modified": "2026-10-16T06:48:42.922Z",
+      "valid_from": "2025-03-22T13:26:12.606Z",
+      "pattern": "[file:hashes.'SHA-1' = 'C13BC01D6630D6E51F5DC3D3B0D90D8D499FF240' OR file:hashes.'SHA-256' = 'BBDD3620A67AEDEC4B9A68B2C9CC880B6631215E129816AEA19902A6F4BC6F41' OR file:hashes.MD5 = '37C1E6931A14601BB136DF5985BEB0A1' OR file:hashes.SSDEEP = '384:px+JDZS7LRJyibXRmymaahSmCS8HVcS8C6YK6P+H+0Np0FO:pxeiJK4HDKZ32O']",
+      "description": null,
+      "operator": "OR",
+      "assertions": [
+        {
+          "kind": "sha1",
+          "value": "C13BC01D6630D6E51F5DC3D3B0D90D8D499FF240",
+          "field": "file_hash"
+        },
+        {
+          "kind": "sha256",
+          "value": "BBDD3620A67AEDEC4B9A68B2C9CC880B6631215E129816AEA19902A6F4BC6F41",
+          "field": "file_hash"
+        },
+        {
+          "kind": "md5",
+          "value": "37C1E6931A14601BB136DF5985BEB0A1",
+          "field": "file_hash"
+        },
+        {
+          "kind": "ssdeep",
+          "value": "384:px+JDZS7LRJyibXRmymaahSmCS8HVcS8C6YK6P+H+0Np0FO:pxeiJK4HDKZ32O",
+          "field": "file_hash_ssdeep"
+        }
+      ],
+      "revoked": false
+    },
+    {
+      "object_id": "indicator--930a4a2a-8060-4668-8fc7-c368ff44c263",
+      "created": "2026-09-15T19:30:45.792Z",
+      "modified": "2026-10-16T06:48:42.834Z",
+      "valid_from": "2026-09-15T19:30:45.792Z",
+      "pattern": "[ipv4-addr:value = '104.26.2.223']",
+      "description": null,
+      "operator": "single",
+      "assertions": [
+        {
+          "kind": "ipv4",
+          "value": "104.26.2.223",
+          "field": "dest"
+        }
+      ],
+      "revoked": false
+    },
+    {
+      "object_id": "indicator--b8a6e2ae-f6a0-4cca-acfc-243f92a835dd",
+      "created": "2026-09-15T19:30:46.553Z",
+      "modified": "2026-10-16T06:48:42.231Z",
+      "valid_from": "2026-09-15T19:30:46.553Z",
+      "pattern": "[ipv4-addr:value = '5.255.11.134']",
+      "description": null,
+      "operator": "single",
+      "assertions": [
+        {
+          "kind": "ipv4",
+          "value": "5.255.11.134",
+          "field": "dest"
+        }
+      ],
+      "revoked": false
+    },
+    {
+      "object_id": "indicator--c378e230-9236-4eba-89c3-631639629838",
+      "created": "2026-09-15T19:30:45.956Z",
+      "modified": "2026-10-16T06:48:42.843Z",
+      "valid_from": "2026-09-15T19:30:45.956Z",
+      "pattern": "[ipv4-addr:value = '140.82.114.4']",
+      "description": null,
+      "operator": "single",
+      "assertions": [
+        {
+          "kind": "ipv4",
+          "value": "140.82.114.4",
+          "field": "dest"
+        }
+      ],
+      "revoked": false
+    },
+    {
+      "object_id": "indicator--d1a15f56-2662-4ec2-8347-4b1fc7b7e53d",
+      "created": "2026-09-15T19:30:45.743Z",
+      "modified": "2026-10-16T06:48:42.865Z",
+      "valid_from": "2026-09-15T19:30:45.743Z",
+      "pattern": "[file:hashes.'SHA-1' = 'D711A5AF5AED48A3B36B98F4FCF52809AEBEF7A2']",
+      "description": null,
+      "operator": "single",
+      "assertions": [
+        {
+          "kind": "sha1",
+          "value": "D711A5AF5AED48A3B36B98F4FCF52809AEBEF7A2",
+          "field": "file_hash"
+        }
+      ],
+      "revoked": false
+    },
+    {
+      "object_id": "indicator--d2e87846-9779-416c-ad76-9e69a397c09a",
+      "created": "2026-09-15T19:30:45.699Z",
+      "modified": "2026-10-16T06:48:42.555Z",
+      "valid_from": "2026-09-15T19:30:45.699Z",
+      "pattern": "[file:hashes.'SHA-1' = 'BBFED53E3BB1F306F4DA97D995CF4AE5B73AD081']",
+      "description": null,
+      "operator": "single",
+      "assertions": [
+        {
+          "kind": "sha1",
+          "value": "BBFED53E3BB1F306F4DA97D995CF4AE5B73AD081",
+          "field": "file_hash"
+        }
+      ],
+      "revoked": false
+    },
+    {
+      "object_id": "indicator--de81c233-9b94-4b4d-a82d-5ef7dd667bfd",
+      "created": "2026-09-15T19:30:45.161Z",
+      "modified": "2026-10-16T06:48:42.855Z",
+      "valid_from": "2026-09-15T19:30:45.161Z",
+      "pattern": "[file:hashes.'SHA-256' = '6C1D36DF94EBE367823E73BA33CFB4F40756A5E8EE1E30E8F0AE55D47E220A6A']",
+      "description": null,
+      "operator": "single",
+      "assertions": [
+        {
+          "kind": "sha256",
+          "value": "6C1D36DF94EBE367823E73BA33CFB4F40756A5E8EE1E30E8F0AE55D47E220A6A",
+          "field": "file_hash"
+        }
+      ],
+      "revoked": false
+    },
+    {
+      "object_id": "indicator--e4a787b4-3092-4476-9fc0-f4ad5dc27213",
+      "created": "2026-09-15T19:30:46.444Z",
+      "modified": "2026-10-16T06:48:42.767Z",
+      "valid_from": "2026-09-15T19:30:46.444Z",
+      "pattern": "[ipv4-addr:value = '167.235.225.149']",
+      "description": null,
+      "operator": "single",
+      "assertions": [
+        {
+          "kind": "ipv4",
+          "value": "167.235.225.149",
+          "field": "dest"
+        }
+      ],
+      "revoked": false
+    },
+    {
+      "object_id": "indicator--e68b7b73-0a4b-45f0-8b01-a6565bd8a393",
+      "created": "2026-09-15T19:30:46.055Z",
+      "modified": "2026-10-16T06:48:42.817Z",
+      "valid_from": "2026-09-15T19:30:46.055Z",
+      "pattern": "[ipv4-addr:value = '185.199.108.133']",
+      "description": null,
+      "operator": "single",
+      "assertions": [
+        {
+          "kind": "ipv4",
+          "value": "185.199.108.133",
+          "field": "dest"
+        }
+      ],
+      "revoked": false
+    },
+    {
+      "object_id": "indicator--f913c6e0-4e9d-4646-808b-896e9a0c6ccd",
+      "created": "2026-09-15T19:30:45.246Z",
+      "modified": "2026-10-16T06:48:42.541Z",
+      "valid_from": "2026-09-15T19:30:45.246Z",
+      "pattern": "[file:hashes.'SHA-256' = '327B8B61EB446CC4F710771E44484F62B804AE3D262B57A56575053E2DF67917']",
+      "description": null,
+      "operator": "single",
+      "assertions": [
+        {
+          "kind": "sha256",
+          "value": "327B8B61EB446CC4F710771E44484F62B804AE3D262B57A56575053E2DF67917",
+          "field": "file_hash"
+        }
+      ],
+      "revoked": false
+    },
+    {
+      "object_id": "indicator--fbaa2222-6b13-41c7-89d8-d37362ab1e29",
+      "created": "2024-11-18T18:35:36.480Z",
+      "modified": "2026-10-16T06:48:42.580Z",
+      "valid_from": "2024-11-18T18:35:36.480Z",
+      "pattern": "[file:hashes.'SHA-256' = 'A0DC80A37EB7E2716C02A94ADC8DF9BAEDEC192A77BDE31669FAED228D9FF526']",
+      "description": "Lockbit 3.0",
+      "operator": "single",
+      "assertions": [
+        {
+          "kind": "sha256",
+          "value": "A0DC80A37EB7E2716C02A94ADC8DF9BAEDEC192A77BDE31669FAED228D9FF526",
+          "field": "file_hash"
+        }
+      ],
+      "revoked": false
+    }
+  ],
+  "stix_other_objects": [
+    {
+      "id": "attack-pattern--069cea35-ecd9-4aba-9679-4c8358c19b24",
+      "type": "attack-pattern",
+      "name": "Impact / Data Encrypted for Impact [T1486] (ENT)",
+      "description": null,
+      "modified": "2025-02-06T19:43:32.285Z",
+      "representation": "impact-artifacts: suffix and fingerprint only; no encryption proof"
+    },
+    {
+      "id": "attack-pattern--0e946a55-1395-4fa3-af87-4ef560173b4f",
+      "type": "attack-pattern",
+      "name": "Execution / System Services: Service Execution [T1569.002] (ENT)",
+      "description": null,
+      "modified": "2025-02-25T15:30:39.162Z",
+      "representation": "lateral-service: remote service/process evidence"
+    },
+    {
+      "id": "attack-pattern--11b4c7dc-42b6-46a5-bbe7-ce1a59ed92b9",
+      "type": "attack-pattern",
+      "name": "Privilege Escalation / Abuse Elevation Control Mechanism: Bypass User Account Control [T1548.002] (ENT)",
+      "description": null,
+      "modified": "2025-12-12T13:37:19.376Z",
+      "representation": "Not simulated in selected credential/RDP/SMB branch; retained as source context. See companion omissions."
+    },
+    {
+      "id": "attack-pattern--1ffb91d0-83b5-47e6-b1f4-a69f21200ec6",
+      "type": "attack-pattern",
+      "name": "Defense Evasion / System Binary Proxy Execution [T1218] (ENT)",
+      "description": null,
+      "modified": "2025-02-20T20:34:41.770Z",
+      "representation": "Not simulated in selected credential/RDP/SMB branch; retained as source context. See companion omissions."
+    },
+    {
+      "id": "attack-pattern--3b864656-ce5f-4d9a-a6ce-ce97e6a55765",
+      "type": "attack-pattern",
+      "name": "Impact / Inhibit System Recovery [T1490] (ENT)",
+      "description": null,
+      "modified": "2025-02-06T19:43:32.289Z",
+      "representation": "recovery-inhibition: command only, not effective service stop"
+    },
+    {
+      "id": "attack-pattern--3da4f136-ffdc-466d-868d-c7d6b8ef32e1",
+      "type": "attack-pattern",
+      "name": "Defense Evasion / Obfuscated Files or Information: Software Packing [T1027.002] (ENT)",
+      "description": null,
+      "modified": "2025-03-14T17:08:29.985Z",
+      "representation": "Not simulated in selected credential/RDP/SMB branch; retained as source context. See companion omissions."
+    },
+    {
+      "id": "attack-pattern--4c673787-532a-4d90-aa24-890c842e8eed",
+      "type": "attack-pattern",
+      "name": "Initial Access / External Remote Services [T1133] (ENT)",
+      "description": null,
+      "modified": "2025-03-25T21:00:45.122Z",
+      "representation": "credential-access: RDP branch; VPN omitted"
+    },
+    {
+      "id": "attack-pattern--4e1e81ff-2ed2-40f1-b316-ff98fc03f39d",
+      "type": "attack-pattern",
+      "name": "Execution / Command and Scripting Interpreter: PowerShell [T1059.001] (ENT)",
+      "description": null,
+      "modified": "2025-02-06T19:24:50.020Z",
+      "representation": "share-discovery: PowerShell process"
+    },
+    {
+      "id": "attack-pattern--55abc434-d579-4715-8520-3f047321c541",
+      "type": "attack-pattern",
+      "name": "Credential Access / Brute Force [T1110] (ENT)",
+      "description": null,
+      "modified": "2025-04-07T14:38:15.675Z",
+      "representation": "credential-access: failed-logon samples only, not proof of brute force"
+    },
+    {
+      "id": "attack-pattern--59b4b31d-b229-481b-be3d-26bf78f0a2fa",
+      "type": "attack-pattern",
+      "name": "Lateral Movement / Remote Services [T1021] (ENT)",
+      "description": null,
+      "modified": "2025-02-12T21:01:48.590Z",
+      "representation": "lateral-service: SMB branch"
+    },
+    {
+      "id": "attack-pattern--63335e85-7bb2-4935-818d-961731b9fb6e",
+      "type": "attack-pattern",
+      "name": "Execution / Command and Scripting Interpreter [T1059] (ENT)",
+      "description": null,
+      "modified": "2025-02-07T19:40:23.644Z",
+      "representation": "share-discovery/lateral-service: command launches"
+    },
+    {
+      "id": "attack-pattern--8829d45e-85cc-4c4e-bfe4-f560ba314e2d",
+      "type": "attack-pattern",
+      "name": "Defense Impairment / Disable or Modify Tools [T1685]",
+      "description": null,
+      "modified": "2026-10-16T06:48:41.990Z",
+      "representation": "security-change: registry write only"
+    },
+    {
+      "id": "attack-pattern--8de665fb-f59c-4b9b-b8f9-da87ea940273",
+      "type": "attack-pattern",
+      "name": "Lateral Movement / Remote Services: Remote Desktop Protocol [T1021.001] (ENT)",
+      "description": null,
+      "modified": "2025-02-10T14:31:01.485Z",
+      "representation": "credential-access: RDP auth evidence"
+    },
+    {
+      "id": "attack-pattern--949e48e2-7d57-44d9-bd59-33b289d54890",
+      "type": "attack-pattern",
+      "name": "Exfiltration / Exfiltration Over Web Service [T1567] (ENT)",
+      "description": null,
+      "modified": "2025-03-26T00:13:48.038Z",
+      "representation": "Not simulated in selected credential/RDP/SMB branch; retained as source context. See companion omissions."
+    },
+    {
+      "id": "attack-pattern--a0554e80-52e7-43cf-8846-d4953379de3f",
+      "type": "attack-pattern",
+      "name": "Defense Evasion / Indicator Removal: File Deletion [T1070.004] (ENT)",
+      "description": null,
+      "modified": "2025-02-12T21:01:48.582Z",
+      "representation": "cleanup: delete observation"
+    },
+    {
+      "id": "attack-pattern--a4b9c00a-5251-4d3b-b7e2-b5e3d17dbbf5",
+      "type": "attack-pattern",
+      "name": "Collection / Archive Collected Data: Archive via Library [T1560.002] (ENT)",
+      "description": null,
+      "modified": "2026-10-16T06:48:42.045Z",
+      "representation": "Not simulated in selected credential/RDP/SMB branch; retained as source context. See companion omissions."
+    },
+    {
+      "id": "attack-pattern--a503f8ba-2378-46ee-958b-be0f2067cc88",
+      "type": "attack-pattern",
+      "name": "Exfiltration / Exfiltration Over Alternative Protocol [T1048] (ENT)",
+      "description": null,
+      "modified": "2025-03-26T00:13:48.051Z",
+      "representation": "transfer: process/flow correlation, not payload proof"
+    },
+    {
+      "id": "attack-pattern--af7f9bb9-5ea1-47d8-811e-43e3280588aa",
+      "type": "attack-pattern",
+      "name": "Lateral Movement / Remote Services: Windows Remote Management [T1021.006] (ENT)",
+      "description": null,
+      "modified": "2025-06-03T13:25:15.696Z",
+      "representation": "Not simulated in selected credential/RDP/SMB branch; retained as source context. See companion omissions."
+    },
+    {
+      "id": "attack-pattern--b05eac92-6a9d-4269-b8d8-0ff9fa6fe153",
+      "type": "attack-pattern",
+      "name": "Execution / Command and Scripting Interpreter: Windows Command Shell [T1059.003] (ENT)",
+      "description": null,
+      "modified": "2025-02-06T19:52:20.942Z",
+      "representation": "lateral-service: command-shell process"
+    },
+    {
+      "id": "attack-pattern--c6a34883-4ab4-4328-92eb-1a9467569493",
+      "type": "attack-pattern",
+      "name": "Collection / Archive Collected Data: Archive via Utility [T1560.001] (ENT)",
+      "description": null,
+      "modified": "2025-02-06T19:24:50.005Z",
+      "representation": "file-collection: archive process and file metadata"
+    },
+    {
+      "id": "attack-pattern--e90788ba-5870-435a-a6e8-d9a1da7070e6",
+      "type": "attack-pattern",
+      "name": "Initial Access / Exploit Public-Facing Application [T1190] (ENT)",
+      "description": null,
+      "modified": "2025-02-06T19:43:32.303Z",
+      "representation": "Not simulated in selected credential/RDP/SMB branch; retained as source context. See companion omissions."
+    },
+    {
+      "id": "attack-pattern--e933bdb1-5307-48af-aee3-85e3670437d4",
+      "type": "attack-pattern",
+      "name": "Persistence / Account Manipulation [T1098] (ENT)",
+      "description": null,
+      "modified": "2025-02-18T19:04:28.158Z",
+      "representation": "account-manipulation: change evidence, no enforced account state"
+    },
+    {
+      "id": "attack-pattern--ef64b84f-7f5e-4569-baaf-28e2c9bae2fc",
+      "type": "attack-pattern",
+      "name": "Lateral Movement / Remote Services: SMB/Windows Admin Shares [T1021.002] (ENT)",
+      "description": null,
+      "modified": "2025-02-06T19:43:32.304Z",
+      "representation": "lateral-service: SMB flow/auth/process correlation"
+    },
+    {
+      "id": "malware--1d7e487b-af41-4918-974f-e2b9e1d8d7b1",
+      "type": "malware",
+      "name": "WinRM",
+      "description": null,
+      "modified": "2025-12-12T13:37:19.485Z",
+      "representation": "Qualified tool context; see selected process steps, independent filename fixtures and unselected-tool notes. STIX type does not establish maliciousness."
+    },
+    {
+      "id": "malware--2589996f-09d4-41d6-bb5f-0c9041fbdc5d",
+      "type": "malware",
+      "name": "WinRAR",
+      "description": null,
+      "modified": "2025-08-19T19:17:21.637Z",
+      "representation": "Qualified tool context; see selected process steps, independent filename fixtures and unselected-tool notes. STIX type does not establish maliciousness."
+    },
+    {
+      "id": "malware--4b787812-e78a-43ed-96b0-601fec67a8c0",
+      "type": "malware",
+      "name": "CCleaner",
+      "description": null,
+      "modified": "2025-05-21T06:15:56.095Z",
+      "representation": "Qualified tool context; see selected process steps, independent filename fixtures and unselected-tool notes. STIX type does not establish maliciousness."
+    },
+    {
+      "id": "malware--53d32f01-29e5-4276-a89a-af17a9281b99",
+      "type": "malware",
+      "name": "AnyDesk",
+      "description": null,
+      "modified": "2025-03-03T17:05:55.006Z",
+      "representation": "Qualified tool context; see selected process steps, independent filename fixtures and unselected-tool notes. STIX type does not establish maliciousness."
+    },
+    {
+      "id": "malware--5aea4969-ecb3-472b-a914-a9eb5bc9bffa",
+      "type": "malware",
+      "name": "7-zip",
+      "description": null,
+      "modified": "2026-10-16T06:48:42.959Z",
+      "representation": "Qualified tool context; see selected process steps, independent filename fixtures and unselected-tool notes. STIX type does not establish maliciousness."
+    },
+    {
+      "id": "malware--7c3dd55b-ec64-41a4-bfd5-045141f9e5ca",
+      "type": "malware",
+      "name": "Filezilla",
+      "description": null,
+      "modified": "2025-06-30T18:12:39.191Z",
+      "representation": "Qualified tool context; see selected process steps, independent filename fixtures and unselected-tool notes. STIX type does not establish maliciousness."
+    },
+    {
+      "id": "malware--7ece3d7a-11a4-4fe1-9b4c-4ed9beaf472c",
+      "type": "malware",
+      "name": "Mimikatz",
+      "description": null,
+      "modified": "2025-03-06T17:45:51.230Z",
+      "representation": "Qualified tool context; see selected process steps, independent filename fixtures and unselected-tool notes. STIX type does not establish maliciousness."
+    },
+    {
+      "id": "malware--856e5e92-fc0a-436a-98c1-257ce7c88c78",
+      "type": "malware",
+      "name": "PsExec",
+      "description": null,
+      "modified": "2025-03-03T17:05:55.001Z",
+      "representation": "Qualified tool context; see selected process steps, independent filename fixtures and unselected-tool notes. STIX type does not establish maliciousness."
+    },
+    {
+      "id": "malware--980f5778-a46b-402c-bec1-29961145849b",
+      "type": "malware",
+      "name": "Rclone",
+      "description": null,
+      "modified": "2025-03-03T17:05:54.648Z",
+      "representation": "Qualified tool context; see selected process steps, independent filename fixtures and unselected-tool notes. STIX type does not establish maliciousness."
+    },
+    {
+      "id": "malware--d48c0022-384f-4c7d-9787-5e50c8601f6b",
+      "type": "malware",
+      "name": "Backblaze",
+      "description": null,
+      "modified": "2026-10-16T06:48:42.958Z",
+      "representation": "Qualified tool context; see selected process steps, independent filename fixtures and unselected-tool notes. STIX type does not establish maliciousness."
+    },
+    {
+      "id": "malware--eee1aae5-a60b-4a4a-870d-230a1c89302f",
+      "type": "malware",
+      "name": "POWERSHELL",
+      "description": null,
+      "modified": "2026-10-16T06:48:43.122Z",
+      "representation": "Qualified tool context; see selected process steps, independent filename fixtures and unselected-tool notes. STIX type does not establish maliciousness."
+    },
+    {
+      "id": "malware--fabcfb4d-03f7-4f68-b40f-b8fba44a8280",
+      "type": "malware",
+      "name": "ScreenConnect",
+      "description": null,
+      "modified": "2025-06-09T16:48:17.575Z",
+      "representation": "Qualified tool context; see selected process steps, independent filename fixtures and unselected-tool notes. STIX type does not establish maliciousness."
+    },
+    {
+      "id": "report--0a76d6de-6b55-4340-be67-004d6e4c255f",
+      "type": "report",
+      "name": "#StopRansomware: SafePay Ransomware",
+      "description": "This STIX file provides indicators of compromise (IOCs) associated with malicious activity reported in CISA CSA,\r\n#StopRansomware SafePay Ransomware\r\n",
+      "modified": "2026-10-16T06:48:42.961Z"
+    },
+    {
+      "id": "vulnerability--0818fb4e-7126-4cdb-8a0d-6051a87bf4b7",
+      "type": "vulnerability",
+      "name": "CVE-2024-40766",
+      "description": null,
+      "modified": "2025-10-21T13:00:39.759Z",
+      "representation": "Source context only: affected edge/backup products are not modeled; no exploitation claim."
+    },
+    {
+      "id": "vulnerability--32329b6f-b944-49cd-bc21-c17bdeb2e1ab",
+      "type": "vulnerability",
+      "name": "CVE-2020-3259",
+      "description": null,
+      "modified": "2025-07-23T18:30:53.123Z",
+      "representation": "Source context only: affected edge/backup products are not modeled; no exploitation claim."
+    },
+    {
+      "id": "vulnerability--3aab39e0-eb34-4540-963b-45d723e097bb",
+      "type": "vulnerability",
+      "name": "CVE-2024-40711",
+      "description": null,
+      "modified": "2025-01-29T23:08:55.073Z",
+      "representation": "Source context only: affected edge/backup products are not modeled; no exploitation claim."
+    },
+    {
+      "id": "vulnerability--73fead78-ef7c-4601-8200-b90b99e71032",
+      "type": "vulnerability",
+      "name": "CVE-2023-20269",
+      "description": null,
+      "modified": "2025-07-23T18:30:53.154Z",
+      "representation": "Source context only: affected edge/backup products are not modeled; no exploitation claim."
+    },
+    {
+      "id": "vulnerability--d8e1c48e-50f6-48da-9386-4bde8b7afbd6",
+      "type": "vulnerability",
+      "name": "CVE-2023-27532",
+      "description": null,
+      "modified": "2025-10-21T13:00:39.755Z",
+      "representation": "Source context only: affected edge/backup products are not modeled; no exploitation claim."
+    },
+    {
+      "id": "marking-definition--6da41aac-710e-4641-ac39-fd68e0c4abcb",
+      "type": "marking-definition",
+      "name": null,
+      "description": null,
+      "modified": null
+    },
+    {
+      "id": "location--78a7f0f3-ea60-4ca2-894e-9e825b94b592",
+      "type": "location",
+      "name": "District of Columbia",
+      "description": null,
+      "modified": "2021-12-01T16:19:51.601791Z"
+    },
+    {
+      "id": "relationship--b6fe158f-fa95-4a40-ac68-78e480a54c69",
+      "type": "relationship",
+      "name": null,
+      "description": null,
+      "modified": "2024-08-07T16:30:26.628Z"
+    }
+  ],
+  "indicators": [
+    {
+      "id": "indicator--0f3ca867-3d0e-496b-a6b8-87051b2e2b81-1",
+      "source": "uploaded-stix",
+      "kind": "ipv4",
+      "value": "77.37.49.40",
+      "field": "dest",
+      "match": "exact",
+      "step_id": "historical-ip-coverage",
+      "stix_object_id": "indicator--0f3ca867-3d0e-496b-a6b8-87051b2e2b81"
+    },
+    {
+      "id": "indicator--32565be8-95a2-4a56-83dd-0d22f05f7d23-1",
+      "source": "uploaded-stix",
+      "kind": "ipv4",
+      "value": "88.119.167.239",
+      "field": "dest",
+      "match": "exact",
+      "step_id": "historical-ip-coverage",
+      "stix_object_id": "indicator--32565be8-95a2-4a56-83dd-0d22f05f7d23"
+    },
+    {
+      "id": "indicator--35a221b8-7283-4ac3-9f99-3eefdaa2830c-1",
+      "source": "uploaded-stix",
+      "kind": "sha256",
+      "value": "921DF888AAABCD828A3723F4C9F5FE8B8379C6B7067D16B2EA10152300417EAE",
+      "field": "file_hash",
+      "match": "exact",
+      "step_id": "historical-hash-coverage",
+      "stix_object_id": "indicator--35a221b8-7283-4ac3-9f99-3eefdaa2830c"
+    },
+    {
+      "id": "indicator--4e7417c6-a5b5-4dfd-a1ba-a771e4eb1bec-1",
+      "source": "uploaded-stix",
+      "kind": "ipv4",
+      "value": "173.194.194.94",
+      "field": "dest",
+      "match": "exact",
+      "step_id": "historical-ip-coverage",
+      "stix_object_id": "indicator--4e7417c6-a5b5-4dfd-a1ba-a771e4eb1bec"
+    },
+    {
+      "id": "indicator--69848ec8-2448-4a61-ab76-ba5a7a06efd2-1",
+      "source": "uploaded-stix",
+      "kind": "sha1",
+      "value": "07353237350C35D6DC2C8F143B649CD07C71F62B",
+      "field": "file_hash",
+      "match": "exact",
+      "step_id": "historical-hash-coverage",
+      "stix_object_id": "indicator--69848ec8-2448-4a61-ab76-ba5a7a06efd2"
+    },
+    {
+      "id": "indicator--6fa1e502-47da-447b-94d6-f8ec88a8dac8-1",
+      "source": "uploaded-stix",
+      "kind": "sha256",
+      "value": "E79608CF1D6B51324C14BEF8883054C1238ED5F080222CC464810E6E14ADC346",
+      "field": "file_hash",
+      "match": "exact",
+      "step_id": "historical-hash-coverage",
+      "stix_object_id": "indicator--6fa1e502-47da-447b-94d6-f8ec88a8dac8"
+    },
+    {
+      "id": "indicator--772056db-95b4-4160-a615-559b442bb7ac-1",
+      "source": "uploaded-stix",
+      "kind": "ipv4",
+      "value": "37.10.71.188",
+      "field": "dest",
+      "match": "exact",
+      "step_id": "historical-ip-coverage",
+      "stix_object_id": "indicator--772056db-95b4-4160-a615-559b442bb7ac"
+    },
+    {
+      "id": "indicator--81cd8281-f5b6-40a0-ad2b-2378a2ca0a4a-1",
+      "source": "uploaded-stix",
+      "kind": "sha1",
+      "value": "B498A2683640C983BB069FA2EA9E67CEF4A3797D",
+      "field": "file_hash",
+      "match": "exact",
+      "step_id": "historical-hash-coverage",
+      "stix_object_id": "indicator--81cd8281-f5b6-40a0-ad2b-2378a2ca0a4a"
+    },
+    {
+      "id": "indicator--8cf93b3c-54c6-4826-a77a-3b24358b1cab-1",
+      "source": "uploaded-stix",
+      "kind": "sha1",
+      "value": "C13BC01D6630D6E51F5DC3D3B0D90D8D499FF240",
+      "field": "file_hash",
+      "match": "exact",
+      "step_id": "historical-hash-coverage",
+      "stix_object_id": "indicator--8cf93b3c-54c6-4826-a77a-3b24358b1cab"
+    },
+    {
+      "id": "indicator--8cf93b3c-54c6-4826-a77a-3b24358b1cab-2",
+      "source": "uploaded-stix",
+      "kind": "sha256",
+      "value": "BBDD3620A67AEDEC4B9A68B2C9CC880B6631215E129816AEA19902A6F4BC6F41",
+      "field": "file_hash",
+      "match": "exact",
+      "step_id": "historical-hash-coverage",
+      "stix_object_id": "indicator--8cf93b3c-54c6-4826-a77a-3b24358b1cab"
+    },
+    {
+      "id": "indicator--8cf93b3c-54c6-4826-a77a-3b24358b1cab-3",
+      "source": "uploaded-stix",
+      "kind": "md5",
+      "value": "37C1E6931A14601BB136DF5985BEB0A1",
+      "field": "file_hash",
+      "match": "exact",
+      "step_id": "historical-hash-coverage",
+      "stix_object_id": "indicator--8cf93b3c-54c6-4826-a77a-3b24358b1cab"
+    },
+    {
+      "id": "indicator--8cf93b3c-54c6-4826-a77a-3b24358b1cab-4",
+      "source": "uploaded-stix",
+      "kind": "ssdeep",
+      "value": "384:px+JDZS7LRJyibXRmymaahSmCS8HVcS8C6YK6P+H+0Np0FO:pxeiJK4HDKZ32O",
+      "field": "file_hash_ssdeep",
+      "match": "exact",
+      "step_id": "historical-hash-coverage",
+      "stix_object_id": "indicator--8cf93b3c-54c6-4826-a77a-3b24358b1cab"
+    },
+    {
+      "id": "indicator--930a4a2a-8060-4668-8fc7-c368ff44c263-1",
+      "source": "uploaded-stix",
+      "kind": "ipv4",
+      "value": "104.26.2.223",
+      "field": "dest",
+      "match": "exact",
+      "step_id": "historical-ip-coverage",
+      "stix_object_id": "indicator--930a4a2a-8060-4668-8fc7-c368ff44c263"
+    },
+    {
+      "id": "indicator--b8a6e2ae-f6a0-4cca-acfc-243f92a835dd-1",
+      "source": "uploaded-stix",
+      "kind": "ipv4",
+      "value": "5.255.11.134",
+      "field": "dest",
+      "match": "exact",
+      "step_id": "historical-ip-coverage",
+      "stix_object_id": "indicator--b8a6e2ae-f6a0-4cca-acfc-243f92a835dd"
+    },
+    {
+      "id": "indicator--c378e230-9236-4eba-89c3-631639629838-1",
+      "source": "uploaded-stix",
+      "kind": "ipv4",
+      "value": "140.82.114.4",
+      "field": "dest",
+      "match": "exact",
+      "step_id": "historical-ip-coverage",
+      "stix_object_id": "indicator--c378e230-9236-4eba-89c3-631639629838"
+    },
+    {
+      "id": "indicator--d1a15f56-2662-4ec2-8347-4b1fc7b7e53d-1",
+      "source": "uploaded-stix",
+      "kind": "sha1",
+      "value": "D711A5AF5AED48A3B36B98F4FCF52809AEBEF7A2",
+      "field": "file_hash",
+      "match": "exact",
+      "step_id": "historical-hash-coverage",
+      "stix_object_id": "indicator--d1a15f56-2662-4ec2-8347-4b1fc7b7e53d"
+    },
+    {
+      "id": "indicator--d2e87846-9779-416c-ad76-9e69a397c09a-1",
+      "source": "uploaded-stix",
+      "kind": "sha1",
+      "value": "BBFED53E3BB1F306F4DA97D995CF4AE5B73AD081",
+      "field": "file_hash",
+      "match": "exact",
+      "step_id": "historical-hash-coverage",
+      "stix_object_id": "indicator--d2e87846-9779-416c-ad76-9e69a397c09a"
+    },
+    {
+      "id": "indicator--de81c233-9b94-4b4d-a82d-5ef7dd667bfd-1",
+      "source": "uploaded-stix",
+      "kind": "sha256",
+      "value": "6C1D36DF94EBE367823E73BA33CFB4F40756A5E8EE1E30E8F0AE55D47E220A6A",
+      "field": "file_hash",
+      "match": "exact",
+      "step_id": "historical-hash-coverage",
+      "stix_object_id": "indicator--de81c233-9b94-4b4d-a82d-5ef7dd667bfd"
+    },
+    {
+      "id": "indicator--e4a787b4-3092-4476-9fc0-f4ad5dc27213-1",
+      "source": "uploaded-stix",
+      "kind": "ipv4",
+      "value": "167.235.225.149",
+      "field": "dest",
+      "match": "exact",
+      "step_id": "historical-ip-coverage",
+      "stix_object_id": "indicator--e4a787b4-3092-4476-9fc0-f4ad5dc27213"
+    },
+    {
+      "id": "indicator--e68b7b73-0a4b-45f0-8b01-a6565bd8a393-1",
+      "source": "uploaded-stix",
+      "kind": "ipv4",
+      "value": "185.199.108.133",
+      "field": "dest",
+      "match": "exact",
+      "step_id": "historical-ip-coverage",
+      "stix_object_id": "indicator--e68b7b73-0a4b-45f0-8b01-a6565bd8a393"
+    },
+    {
+      "id": "indicator--f913c6e0-4e9d-4646-808b-896e9a0c6ccd-1",
+      "source": "uploaded-stix",
+      "kind": "sha256",
+      "value": "327B8B61EB446CC4F710771E44484F62B804AE3D262B57A56575053E2DF67917",
+      "field": "file_hash",
+      "match": "exact",
+      "step_id": "historical-hash-coverage",
+      "stix_object_id": "indicator--f913c6e0-4e9d-4646-808b-896e9a0c6ccd"
+    },
+    {
+      "id": "indicator--fbaa2222-6b13-41c7-89d8-d37362ab1e29-1",
+      "source": "uploaded-stix",
+      "kind": "sha256",
+      "value": "A0DC80A37EB7E2716C02A94ADC8DF9BAEDEC192A77BDE31669FAED228D9FF526",
+      "field": "file_hash",
+      "match": "exact",
+      "step_id": "historical-hash-coverage",
+      "stix_object_id": "indicator--fbaa2222-6b13-41c7-89d8-d37362ab1e29"
+    },
+    {
+      "id": "pdf-file-1-1",
+      "source": "publication",
+      "table": "3",
+      "row": 1,
+      "kind": "path",
+      "value": "1 - Copy.bat",
+      "field": "file_path",
+      "match": "basename",
+      "step_id": "historical-file-coverage",
+      "qualification": "Historical/context-dependent; dual-use and suspected files are not automatically malicious. Paths and wildcard representatives fictional."
+    },
+    {
+      "id": "pdf-file-2-1",
+      "source": "publication",
+      "table": "3",
+      "row": 2,
+      "kind": "path",
+      "value": "CCleaner.exe",
+      "field": "file_path",
+      "match": "basename",
+      "step_id": "historical-file-coverage",
+      "qualification": "Historical/context-dependent; dual-use and suspected files are not automatically malicious. Paths and wildcard representatives fictional."
+    },
+    {
+      "id": "pdf-file-2-2",
+      "source": "publication",
+      "table": "3",
+      "row": 2,
+      "kind": "path",
+      "value": "CCleaner64.exe",
+      "field": "file_path",
+      "match": "basename",
+      "step_id": "historical-file-coverage",
+      "qualification": "Historical/context-dependent; dual-use and suspected files are not automatically malicious. Paths and wildcard representatives fictional."
+    },
+    {
+      "id": "pdf-file-3-1",
+      "source": "publication",
+      "table": "3",
+      "row": 3,
+      "kind": "path",
+      "value": "C:\\ProgramData\\Ops\\CCleaner*.exe",
+      "field": "file_path",
+      "match": "glob",
+      "step_id": "historical-file-coverage",
+      "qualification": "Historical/context-dependent; dual-use and suspected files are not automatically malicious. Paths and wildcard representatives fictional."
+    },
+    {
+      "id": "pdf-file-3-2",
+      "source": "publication",
+      "table": "3",
+      "row": 3,
+      "kind": "path",
+      "value": "C:\\ProgramData\\Ops\\*.dll",
+      "field": "file_path",
+      "match": "glob",
+      "step_id": "historical-file-coverage",
+      "qualification": "Historical/context-dependent; dual-use and suspected files are not automatically malicious. Paths and wildcard representatives fictional."
+    },
+    {
+      "id": "pdf-file-4-1",
+      "source": "publication",
+      "table": "3",
+      "row": 4,
+      "kind": "path",
+      "value": "dcsync.exe",
+      "field": "file_path",
+      "match": "basename",
+      "step_id": "historical-file-coverage",
+      "qualification": "Historical/context-dependent; dual-use and suspected files are not automatically malicious. Paths and wildcard representatives fictional."
+    },
+    {
+      "id": "pdf-file-5-1",
+      "source": "publication",
+      "table": "3",
+      "row": 5,
+      "kind": "path",
+      "value": "domains.txt",
+      "field": "file_path",
+      "match": "basename",
+      "step_id": "historical-file-coverage",
+      "qualification": "Historical/context-dependent; dual-use and suspected files are not automatically malicious. Paths and wildcard representatives fictional."
+    },
+    {
+      "id": "pdf-file-6-1",
+      "source": "publication",
+      "table": "3",
+      "row": 6,
+      "kind": "path",
+      "value": "DYRasWtb.exe",
+      "field": "file_path",
+      "match": "basename",
+      "step_id": "historical-file-coverage",
+      "qualification": "Historical/context-dependent; dual-use and suspected files are not automatically malicious. Paths and wildcard representatives fictional."
+    },
+    {
+      "id": "pdf-file-7-1",
+      "source": "publication",
+      "table": "3",
+      "row": 7,
+      "kind": "path",
+      "value": "libsmb2.dll",
+      "field": "file_path",
+      "match": "basename",
+      "step_id": "historical-file-coverage",
+      "qualification": "Historical/context-dependent; dual-use and suspected files are not automatically malicious. Paths and wildcard representatives fictional."
+    },
+    {
+      "id": "pdf-file-8-1",
+      "source": "publication",
+      "table": "3",
+      "row": 8,
+      "kind": "path",
+      "value": "C:\\ProgramData\\Ops\\Libwa*.dll",
+      "field": "file_path",
+      "match": "glob",
+      "step_id": "historical-file-coverage",
+      "qualification": "Historical/context-dependent; dual-use and suspected files are not automatically malicious. Paths and wildcard representatives fictional."
+    },
+    {
+      "id": "pdf-file-9-1",
+      "source": "publication",
+      "table": "3",
+      "row": 9,
+      "kind": "path",
+      "value": "License.txt",
+      "field": "file_path",
+      "match": "basename",
+      "step_id": "historical-file-coverage",
+      "qualification": "Historical/context-dependent; dual-use and suspected files are not automatically malicious. Paths and wildcard representatives fictional."
+    },
+    {
+      "id": "pdf-file-10-1",
+      "source": "publication",
+      "table": "3",
+      "row": 10,
+      "kind": "path",
+      "value": "locker.dll",
+      "field": "file_path",
+      "match": "basename",
+      "step_id": "historical-file-coverage",
+      "qualification": "Historical/context-dependent; dual-use and suspected files are not automatically malicious. Paths and wildcard representatives fictional."
+    },
+    {
+      "id": "pdf-file-11-1",
+      "source": "publication",
+      "table": "3",
+      "row": 11,
+      "kind": "path",
+      "value": "netscan.exe",
+      "field": "file_path",
+      "match": "basename",
+      "step_id": "historical-file-coverage",
+      "qualification": "Historical/context-dependent; dual-use and suspected files are not automatically malicious. Paths and wildcard representatives fictional."
+    },
+    {
+      "id": "pdf-file-12-1",
+      "source": "publication",
+      "table": "3",
+      "row": 12,
+      "kind": "path",
+      "value": "netscan.lic",
+      "field": "file_path",
+      "match": "basename",
+      "step_id": "historical-file-coverage",
+      "qualification": "Historical/context-dependent; dual-use and suspected files are not automatically malicious. Paths and wildcard representatives fictional."
+    },
+    {
+      "id": "pdf-file-12-2",
+      "source": "publication",
+      "table": "3",
+      "row": 12,
+      "kind": "path",
+      "value": "netscan.xml",
+      "field": "file_path",
+      "match": "basename",
+      "step_id": "historical-file-coverage",
+      "qualification": "Historical/context-dependent; dual-use and suspected files are not automatically malicious. Paths and wildcard representatives fictional."
+    },
+    {
+      "id": "pdf-file-13-1",
+      "source": "publication",
+      "table": "3",
+      "row": 13,
+      "kind": "path",
+      "value": "netscanNEW.zip",
+      "field": "file_path",
+      "match": "basename",
+      "step_id": "historical-file-coverage",
+      "qualification": "Historical/context-dependent; dual-use and suspected files are not automatically malicious. Paths and wildcard representatives fictional."
+    },
+    {
+      "id": "pdf-file-14-1",
+      "source": "publication",
+      "table": "3",
+      "row": 14,
+      "kind": "path",
+      "value": "nltest.exe",
+      "field": "file_path",
+      "match": "basename",
+      "step_id": "historical-file-coverage",
+      "qualification": "Historical/context-dependent; dual-use and suspected files are not automatically malicious. Paths and wildcard representatives fictional."
+    },
+    {
+      "id": "pdf-file-15-1",
+      "source": "publication",
+      "table": "3",
+      "row": 15,
+      "kind": "path",
+      "value": "oui.txt",
+      "field": "file_path",
+      "match": "basename",
+      "step_id": "historical-file-coverage",
+      "qualification": "Historical/context-dependent; dual-use and suspected files are not automatically malicious. Paths and wildcard representatives fictional."
+    },
+    {
+      "id": "pdf-file-16-1",
+      "source": "publication",
+      "table": "3",
+      "row": 16,
+      "kind": "path",
+      "value": "ping.txt",
+      "field": "file_path",
+      "match": "basename",
+      "step_id": "historical-file-coverage",
+      "qualification": "Historical/context-dependent; dual-use and suspected files are not automatically malicious. Paths and wildcard representatives fictional."
+    },
+    {
+      "id": "pdf-file-17-1",
+      "source": "publication",
+      "table": "3",
+      "row": 17,
+      "kind": "path",
+      "value": "portable.dat",
+      "field": "file_path",
+      "match": "basename",
+      "step_id": "historical-file-coverage",
+      "qualification": "Historical/context-dependent; dual-use and suspected files are not automatically malicious. Paths and wildcard representatives fictional."
+    },
+    {
+      "id": "pdf-file-18-1",
+      "source": "publication",
+      "table": "3",
+      "row": 18,
+      "kind": "path",
+      "value": "scan.xml",
+      "field": "file_path",
+      "match": "basename",
+      "step_id": "historical-file-coverage",
+      "qualification": "Historical/context-dependent; dual-use and suspected files are not automatically malicious. Paths and wildcard representatives fictional."
+    },
+    {
+      "id": "pdf-file-19-1",
+      "source": "publication",
+      "table": "3",
+      "row": 19,
+      "kind": "path",
+      "value": "sharefinder.ps1",
+      "field": "file_path",
+      "match": "basename",
+      "step_id": "historical-file-coverage",
+      "qualification": "Historical/context-dependent; dual-use and suspected files are not automatically malicious. Paths and wildcard representatives fictional."
+    },
+    {
+      "id": "pdf-file-20-1",
+      "source": "publication",
+      "table": "3",
+      "row": 20,
+      "kind": "path",
+      "value": "Socks.exe",
+      "field": "file_path",
+      "match": "basename",
+      "step_id": "historical-file-coverage",
+      "qualification": "Historical/context-dependent; dual-use and suspected files are not automatically malicious. Paths and wildcard representatives fictional."
+    },
+    {
+      "id": "pdf-file-21-1",
+      "source": "publication",
+      "table": "3",
+      "row": 21,
+      "kind": "path",
+      "value": "Socks_werfault.exe",
+      "field": "file_path",
+      "match": "basename",
+      "step_id": "historical-file-coverage",
+      "qualification": "Historical/context-dependent; dual-use and suspected files are not automatically malicious. Paths and wildcard representatives fictional."
+    },
+    {
+      "id": "pdf-file-22-1",
+      "source": "publication",
+      "table": "3",
+      "row": 22,
+      "kind": "path",
+      "value": "subs.txt",
+      "field": "file_path",
+      "match": "basename",
+      "step_id": "historical-file-coverage",
+      "qualification": "Historical/context-dependent; dual-use and suspected files are not automatically malicious. Paths and wildcard representatives fictional."
+    },
+    {
+      "id": "pdf-file-23-1",
+      "source": "publication",
+      "table": "3",
+      "row": 23,
+      "kind": "path",
+      "value": "svchost.exe",
+      "field": "file_path",
+      "match": "basename",
+      "step_id": "historical-file-coverage",
+      "qualification": "Historical/context-dependent; dual-use and suspected files are not automatically malicious. Paths and wildcard representatives fictional."
+    },
+    {
+      "id": "pdf-file-24-1",
+      "source": "publication",
+      "table": "3",
+      "row": 24,
+      "kind": "path",
+      "value": "C:\\ProgramData\\Ops\\wa_3rd_party_host_*.exe",
+      "field": "file_path",
+      "match": "glob",
+      "step_id": "historical-file-coverage",
+      "qualification": "Historical/context-dependent; dual-use and suspected files are not automatically malicious. Paths and wildcard representatives fictional."
+    },
+    {
+      "id": "pdf-file-25-1",
+      "source": "publication",
+      "table": "3",
+      "row": 25,
+      "kind": "path",
+      "value": "winrar.exe",
+      "field": "file_path",
+      "match": "basename",
+      "step_id": "historical-file-coverage",
+      "qualification": "Historical/context-dependent; dual-use and suspected files are not automatically malicious. Paths and wildcard representatives fictional."
+    },
+    {
+      "id": "pdf-file-26-1",
+      "source": "publication",
+      "table": "3",
+      "row": 26,
+      "kind": "path",
+      "value": "AnyDesk.exe",
+      "field": "file_path",
+      "match": "basename",
+      "step_id": "historical-file-coverage",
+      "qualification": "Historical/context-dependent; dual-use and suspected files are not automatically malicious. Paths and wildcard representatives fictional."
+    },
+    {
+      "id": "pdf-file-27-1",
+      "source": "publication",
+      "table": "3",
+      "row": 27,
+      "kind": "path",
+      "value": "SharpShares.exe",
+      "field": "file_path",
+      "match": "basename",
+      "step_id": "historical-file-coverage",
+      "qualification": "Historical/context-dependent; dual-use and suspected files are not automatically malicious. Paths and wildcard representatives fictional."
+    },
+    {
+      "id": "pdf-file-28-1",
+      "source": "publication",
+      "table": "3",
+      "row": 28,
+      "kind": "path",
+      "value": "AcronisDiskDirector-12.5",
+      "field": "file_path",
+      "match": "basename",
+      "step_id": "historical-file-coverage",
+      "qualification": "Historical/context-dependent; dual-use and suspected files are not automatically malicious. Paths and wildcard representatives fictional."
+    },
+    {
+      "id": "pdf-file-28-2",
+      "source": "publication",
+      "table": "3",
+      "row": 28,
+      "kind": "path",
+      "value": "acro.exe",
+      "field": "file_path",
+      "match": "basename",
+      "step_id": "historical-file-coverage",
+      "qualification": "Historical/context-dependent; dual-use and suspected files are not automatically malicious. Paths and wildcard representatives fictional."
+    },
+    {
+      "id": "pdf-file-28-3",
+      "source": "publication",
+      "table": "3",
+      "row": 28,
+      "kind": "path",
+      "value": "DiskDirector.exe",
+      "field": "file_path",
+      "match": "basename",
+      "step_id": "historical-file-coverage",
+      "qualification": "Historical/context-dependent; dual-use and suspected files are not automatically malicious. Paths and wildcard representatives fictional."
+    },
+    {
+      "id": "pdf-file-28-4",
+      "source": "publication",
+      "table": "3",
+      "row": 28,
+      "kind": "path",
+      "value": "Acronis.exe",
+      "field": "file_path",
+      "match": "basename",
+      "step_id": "historical-file-coverage",
+      "qualification": "Historical/context-dependent; dual-use and suspected files are not automatically malicious. Paths and wildcard representatives fictional."
+    },
+    {
+      "id": "pdf-file-29-1",
+      "source": "publication",
+      "table": "3",
+      "row": 29,
+      "kind": "path",
+      "value": "b2.exe",
+      "field": "file_path",
+      "match": "basename",
+      "step_id": "historical-file-coverage",
+      "qualification": "Historical/context-dependent; dual-use and suspected files are not automatically malicious. Paths and wildcard representatives fictional."
+    },
+    {
+      "id": "pdf-file-30-1",
+      "source": "publication",
+      "table": "3",
+      "row": 30,
+      "kind": "path",
+      "value": "nxc.exe",
+      "field": "file_path",
+      "match": "basename",
+      "step_id": "historical-file-coverage",
+      "qualification": "Historical/context-dependent; dual-use and suspected files are not automatically malicious. Paths and wildcard representatives fictional."
+    },
+    {
+      "id": "pdf-host-1",
+      "source": "publication",
+      "kind": "hostname",
+      "value": "WIN-SBOE3CPNAL",
+      "field": "src",
+      "match": "exact",
+      "step_id": "historical-hostname-coverage"
+    },
+    {
+      "id": "pdf-host-2",
+      "source": "publication",
+      "kind": "hostname",
+      "value": "WIN-3IUUOFVTQAR",
+      "field": "src",
+      "match": "exact",
+      "step_id": "historical-hostname-coverage"
+    },
+    {
+      "id": "pdf-host-3",
+      "source": "publication",
+      "kind": "hostname",
+      "value": "WIN-DK18BI83M0S",
+      "field": "src",
+      "match": "exact",
+      "step_id": "historical-hostname-coverage"
+    },
+    {
+      "id": "pdf-host-4",
+      "source": "publication",
+      "kind": "hostname",
+      "value": "WIN-I1HRRJHCEIV",
+      "field": "src",
+      "match": "exact",
+      "step_id": "historical-hostname-coverage"
+    }
+  ],
+  "normalization": [
+    "IP values remain unchanged; published [.] refanged in STIX already.",
+    "Cryptographic hashes matched case-insensitively; exact bytes retained. SSDEEP is case-sensitive exact text, not fuzzy scoring.",
+    "All four OR branches retained as independently required coverage assertions; this is stronger than satisfying a single OR indicator.",
+    "PDF filenames split explicit slash alternatives. Wildcards become matching patterns with fictional sample representatives; paths are fictional.",
+    "Hostnames remain hostnames; no invented DNS or published IP binding."
+  ]
+}

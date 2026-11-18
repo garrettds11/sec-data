@@ -50,7 +50,7 @@ FORBIDDEN = {"attack", "attacker", "malicious", "compromised", "ground_truth",
 STRING_FIELDS = {
     "access_reason", "access_result", "action", "app", "asset_id", "category",
     "change_id", "connection_result", "connection_state", "cve", "description",
-    "dest", "dest_ip", "dvc", "file_path", "file_hash", "process_hash", "finding_id", "http_method",
+    "dest", "dest_ip", "dvc", "file_path", "file_hash", "file_hash_ssdeep", "process_hash", "finding_id", "http_method",
     "message_type", "object", "object_category", "object_path", "parent_process",
     "probe_type", "process", "process_cmdline", "process_guid", "query",
     "query_type", "reason", "record_type", "registry_path",
@@ -91,6 +91,10 @@ def _validate_fields(fields, dataset):
                 fields[field])):
             raise ValueError(f"{field} requires a hexadecimal MD5/SHA-1/SHA-256/SHA-512 "
                              f"digest in {allowed_dataset}")
+    if "file_hash_ssdeep" in fields and (dataset != "Endpoint.Filesystem" or not re.fullmatch(
+            r"[1-9][0-9]*:[A-Za-z0-9/+]{1,64}:[A-Za-z0-9/+]{1,64}", fields["file_hash_ssdeep"])):
+        raise ValueError("file_hash_ssdeep requires a blocksize:signature:signature value "
+                         "in Endpoint.Filesystem only")
     if all(key in fields for key in ("bytes", "bytes_in", "bytes_out")):
         if fields["bytes"] != fields["bytes_in"] + fields["bytes_out"]:
             raise ValueError("Network bytes must equal bytes_in + bytes_out")

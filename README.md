@@ -55,6 +55,7 @@ Set `$scenarioFile` to the JSON file you want to run. Included examples:
 | Scenario file | Purpose |
 | --- | --- |
 | `scenarios/file-collection.json` | Small authored file-collection investigation |
+| `scenarios/cisa/aa26-293a-safepay-v1.json` | SafePay AA26-293A with uploaded-STIX and publication coverage; [settings and catalog](docs/examples/aa26-293a-safepay-v1-notes.md) |
 | `scenarios/cisa/aa24-131a-black-basta-v2.json` | Black Basta exercise with historical publication indicator coverage |
 | `scenarios/cisa/aa24-131a-black-basta.json` | Earlier Black Basta v1 adaptation with six network indicators |
 

@@ -15,6 +15,9 @@ def load_coverage(path):
     ids = set()
     allowed = {"domain": {"query"}, "ipv4": {"src", "dest", "src_ip", "dest_ip"},
                "sha256": {"file_hash", "process_hash"},
+               "sha1": {"file_hash", "process_hash"},
+               "ssdeep": {"file_hash_ssdeep"},
+               "hostname": {"src", "dest"},
                "md5": {"file_hash", "process_hash"}, "path": {"file_path", "process"}}
     for entry in entries:
         if not isinstance(entry, dict) or not all(isinstance(entry.get(key), str) and entry[key]
@@ -32,6 +35,8 @@ def load_coverage(path):
 def _matches(actual, entry):
     if not isinstance(actual, str):
         return False
+    if entry["kind"] == "ssdeep":
+        return actual == entry["value"]
     actual, expected = actual.casefold(), entry["value"].casefold()
     if entry["match"] == "glob":
         # Windows paths are compared independently of the checker's operating system.
@@ -67,8 +72,8 @@ def check_coverage(catalog, events):
     return {"scenario_id": catalog["scenario_id"], "status": "complete" if missing == 0 else "incomplete",
             "assertion_count": len(entries), "present": len(entries) - missing,
             "missing": missing,
-            "unique_indicators": len({(e["kind"], e["value"].casefold()) for e in entries}),
-            "scope": "Published-table assertions only; STIX attachment/CSV parity and detection efficacy are not established.",
+            "unique_indicators": len({(e["kind"], e["value"] if e["kind"] == "ssdeep" else e["value"].casefold()) for e in entries}),
+            "scope": catalog.get("scope", "Published-table assertions only; STIX attachment/CSV parity and detection efficacy are not established."),
             "assertions": assertions}
 
 

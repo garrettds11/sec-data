@@ -1,3 +1,5 @@
 # Auto detect text files and perform LF normalization
 * text=auto
 tests/fixtures/** text eol=lf
+
+/catalogs/intelligence/sources/AA26-293A-stix.json -text
