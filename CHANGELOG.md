@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Add Black Basta v2 with original May publication Tables 7–11 plus the explicitly retained November IOC set; keep v1 unchanged. Add typed filesystem/process hash fields, Linux filesystem observations, a source inventory, and event-ID-backed publication coverage checks that fail on missing IOCs.
+
 - Use Python 3.15 as the default for new environments, declare it in `.python-version`, document venv migration, and test Python 3.12/3.15 on Windows/Linux.
 
 - Added manual and AI-assisted authoring paths for CISA-oriented, AI-generated and human-generated stories, with shared source fidelity and review instructions.

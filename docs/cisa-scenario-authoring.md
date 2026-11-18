@@ -47,6 +47,14 @@ Deliver one scenario JSON plus companion source/assumption notes. Each selected 
 
 Run the validation-only command from [general authoring](scenario-authoring.md#6-validate-without-generating). After the required review, generate locally, reconcile the manifest counts and inspect evidence versus private truth. No special CISA runtime flag is needed: the input is the same --scenario-file contract used by other story sources.
 
+## Verify indicator coverage separately
+
+If the objective includes matching a published indicator set, inventory the exact publication and attachment revisions before authoring. Do not claim that a newer revision's replacement list covers an older STIX attachment. State whether each input's bytes were actually available. Keep every source indicator with its type, original value, normalization, qualification, intended field and represented/omitted reason in a companion machine-readable catalog.
+
+Use `validate_ioc_coverage.py --dataset-dir PATH --coverage-file CATALOG` to verify supported publication assertions against actual `events/*.jsonl` after generation. An optional `--output NEW_REPORT.json` records the event IDs supporting each match; missing values cause a nonzero exit. The checker does not count context, truth, narrative mentions or unrelated fields as evidence. Structural validation and event counts alone cannot establish source-indicator completeness. Review catalog completeness against the source separately.
+
 ## Worked example
 
 [Black Basta AA24-131A](examples/aa24-131a-black-basta-notes.md) pairs a source-backed adaptation with [one runnable input](../scenarios/cisa/aa24-131a-black-basta.json). The notes distinguish the historical indicators and published behaviors from invented host assignments, ordering and outcomes. They document a benign comparison and the observations that cannot prove successful theft, impairment or encryption.
+
+For historical original-publication IOC matching, use [Black Basta v2](examples/aa24-131a-black-basta-v2-notes.md). V1 above remains the narrower November-revision story. V2 explicitly combines both historical source sets and adds typed hashes plus machine-checked export coverage; it does not claim attachment/CSV parity without those bytes.

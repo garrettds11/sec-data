@@ -1,0 +1,4259 @@
+{
+  "schema_version": 1,
+  "scenario_id": "cisa-aa24-131a-black-basta-composite-v2",
+  "sources": [
+    {
+      "id": "may-2024",
+      "publication_date": "2024-05-10",
+      "url": "https://www.cisa.gov/sites/default/files/2024-05/aa24-131a-joint-csa-stopransomware-black-basta_1.pdf",
+      "tables": [
+        7,
+        8,
+        9,
+        10,
+        11
+      ],
+      "acquisition": "CISA indexed PDF text; complete IOC table rows recovered. Malformed hash cell independently cross-checked against the official July PDF rendering.",
+      "attachment_status": "Original STIX/consumer CSV bytes unavailable; no assertion of exact attachment parity."
+    },
+    {
+      "id": "nov-2024",
+      "publication_date": "2024-11-08",
+      "url": "https://www.cisa.gov/sites/default/files/2024-11/aa24-131a-joint-csa-stopransomware-black-basta_3.pdf",
+      "tables": [
+        7,
+        8
+      ],
+      "qualification": "Retained v1 replacement set; explicitly distinct from superseded May indicators."
+    }
+  ],
+  "normalization": [
+    "Refang [.] to dot and lowercase DNS/hash strings.",
+    "Remove PDF-inserted whitespace from hashes; do not change hex digits.",
+    "Convert renderer-escaped doubled backslashes to canonical Windows paths and rejoin Music word wrapping.",
+    "Preserve leading-dot suffix and redacted/wildcard path semantics in original_value/qualification; emit one matching representative.",
+    "Keep duplicate source rows/provenance; unique type/value totals differ from assertion counts.",
+    "SHA-256/MD5 catalog kinds are inferred from 64/32 hexadecimal characters in a generic Hash column; matching uses the digest string, not cryptographic verification."
+  ],
+  "source_tables": {
+    "7": [
+      [
+        "0112e3b20872760dda5f658f6b546c85f126e803e27f0577b294f335ffa5a298",
+        "rclone.exe"
+      ],
+      [
+        "d3683beca3a40574e5fd68d30451137e4a8bbaca8c428ebb781d565d6a70385e",
+        "Winscp.exe"
+      ],
+      [
+        "88c8b472108e0d79d16a1634499c1b45048a10a38ee799054414613cc9dccccc",
+        "DLL"
+      ],
+      [
+        "58ddbea084ce18cfb3439219ebcf2fc5c1605d2f6271610b1c7af77b8d0484bd",
+        "DLL"
+      ],
+      [
+        "39939eacfbc20a2607064994497e3e886c90cd97b25926478434f46c95bd8ead",
+        "DLL"
+      ],
+      [
+        "5b2178c7a0fd69ab00cef041f446e04098bbb397946eda3f6755f9d94d53c221",
+        "DLL"
+      ],
+      [
+        "51eb749d6cbd08baf9d43c2f83abd9d4d86eb5206f62ba43b768251a98ce9d3e",
+        "DLL"
+      ],
+      [
+        "d15bfbc181aac8ce9faa05c2063ef4695c09b718596f43edc81ca02ef03110d1",
+        "DLL"
+      ],
+      [
+        "5942143614d8ed34567ea472c2b819777edd25c00b3e1b13b1ae98d7f9e28d43",
+        "DLL"
+      ],
+      [
+        "05ebae760340fe44362ab7c8f70b2d89d6c9ba9b9ee8a9f747b2f19d326c3431",
+        "DLL"
+      ],
+      [
+        "a7b36482ba5bca7a143a795074c432ed627d6afa5bc64de97fa660faa852f1a6",
+        "DLL"
+      ],
+      [
+        "86a4dd6be867846b251460d2a0874e6413589878d27f2c4482b54cec134cc737",
+        "DLL"
+      ],
+      [
+        "07117c02a09410f47a326b52c7f17407e63ba5e6ff97277446efc75b862d2799",
+        "DLL"
+      ],
+      [
+        "96339a7e87ffce6ced247feb9b4cb7c05b83ca315976a9522155bad726b8e5be",
+        "ELF"
+      ],
+      [
+        "1c1b2d7f790750d60a14bd661dae5c5565f00c6ca7d03d062adcecda807e1779",
+        "ELF"
+      ],
+      [
+        "360c9c8f0a62010d455f35588ef27817ad35c715a5f291e43449ce6cb1986b98",
+        "ELF"
+      ],
+      [
+        "0554eb2ffa3582b000d558b6950ec60e876f1259c41acff2eac47ab78a53e94a",
+        "EXE"
+      ],
+      [
+        "9a55f55886285eef7ffabdd55c0232d1458175b1d868c03d3e304ce7d98980bc",
+        "EXE"
+      ],
+      [
+        "62e63388953bb30669b403867a3ac2c8130332cf78133f7fd4a7f23cdc939087",
+        "EXE"
+      ],
+      [
+        "7ad4324ea241782ea859af12094f89f9a182236542627e95b6416c8fb9757c59",
+        "EXE"
+      ],
+      [
+        "350ba7fca67721c74385faff083914ecdd66ef107a765dfb7ac08b38d5c9c0bd",
+        "EXE"
+      ],
+      [
+        "90ba27750a04d1308115fa6a90f36503398a8f528c974c5adc07ae8a6cd630e7",
+        "EXE"
+      ],
+      [
+        "fafaff3d665b26b5c057e64b4238980589deb0dff0501497ac50be1bc91b3e08",
+        "EXE"
+      ],
+      [
+        "acb60f0dd19a9a26aaaefd3326db8c28f546b6b0182ed2dcc23170bcb0af6d8f",
+        "EXE"
+      ],
+      [
+        "d73f6e240766ddd6c3c16eff8db50794ab8ab95c6a616d4ab2bc96780f13464d",
+        "EXE"
+      ],
+      [
+        "f039eaaced72618eaba699d2985f9e10d252ac5fe85d609c217b45bc8c3614f4",
+        "EXE"
+      ],
+      [
+        "723d1cf3d74fb3ce95a77ed9dff257a78c8af8e67a82963230dd073781074224",
+        "EXE"
+      ],
+      [
+        "ae7c868713e1d02b4db60128c651eb1e3f6a33c02544cc4cb57c3aa6c6581b6e",
+        "EXE"
+      ],
+      [
+        "fff35c2da67eef6f1a10c585b427ac32e7f06f4e4460542207abcd62264e435f",
+        "EXE"
+      ],
+      [
+        "df5b004be71717362e6b1ad22072f9ee4113b95b5d78c496a90857977a9fb415",
+        "EXE"
+      ],
+      [
+        "462bbb8fd7be98129aa73efa91e2d88fa9cafc7b47431b8227d1957f5d0c8ba7",
+        "EXE"
+      ],
+      [
+        "3c50f6369f0938f42d47db29a1f398e754acb2a8d96fd4b366246ac2ccbe250a",
+        "EXE"
+      ],
+      [
+        "5d2204f3a20e163120f52a2e3595db19890050b2faa96c6cba6b094b0a52b0aa",
+        "EXE"
+      ],
+      [
+        "37a5cd265f7f555f2fe320a68d70553b7aa9601981212921d1ac2c114e662004",
+        "EXE"
+      ],
+      [
+        "3090a37e591554d7406107df87b3dc21bda059df0bc66244e8abef6a5678af35",
+        "EXE"
+      ],
+      [
+        "17879ed48c2a2e324d4f5175112f51b75f4a8ab100b8833c82e6ddb7cd817f20",
+        "EXE"
+      ],
+      [
+        "42f05f5d4a2617b7ae0bc601dd6c053bf974f9a337a8fcc51f9338b108811b78",
+        "EXE"
+      ],
+      [
+        "882019d1024778e13841db975d5e60aaae1482fcf86ba669e819a68ce980d7d3",
+        "EXE"
+      ],
+      [
+        "e28188e516db1bda9015c30de59a2e91996b67c2e2b44989a6b0f562577fd757",
+        "EXE"
+      ],
+      [
+        "0a8297b274aeab986d6336b395b39b3af1bb00464cf5735d1ecdb506fef9098e",
+        "EXE"
+      ],
+      [
+        "69192821f8ce4561cf9c9cb494a133584179116cb2e7409bea3e18901a1ca944",
+        "EXE"
+      ],
+      [
+        "3337a7a9ccdd06acdd6e3cf4af40d871172d0a0e96fc48787b574ac93689622a",
+        "EXE"
+      ],
+      [
+        "17205c43189c22dfcb278f5cc45c2562f622b0b6280dcd43cc1d3c274095eb90",
+        "EXE"
+      ],
+      [
+        "b32daf27aa392d26bdf5faafbaae6b21cd6c918d461ff59f548a73d447a96dd9",
+        "EXE"
+      ]
+    ],
+    "8": [
+      [
+        "66.249.66[.]18",
+        "0gpw.588027fa.dns.realbumblebee[.]net, dns.trailshop[.]net, dns.artspathgroupe[.]net"
+      ],
+      [
+        "66.249.66[.]18",
+        "my.2a91c002002.588027fa.dns.realbumblebee[.]net"
+      ],
+      [
+        "66.249.66[.]18",
+        "fy9.39d9030e5d3a8e2352daae2f4cd3c417b36f64c6644a783b9629147a1.afd8b8a4615358e0313bad8c544a1af0d8efcec0e8056c2c8eee96c7.b06d1825c0247387e38851b06be0272b0bd619b7c9636bc17b09aa70.a46890f27.588027fa.dns.realbumblebee[.]net"
+      ],
+      [
+        "95.181.173[.]227",
+        "adslsdfdsfmo[.]world"
+      ],
+      [
+        "",
+        "fy9.36c44903529fa273afff3c9b7ef323432e223d22ae1d625c4a3957d57.015c16eff32356bf566c4fd3590c6ff9b2f6e8c587444ecbfc4bcae7.f71995aff9e6f22f8daffe9d2ad9050abc928b8f93bb0d42682fd3c3.445de2118.588027fa.dns.realbumblebee[.]net"
+      ],
+      [
+        "207.126.152[.]242",
+        "xkpal.d6597fa.dns.blocktoday.net nuher.3577125d2a75f6a277fc5714ff536c5c6af5283d928a66daad6825b9a.7aaf8bba88534e88ec89251c57b01b322c7f52c7f1a5338930ae2a50.cbb47411f60fe58f76cf79d300c03bdecfb9e83379f59d80b8494951.e10c20f77.7fcc0eb6.dns.blocktoday[.]net"
+      ],
+      [
+        "72.14.196[.]50",
+        ".rasapool[.]net, dns.trailshop[.]net"
+      ],
+      [
+        "72.14.196[.]192",
+        ".rasapool[.]net"
+      ],
+      [
+        "72.14.196[.]2",
+        ".rasapool[.]net"
+      ],
+      [
+        "72.14.196[.]226",
+        ".rasapool[.]net"
+      ],
+      [
+        "46.161.27[.]151",
+        ""
+      ],
+      [
+        "207.126.152[.]242",
+        "nuher.1d67bbcf4.456d87aa6.2d84dfba.dns.specialdrills[.]com"
+      ],
+      [
+        "185.219.221[.]136",
+        ""
+      ],
+      [
+        "64.176.219[.]106",
+        ""
+      ],
+      [
+        "5.78.115[.]67",
+        "your-server[.]de"
+      ],
+      [
+        "207.126.152[.]242",
+        "xkpal.1a4a64b6.dns.blocktoday[.]net"
+      ],
+      [
+        "46.8.16[.]77",
+        ""
+      ],
+      [
+        "185.7.214[.]79",
+        "VPN Server"
+      ],
+      [
+        "185.220.100[.]240",
+        "Tor exit"
+      ],
+      [
+        "107.189.30[.]69",
+        "Tor exit"
+      ],
+      [
+        "5.183.130[.]92",
+        ""
+      ],
+      [
+        "185.220.101[.]149",
+        "Tor exit"
+      ],
+      [
+        "188.130.218[.]39",
+        ""
+      ],
+      [
+        "188.130.137[.]181",
+        ""
+      ],
+      [
+        "46.8.10[.]134",
+        ""
+      ],
+      [
+        "155.138.246[.]122",
+        ""
+      ],
+      [
+        "80.239.207[.]200",
+        "winklen[.]ch"
+      ],
+      [
+        "183.181.86[.]147",
+        "Xserver[.]jp"
+      ],
+      [
+        "34.149.120[.]3",
+        ""
+      ],
+      [
+        "104.21.40[.]72",
+        ""
+      ],
+      [
+        "34.250.161[.]149",
+        ""
+      ],
+      [
+        "88.198.198[.]90",
+        "your-server[.]de; literoved[.]ru"
+      ],
+      [
+        "151.101.130[.]159",
+        ""
+      ],
+      [
+        "35.244.153[.]44",
+        ""
+      ],
+      [
+        "35.212.86[.]55",
+        ""
+      ],
+      [
+        "34.251.163[.]236",
+        ""
+      ],
+      [
+        "34.160.81[.]203",
+        ""
+      ],
+      [
+        "34.149.36[.]179",
+        ""
+      ],
+      [
+        "104.21.26[.]145",
+        ""
+      ],
+      [
+        "83.243.40[.]10",
+        ""
+      ],
+      [
+        "35.227.194[.]51",
+        ""
+      ],
+      [
+        "35.190.31[.]54",
+        ""
+      ],
+      [
+        "34.120.190[.]48",
+        ""
+      ],
+      [
+        "116.203.186[.]178",
+        ""
+      ],
+      [
+        "34.160.17[.]71",
+        ""
+      ]
+    ],
+    "9": [
+      [
+        "C:\\Users\\Public\\Audio\\Jun.exe",
+        "b6a4f4097367d9c124f51154d8750ea036a812d5b adde0baf9c5f183bb53dd24"
+      ],
+      [
+        "C:\\Users\\Public\\Audio\\esx.zip",
+        ""
+      ],
+      [
+        "C:\\Users\\Public\\Audio\\7zG.exe",
+        "f21240e0bf9f0a391d514e34d4fa24ecb997d93937 9d2260ebce7c693e55f061"
+      ],
+      [
+        "C:\\Users\\Public\\Audio\\Jun.exe",
+        "b6a4f4097367d9c124f51154d8750ea036a812d5b adde0baf9c5f183bb53dd24"
+      ],
+      [
+        "C:\\Users\\Public\\Audio\\7z.dll",
+        ""
+      ],
+      [
+        "C:\\Users\\Public\\db_Usr.sql",
+        "8501e14ee6ee142122746333b936c9ab0fc541328 f37b5612b6804e6cdc2c2c6"
+      ],
+      [
+        "C:\\Users\\Public\\Audio\\db_Usr.sql",
+        ""
+      ],
+      [
+        "C:\\Users\\Public\\Audio\\hv2.ps1",
+        ""
+      ],
+      [
+        "C:\\Users\\Public\\7zG.exe",
+        ""
+      ],
+      [
+        "C:\\Users\\Public\\7z.dll",
+        ""
+      ],
+      [
+        "C:\\Users\\Public\\BitLogic.dll",
+        ""
+      ],
+      [
+        "C:\\Users\\Public\\NetApp.exe",
+        "4c897334e6391e7a2fa3cbcbf773d5a4"
+      ],
+      [
+        "C:\\Users\\Public\\DataSoft.exe",
+        "2642ec377c0cee3235571832cb472870"
+      ],
+      [
+        "C:\\Users\\Public\\BitData.exe",
+        "b3fe23dd4701ed00d79c03043b0b952e"
+      ],
+      [
+        "C:\\Users\\Public\\DigitalText.dll",
+        ""
+      ],
+      [
+        "C:\\Users\\Public\\GeniusMesh.exe",
+        ""
+      ],
+      [
+        "\\Device\\Mup\\{redacted}\\C$\\Users\\Public\\Musi c\\PROCEXP.sys",
+        ""
+      ],
+      [
+        "\\Device\\Mup\\{redacted}\\C$\\Users\\Public\\Musi c\\DumpNParse86.exe",
+        ""
+      ],
+      [
+        "\\Device\\Mup\\{redacted}\\C$\\Users\\Public\\Musi c\\POSTDump.exe",
+        ""
+      ],
+      [
+        "\\Device\\Mup\\{redacted}\\C$\\Users\\Public\\Musi c\\DumpNParse.exe",
+        ""
+      ],
+      [
+        "C:\\Users\\Public\\socksps.ps1",
+        ""
+      ],
+      [
+        "C:\\Users\\Public\\Thief.exe",
+        "034b5fe047920b2ae9493451623633b14a85176f5 eea0c7aadc110ea1730ee79"
+      ],
+      [
+        "C:\\Users\\All Users\\{redacted}\\GWT.ps1\nC:\\Program Files\\MonitorIT\\GWT.ps1",
+        "8C68B2A794BA3D148CAE91BDF9C8D35728975 2A94118B5558418A36D95A5A45F"
+      ],
+      [
+        "Winx86.exe\nComment: alias for cmd.exe",
+        ""
+      ],
+      [
+        "C:\\Users\\Public\\Audio\\Jun.exe",
+        "b6a4f4097367d9c124f51154d8750ea036a812d5b adde0baf9c5f183bb53dd24"
+      ],
+      [
+        "C:\\Users\\Public\\eucr.exe",
+        "3c65da7f7bfdaf9acc6445abbedd9c4e927d37bb9e 3629f34afc338058680407"
+      ],
+      [
+        "C:\\Windows\\DS_c1.dll",
+        "808c96cb90b7de7792a827c6946ff481238029596 35a23bf9d98478ae6a259f9"
+      ],
+      [
+        "C:\\Windows\\DS_c1.dll",
+        "3a8fc07cadc08eeb8be342452636a754158403c3d 4ebff379a4ae66f8298d9a6"
+      ],
+      [
+        "C:\\Windows\\DS_c1.dll",
+        "4ac69411ed124da06ad66ee8bfbcea2f593b5b199 a2c38496e1ee24f9d04f34a"
+      ],
+      [
+        "C:\\Windows\\DS_c1.dll",
+        "819cb9bcf62be7666db5666a693524070b0df589c 58309b067191b30480b0c3a"
+      ],
+      [
+        "C:\\Windows\\DS_c1.dll",
+        "c26a5cb62a78c467cc6b6867c7093fbb7b1a96d92 121d4d6c3f0557ef9c881e0"
+      ],
+      [
+        "C:\\Windows\\DS_c1.dll",
+        "d503090431fdd99c9df3451d9b73c5737c79eda6e b80c148b8dc71e84623401f"
+      ],
+      [
+        "*\\instructions_read_me.txt",
+        ""
+      ]
+    ],
+    "10": [
+      [
+        "trailshop[.]net",
+        "5/8/2024 6:37"
+      ],
+      [
+        "realbumblebee[.]net",
+        "5/8/2024 6:37"
+      ],
+      [
+        "recentbee[.]net",
+        "5/8/2024 6:37"
+      ],
+      [
+        "investrealtydom[.]net",
+        "5/8/2024 6:37"
+      ],
+      [
+        "webnubee[.]com",
+        "5/8/2024 6:37"
+      ],
+      [
+        "artspathgroup[.]net",
+        "5/8/2024 6:37"
+      ],
+      [
+        "buyblocknow[.]com",
+        "5/8/2024 6:37"
+      ],
+      [
+        "currentbee[.]net",
+        "5/8/2024 6:37"
+      ],
+      [
+        "modernbeem[.]net",
+        "5/8/2024 6:37"
+      ],
+      [
+        "startupbusiness24[.]net",
+        "5/8/2024 6:37"
+      ],
+      [
+        "magentoengineers[.]com",
+        "5/8/2024 6:37"
+      ],
+      [
+        "childrensdolls[.]com",
+        "5/8/2024 6:37"
+      ],
+      [
+        "myfinancialexperts[.]com",
+        "5/8/2024 6:37"
+      ],
+      [
+        "limitedtoday[.]com",
+        "5/8/2024 6:37"
+      ],
+      [
+        "kekeoamigo[.]com",
+        "5/8/2024 6:37"
+      ],
+      [
+        "nebraska-lawyers[.]com",
+        "5/8/2024 6:37"
+      ],
+      [
+        "tomlawcenter[.]com",
+        "5/8/2024 6:37"
+      ],
+      [
+        "thesmartcloudusa[.]com",
+        "5/8/2024 6:37"
+      ],
+      [
+        "rasapool[.]net",
+        "5/8/2024 6:37"
+      ],
+      [
+        "artspathgroupe[.]net",
+        "5/8/2024 6:37"
+      ],
+      [
+        "specialdrills[.]com",
+        "5/8/2024 6:37"
+      ],
+      [
+        "thetrailbig[.]net",
+        "5/8/2024 6:37"
+      ],
+      [
+        "consulheartinc[.]com",
+        "3/22/2024 15:35"
+      ],
+      [
+        "otxcosmeticscare[.]com",
+        "3/15/2024 10:14"
+      ],
+      [
+        "otxcarecosmetics[.]com",
+        "3/15/2024 10:14"
+      ],
+      [
+        "artstrailman[.]com",
+        "3/15/2024 10:14"
+      ],
+      [
+        "ontexcare[.]com",
+        "3/15/2024 10:14"
+      ],
+      [
+        "trackgroup[.]net",
+        "3/15/2024 10:14"
+      ],
+      [
+        "businessprofessionalllc[.]com",
+        "3/15/2024 10:14"
+      ],
+      [
+        "securecloudmanage[.]com",
+        "3/7/2024 10:42"
+      ],
+      [
+        "oneblackwood[.]com",
+        "3/7/2024 10:42"
+      ],
+      [
+        "buygreenstudio[.]com",
+        "3/7/2024 10:42"
+      ],
+      [
+        "startupbuss[.]com",
+        "3/7/2024 10:42"
+      ],
+      [
+        "onedogsclub[.]com",
+        "3/4/2024 18:26"
+      ],
+      [
+        "wipresolutions[.]com",
+        "3/4/2024 18:26"
+      ],
+      [
+        "recentbeelive[.]com",
+        "3/4/2024 18:26"
+      ],
+      [
+        "trailcocompany[.]com",
+        "3/4/2024 18:26"
+      ],
+      [
+        "trailcosolutions[.]com",
+        "3/4/2024 18:26"
+      ],
+      [
+        "artstrailreviews[.]com",
+        "3/4/2024 18:26"
+      ],
+      [
+        "usaglobalnews[.]com",
+        "2/15/2024 5:56"
+      ],
+      [
+        "topglobaltv[.]com",
+        "2/15/2024 5:56"
+      ],
+      [
+        "startupmartec[.]net",
+        "2/15/2024 5:56"
+      ],
+      [
+        "technologgies[.]com",
+        "1/2/2024 18:16"
+      ],
+      [
+        "jenshol[.]com",
+        "1/2/2024 18:16"
+      ],
+      [
+        "simorten[.]com",
+        "1/2/2024 18:16"
+      ],
+      [
+        "investmentgblog[.]net",
+        "1/2/2024 18:16"
+      ],
+      [
+        "protectionek[.]com",
+        "1/2/2024 18:16"
+      ]
+    ],
+    "11": [
+      [
+        "airbusco[.]net"
+      ],
+      [
+        "allcompanycenter[.]com"
+      ],
+      [
+        "animalsfast[.]net"
+      ],
+      [
+        "audsystemecll[.]net"
+      ],
+      [
+        "auuditoe[.]com"
+      ],
+      [
+        "bluenetworking[.]net"
+      ],
+      [
+        "brendonline[.]com"
+      ],
+      [
+        "businesforhome[.]com"
+      ],
+      [
+        "caspercan[.]com"
+      ],
+      [
+        "clearsystemwo[.]net"
+      ],
+      [
+        "cloudworldst[.]net"
+      ],
+      [
+        "constrtionfirst[.]com"
+      ],
+      [
+        "erihudeg[.]com"
+      ],
+      [
+        "garbagemoval[.]com"
+      ],
+      [
+        "gartenlofti[.]com"
+      ],
+      [
+        "getfnewsolutions[.]com"
+      ],
+      [
+        "getfnewssolutions[.]com"
+      ],
+      [
+        "investmendvisor[.]net"
+      ],
+      [
+        "investmentrealtyhp[.]net"
+      ],
+      [
+        "ionoslaba[.]com"
+      ],
+      [
+        "jessvisser[.]com"
+      ],
+      [
+        "karmafisker[.]com"
+      ],
+      [
+        "kolinileas[.]com"
+      ],
+      [
+        "maluisepaul[.]com"
+      ],
+      [
+        "masterunix[.]net"
+      ],
+      [
+        "monitor-websystem[.]net"
+      ],
+      [
+        "monitorsystem[.]net"
+      ],
+      [
+        "mytrailinvest[.]net"
+      ],
+      [
+        "prettyanimals[.]net"
+      ],
+      [
+        "reelsysmoona[.]net"
+      ],
+      [
+        "seohomee[.]com"
+      ],
+      [
+        "septcntr[.]com"
+      ],
+      [
+        "softradar[.]net"
+      ],
+      [
+        "startupbizaud[.]net"
+      ],
+      [
+        "startuptechnologyw[.]net"
+      ],
+      [
+        "steamteamdev[.]net"
+      ],
+      [
+        "stockinvestlab[.]net"
+      ],
+      [
+        "taskthebox[.]net"
+      ],
+      [
+        "trailgroupl[.]net"
+      ],
+      [
+        "treeauwin[.]net"
+      ],
+      [
+        "unitedfrom[.]com"
+      ],
+      [
+        "unougn[.]com"
+      ],
+      [
+        "wardeli[.]com"
+      ],
+      [
+        "welausystem[.]net"
+      ],
+      [
+        "wellsystemte[.]net"
+      ],
+      [
+        "withclier[.]com"
+      ]
+    ]
+  },
+  "indicators": [
+    {
+      "id": "may-2024-t8-r001-domain-000",
+      "source": "may-2024",
+      "table": 8,
+      "row": 1,
+      "kind": "domain",
+      "value": "0gpw.588027fa.dns.realbumblebee.net",
+      "original_value": "0gpw.588027fa.dns.realbumblebee[.]net",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Third-party reported context; shared infrastructure may be legitimate."
+    },
+    {
+      "id": "may-2024-t8-r001-domain-001",
+      "source": "may-2024",
+      "table": 8,
+      "row": 1,
+      "kind": "domain",
+      "value": "dns.trailshop.net",
+      "original_value": "dns.trailshop[.]net",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Third-party reported context; shared infrastructure may be legitimate."
+    },
+    {
+      "id": "may-2024-t8-r001-domain-002",
+      "source": "may-2024",
+      "table": 8,
+      "row": 1,
+      "kind": "domain",
+      "value": "dns.artspathgroupe.net",
+      "original_value": "dns.artspathgroupe[.]net",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Third-party reported context; shared infrastructure may be legitimate."
+    },
+    {
+      "id": "may-2024-t8-r002-domain-003",
+      "source": "may-2024",
+      "table": 8,
+      "row": 2,
+      "kind": "domain",
+      "value": "my.2a91c002002.588027fa.dns.realbumblebee.net",
+      "original_value": "my.2a91c002002.588027fa.dns.realbumblebee[.]net",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Third-party reported context; shared infrastructure may be legitimate."
+    },
+    {
+      "id": "may-2024-t8-r003-domain-004",
+      "source": "may-2024",
+      "table": 8,
+      "row": 3,
+      "kind": "domain",
+      "value": "fy9.39d9030e5d3a8e2352daae2f4cd3c417b36f64c6644a783b9629147a1.afd8b8a4615358e0313bad8c544a1af0d8efcec0e8056c2c8eee96c7.b06d1825c0247387e38851b06be0272b0bd619b7c9636bc17b09aa70.a46890f27.588027fa.dns.realbumblebee.net",
+      "original_value": "fy9.39d9030e5d3a8e2352daae2f4cd3c417b36f64c6644a783b9629147a1.afd8b8a4615358e0313bad8c544a1af0d8efcec0e8056c2c8eee96c7.b06d1825c0247387e38851b06be0272b0bd619b7c9636bc17b09aa70.a46890f27.588027fa.dns.realbumblebee[.]net",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Third-party reported context; shared infrastructure may be legitimate."
+    },
+    {
+      "id": "may-2024-t8-r004-domain-005",
+      "source": "may-2024",
+      "table": 8,
+      "row": 4,
+      "kind": "domain",
+      "value": "adslsdfdsfmo.world",
+      "original_value": "adslsdfdsfmo[.]world",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Third-party reported context; shared infrastructure may be legitimate."
+    },
+    {
+      "id": "may-2024-t8-r005-domain-006",
+      "source": "may-2024",
+      "table": 8,
+      "row": 5,
+      "kind": "domain",
+      "value": "fy9.36c44903529fa273afff3c9b7ef323432e223d22ae1d625c4a3957d57.015c16eff32356bf566c4fd3590c6ff9b2f6e8c587444ecbfc4bcae7.f71995aff9e6f22f8daffe9d2ad9050abc928b8f93bb0d42682fd3c3.445de2118.588027fa.dns.realbumblebee.net",
+      "original_value": "fy9.36c44903529fa273afff3c9b7ef323432e223d22ae1d625c4a3957d57.015c16eff32356bf566c4fd3590c6ff9b2f6e8c587444ecbfc4bcae7.f71995aff9e6f22f8daffe9d2ad9050abc928b8f93bb0d42682fd3c3.445de2118.588027fa.dns.realbumblebee[.]net",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Third-party reported context; shared infrastructure may be legitimate."
+    },
+    {
+      "id": "may-2024-t8-r006-domain-007",
+      "source": "may-2024",
+      "table": 8,
+      "row": 6,
+      "kind": "domain",
+      "value": "xkpal.d6597fa.dns.blocktoday.net",
+      "original_value": "xkpal.d6597fa.dns.blocktoday.net",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Third-party reported context; shared infrastructure may be legitimate."
+    },
+    {
+      "id": "may-2024-t8-r006-domain-008",
+      "source": "may-2024",
+      "table": 8,
+      "row": 6,
+      "kind": "domain",
+      "value": "nuher.3577125d2a75f6a277fc5714ff536c5c6af5283d928a66daad6825b9a.7aaf8bba88534e88ec89251c57b01b322c7f52c7f1a5338930ae2a50.cbb47411f60fe58f76cf79d300c03bdecfb9e83379f59d80b8494951.e10c20f77.7fcc0eb6.dns.blocktoday.net",
+      "original_value": "nuher.3577125d2a75f6a277fc5714ff536c5c6af5283d928a66daad6825b9a.7aaf8bba88534e88ec89251c57b01b322c7f52c7f1a5338930ae2a50.cbb47411f60fe58f76cf79d300c03bdecfb9e83379f59d80b8494951.e10c20f77.7fcc0eb6.dns.blocktoday[.]net",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Third-party reported context; shared infrastructure may be legitimate."
+    },
+    {
+      "id": "may-2024-t8-r007-domain-009",
+      "source": "may-2024",
+      "table": 8,
+      "row": 7,
+      "kind": "domain",
+      "value": "rasapool.net",
+      "original_value": ".rasapool[.]net",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Third-party reported context; shared infrastructure may be legitimate."
+    },
+    {
+      "id": "may-2024-t8-r007-domain-010",
+      "source": "may-2024",
+      "table": 8,
+      "row": 7,
+      "kind": "domain",
+      "value": "dns.trailshop.net",
+      "original_value": "dns.trailshop[.]net",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Third-party reported context; shared infrastructure may be legitimate."
+    },
+    {
+      "id": "may-2024-t8-r008-domain-011",
+      "source": "may-2024",
+      "table": 8,
+      "row": 8,
+      "kind": "domain",
+      "value": "rasapool.net",
+      "original_value": ".rasapool[.]net",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Third-party reported context; shared infrastructure may be legitimate."
+    },
+    {
+      "id": "may-2024-t8-r009-domain-012",
+      "source": "may-2024",
+      "table": 8,
+      "row": 9,
+      "kind": "domain",
+      "value": "rasapool.net",
+      "original_value": ".rasapool[.]net",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Third-party reported context; shared infrastructure may be legitimate."
+    },
+    {
+      "id": "may-2024-t8-r010-domain-013",
+      "source": "may-2024",
+      "table": 8,
+      "row": 10,
+      "kind": "domain",
+      "value": "rasapool.net",
+      "original_value": ".rasapool[.]net",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Third-party reported context; shared infrastructure may be legitimate."
+    },
+    {
+      "id": "may-2024-t8-r012-domain-014",
+      "source": "may-2024",
+      "table": 8,
+      "row": 12,
+      "kind": "domain",
+      "value": "nuher.1d67bbcf4.456d87aa6.2d84dfba.dns.specialdrills.com",
+      "original_value": "nuher.1d67bbcf4.456d87aa6.2d84dfba.dns.specialdrills[.]com",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Third-party reported context; shared infrastructure may be legitimate."
+    },
+    {
+      "id": "may-2024-t8-r015-domain-015",
+      "source": "may-2024",
+      "table": 8,
+      "row": 15,
+      "kind": "domain",
+      "value": "your-server.de",
+      "original_value": "your-server[.]de",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Third-party reported context; shared infrastructure may be legitimate."
+    },
+    {
+      "id": "may-2024-t8-r016-domain-016",
+      "source": "may-2024",
+      "table": 8,
+      "row": 16,
+      "kind": "domain",
+      "value": "xkpal.1a4a64b6.dns.blocktoday.net",
+      "original_value": "xkpal.1a4a64b6.dns.blocktoday[.]net",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Third-party reported context; shared infrastructure may be legitimate."
+    },
+    {
+      "id": "may-2024-t8-r027-domain-017",
+      "source": "may-2024",
+      "table": 8,
+      "row": 27,
+      "kind": "domain",
+      "value": "winklen.ch",
+      "original_value": "winklen[.]ch",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Third-party reported context; shared infrastructure may be legitimate."
+    },
+    {
+      "id": "may-2024-t8-r028-domain-018",
+      "source": "may-2024",
+      "table": 8,
+      "row": 28,
+      "kind": "domain",
+      "value": "Xserver.jp",
+      "original_value": "Xserver[.]jp",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Third-party reported context; shared infrastructure may be legitimate."
+    },
+    {
+      "id": "may-2024-t8-r032-domain-019",
+      "source": "may-2024",
+      "table": 8,
+      "row": 32,
+      "kind": "domain",
+      "value": "your-server.de",
+      "original_value": "your-server[.]de",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Third-party reported context; shared infrastructure may be legitimate."
+    },
+    {
+      "id": "may-2024-t8-r032-domain-020",
+      "source": "may-2024",
+      "table": 8,
+      "row": 32,
+      "kind": "domain",
+      "value": "literoved.ru",
+      "original_value": "literoved[.]ru",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Third-party reported context; shared infrastructure may be legitimate."
+    },
+    {
+      "id": "may-2024-t10-r001-domain-021",
+      "source": "may-2024",
+      "table": 10,
+      "row": 1,
+      "kind": "domain",
+      "value": "trailshop.net",
+      "original_value": "trailshop[.]net",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Known Black Basta Cobalt Strike domain in the original publication."
+    },
+    {
+      "id": "may-2024-t10-r002-domain-022",
+      "source": "may-2024",
+      "table": 10,
+      "row": 2,
+      "kind": "domain",
+      "value": "realbumblebee.net",
+      "original_value": "realbumblebee[.]net",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Known Black Basta Cobalt Strike domain in the original publication."
+    },
+    {
+      "id": "may-2024-t10-r003-domain-023",
+      "source": "may-2024",
+      "table": 10,
+      "row": 3,
+      "kind": "domain",
+      "value": "recentbee.net",
+      "original_value": "recentbee[.]net",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Known Black Basta Cobalt Strike domain in the original publication."
+    },
+    {
+      "id": "may-2024-t10-r004-domain-024",
+      "source": "may-2024",
+      "table": 10,
+      "row": 4,
+      "kind": "domain",
+      "value": "investrealtydom.net",
+      "original_value": "investrealtydom[.]net",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Known Black Basta Cobalt Strike domain in the original publication."
+    },
+    {
+      "id": "may-2024-t10-r005-domain-025",
+      "source": "may-2024",
+      "table": 10,
+      "row": 5,
+      "kind": "domain",
+      "value": "webnubee.com",
+      "original_value": "webnubee[.]com",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Known Black Basta Cobalt Strike domain in the original publication."
+    },
+    {
+      "id": "may-2024-t10-r006-domain-026",
+      "source": "may-2024",
+      "table": 10,
+      "row": 6,
+      "kind": "domain",
+      "value": "artspathgroup.net",
+      "original_value": "artspathgroup[.]net",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Known Black Basta Cobalt Strike domain in the original publication."
+    },
+    {
+      "id": "may-2024-t10-r007-domain-027",
+      "source": "may-2024",
+      "table": 10,
+      "row": 7,
+      "kind": "domain",
+      "value": "buyblocknow.com",
+      "original_value": "buyblocknow[.]com",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Known Black Basta Cobalt Strike domain in the original publication."
+    },
+    {
+      "id": "may-2024-t10-r008-domain-028",
+      "source": "may-2024",
+      "table": 10,
+      "row": 8,
+      "kind": "domain",
+      "value": "currentbee.net",
+      "original_value": "currentbee[.]net",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Known Black Basta Cobalt Strike domain in the original publication."
+    },
+    {
+      "id": "may-2024-t10-r009-domain-029",
+      "source": "may-2024",
+      "table": 10,
+      "row": 9,
+      "kind": "domain",
+      "value": "modernbeem.net",
+      "original_value": "modernbeem[.]net",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Known Black Basta Cobalt Strike domain in the original publication."
+    },
+    {
+      "id": "may-2024-t10-r010-domain-030",
+      "source": "may-2024",
+      "table": 10,
+      "row": 10,
+      "kind": "domain",
+      "value": "startupbusiness24.net",
+      "original_value": "startupbusiness24[.]net",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Known Black Basta Cobalt Strike domain in the original publication."
+    },
+    {
+      "id": "may-2024-t10-r011-domain-031",
+      "source": "may-2024",
+      "table": 10,
+      "row": 11,
+      "kind": "domain",
+      "value": "magentoengineers.com",
+      "original_value": "magentoengineers[.]com",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Known Black Basta Cobalt Strike domain in the original publication."
+    },
+    {
+      "id": "may-2024-t10-r012-domain-032",
+      "source": "may-2024",
+      "table": 10,
+      "row": 12,
+      "kind": "domain",
+      "value": "childrensdolls.com",
+      "original_value": "childrensdolls[.]com",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Known Black Basta Cobalt Strike domain in the original publication."
+    },
+    {
+      "id": "may-2024-t10-r013-domain-033",
+      "source": "may-2024",
+      "table": 10,
+      "row": 13,
+      "kind": "domain",
+      "value": "myfinancialexperts.com",
+      "original_value": "myfinancialexperts[.]com",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Known Black Basta Cobalt Strike domain in the original publication."
+    },
+    {
+      "id": "may-2024-t10-r014-domain-034",
+      "source": "may-2024",
+      "table": 10,
+      "row": 14,
+      "kind": "domain",
+      "value": "limitedtoday.com",
+      "original_value": "limitedtoday[.]com",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Known Black Basta Cobalt Strike domain in the original publication."
+    },
+    {
+      "id": "may-2024-t10-r015-domain-035",
+      "source": "may-2024",
+      "table": 10,
+      "row": 15,
+      "kind": "domain",
+      "value": "kekeoamigo.com",
+      "original_value": "kekeoamigo[.]com",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Known Black Basta Cobalt Strike domain in the original publication."
+    },
+    {
+      "id": "may-2024-t10-r016-domain-036",
+      "source": "may-2024",
+      "table": 10,
+      "row": 16,
+      "kind": "domain",
+      "value": "nebraska-lawyers.com",
+      "original_value": "nebraska-lawyers[.]com",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Known Black Basta Cobalt Strike domain in the original publication."
+    },
+    {
+      "id": "may-2024-t10-r017-domain-037",
+      "source": "may-2024",
+      "table": 10,
+      "row": 17,
+      "kind": "domain",
+      "value": "tomlawcenter.com",
+      "original_value": "tomlawcenter[.]com",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Known Black Basta Cobalt Strike domain in the original publication."
+    },
+    {
+      "id": "may-2024-t10-r018-domain-038",
+      "source": "may-2024",
+      "table": 10,
+      "row": 18,
+      "kind": "domain",
+      "value": "thesmartcloudusa.com",
+      "original_value": "thesmartcloudusa[.]com",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Known Black Basta Cobalt Strike domain in the original publication."
+    },
+    {
+      "id": "may-2024-t10-r019-domain-039",
+      "source": "may-2024",
+      "table": 10,
+      "row": 19,
+      "kind": "domain",
+      "value": "rasapool.net",
+      "original_value": "rasapool[.]net",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Known Black Basta Cobalt Strike domain in the original publication."
+    },
+    {
+      "id": "may-2024-t10-r020-domain-040",
+      "source": "may-2024",
+      "table": 10,
+      "row": 20,
+      "kind": "domain",
+      "value": "artspathgroupe.net",
+      "original_value": "artspathgroupe[.]net",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Known Black Basta Cobalt Strike domain in the original publication."
+    },
+    {
+      "id": "may-2024-t10-r021-domain-041",
+      "source": "may-2024",
+      "table": 10,
+      "row": 21,
+      "kind": "domain",
+      "value": "specialdrills.com",
+      "original_value": "specialdrills[.]com",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Known Black Basta Cobalt Strike domain in the original publication."
+    },
+    {
+      "id": "may-2024-t10-r022-domain-042",
+      "source": "may-2024",
+      "table": 10,
+      "row": 22,
+      "kind": "domain",
+      "value": "thetrailbig.net",
+      "original_value": "thetrailbig[.]net",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Known Black Basta Cobalt Strike domain in the original publication."
+    },
+    {
+      "id": "may-2024-t10-r023-domain-043",
+      "source": "may-2024",
+      "table": 10,
+      "row": 23,
+      "kind": "domain",
+      "value": "consulheartinc.com",
+      "original_value": "consulheartinc[.]com",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Known Black Basta Cobalt Strike domain in the original publication."
+    },
+    {
+      "id": "may-2024-t10-r024-domain-044",
+      "source": "may-2024",
+      "table": 10,
+      "row": 24,
+      "kind": "domain",
+      "value": "otxcosmeticscare.com",
+      "original_value": "otxcosmeticscare[.]com",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Known Black Basta Cobalt Strike domain in the original publication."
+    },
+    {
+      "id": "may-2024-t10-r025-domain-045",
+      "source": "may-2024",
+      "table": 10,
+      "row": 25,
+      "kind": "domain",
+      "value": "otxcarecosmetics.com",
+      "original_value": "otxcarecosmetics[.]com",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Known Black Basta Cobalt Strike domain in the original publication."
+    },
+    {
+      "id": "may-2024-t10-r026-domain-046",
+      "source": "may-2024",
+      "table": 10,
+      "row": 26,
+      "kind": "domain",
+      "value": "artstrailman.com",
+      "original_value": "artstrailman[.]com",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Known Black Basta Cobalt Strike domain in the original publication."
+    },
+    {
+      "id": "may-2024-t10-r027-domain-047",
+      "source": "may-2024",
+      "table": 10,
+      "row": 27,
+      "kind": "domain",
+      "value": "ontexcare.com",
+      "original_value": "ontexcare[.]com",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Known Black Basta Cobalt Strike domain in the original publication."
+    },
+    {
+      "id": "may-2024-t10-r028-domain-048",
+      "source": "may-2024",
+      "table": 10,
+      "row": 28,
+      "kind": "domain",
+      "value": "trackgroup.net",
+      "original_value": "trackgroup[.]net",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Known Black Basta Cobalt Strike domain in the original publication."
+    },
+    {
+      "id": "may-2024-t10-r029-domain-049",
+      "source": "may-2024",
+      "table": 10,
+      "row": 29,
+      "kind": "domain",
+      "value": "businessprofessionalllc.com",
+      "original_value": "businessprofessionalllc[.]com",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Known Black Basta Cobalt Strike domain in the original publication."
+    },
+    {
+      "id": "may-2024-t10-r030-domain-050",
+      "source": "may-2024",
+      "table": 10,
+      "row": 30,
+      "kind": "domain",
+      "value": "securecloudmanage.com",
+      "original_value": "securecloudmanage[.]com",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Known Black Basta Cobalt Strike domain in the original publication."
+    },
+    {
+      "id": "may-2024-t10-r031-domain-051",
+      "source": "may-2024",
+      "table": 10,
+      "row": 31,
+      "kind": "domain",
+      "value": "oneblackwood.com",
+      "original_value": "oneblackwood[.]com",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Known Black Basta Cobalt Strike domain in the original publication."
+    },
+    {
+      "id": "may-2024-t10-r032-domain-052",
+      "source": "may-2024",
+      "table": 10,
+      "row": 32,
+      "kind": "domain",
+      "value": "buygreenstudio.com",
+      "original_value": "buygreenstudio[.]com",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Known Black Basta Cobalt Strike domain in the original publication."
+    },
+    {
+      "id": "may-2024-t10-r033-domain-053",
+      "source": "may-2024",
+      "table": 10,
+      "row": 33,
+      "kind": "domain",
+      "value": "startupbuss.com",
+      "original_value": "startupbuss[.]com",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Known Black Basta Cobalt Strike domain in the original publication."
+    },
+    {
+      "id": "may-2024-t10-r034-domain-054",
+      "source": "may-2024",
+      "table": 10,
+      "row": 34,
+      "kind": "domain",
+      "value": "onedogsclub.com",
+      "original_value": "onedogsclub[.]com",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Known Black Basta Cobalt Strike domain in the original publication."
+    },
+    {
+      "id": "may-2024-t10-r035-domain-055",
+      "source": "may-2024",
+      "table": 10,
+      "row": 35,
+      "kind": "domain",
+      "value": "wipresolutions.com",
+      "original_value": "wipresolutions[.]com",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Known Black Basta Cobalt Strike domain in the original publication."
+    },
+    {
+      "id": "may-2024-t10-r036-domain-056",
+      "source": "may-2024",
+      "table": 10,
+      "row": 36,
+      "kind": "domain",
+      "value": "recentbeelive.com",
+      "original_value": "recentbeelive[.]com",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Known Black Basta Cobalt Strike domain in the original publication."
+    },
+    {
+      "id": "may-2024-t10-r037-domain-057",
+      "source": "may-2024",
+      "table": 10,
+      "row": 37,
+      "kind": "domain",
+      "value": "trailcocompany.com",
+      "original_value": "trailcocompany[.]com",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Known Black Basta Cobalt Strike domain in the original publication."
+    },
+    {
+      "id": "may-2024-t10-r038-domain-058",
+      "source": "may-2024",
+      "table": 10,
+      "row": 38,
+      "kind": "domain",
+      "value": "trailcosolutions.com",
+      "original_value": "trailcosolutions[.]com",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Known Black Basta Cobalt Strike domain in the original publication."
+    },
+    {
+      "id": "may-2024-t10-r039-domain-059",
+      "source": "may-2024",
+      "table": 10,
+      "row": 39,
+      "kind": "domain",
+      "value": "artstrailreviews.com",
+      "original_value": "artstrailreviews[.]com",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Known Black Basta Cobalt Strike domain in the original publication."
+    },
+    {
+      "id": "may-2024-t10-r040-domain-060",
+      "source": "may-2024",
+      "table": 10,
+      "row": 40,
+      "kind": "domain",
+      "value": "usaglobalnews.com",
+      "original_value": "usaglobalnews[.]com",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Known Black Basta Cobalt Strike domain in the original publication."
+    },
+    {
+      "id": "may-2024-t10-r041-domain-061",
+      "source": "may-2024",
+      "table": 10,
+      "row": 41,
+      "kind": "domain",
+      "value": "topglobaltv.com",
+      "original_value": "topglobaltv[.]com",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Known Black Basta Cobalt Strike domain in the original publication."
+    },
+    {
+      "id": "may-2024-t10-r042-domain-062",
+      "source": "may-2024",
+      "table": 10,
+      "row": 42,
+      "kind": "domain",
+      "value": "startupmartec.net",
+      "original_value": "startupmartec[.]net",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Known Black Basta Cobalt Strike domain in the original publication."
+    },
+    {
+      "id": "may-2024-t10-r043-domain-063",
+      "source": "may-2024",
+      "table": 10,
+      "row": 43,
+      "kind": "domain",
+      "value": "technologgies.com",
+      "original_value": "technologgies[.]com",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Known Black Basta Cobalt Strike domain in the original publication."
+    },
+    {
+      "id": "may-2024-t10-r044-domain-064",
+      "source": "may-2024",
+      "table": 10,
+      "row": 44,
+      "kind": "domain",
+      "value": "jenshol.com",
+      "original_value": "jenshol[.]com",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Known Black Basta Cobalt Strike domain in the original publication."
+    },
+    {
+      "id": "may-2024-t10-r045-domain-065",
+      "source": "may-2024",
+      "table": 10,
+      "row": 45,
+      "kind": "domain",
+      "value": "simorten.com",
+      "original_value": "simorten[.]com",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Known Black Basta Cobalt Strike domain in the original publication."
+    },
+    {
+      "id": "may-2024-t10-r046-domain-066",
+      "source": "may-2024",
+      "table": 10,
+      "row": 46,
+      "kind": "domain",
+      "value": "investmentgblog.net",
+      "original_value": "investmentgblog[.]net",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Known Black Basta Cobalt Strike domain in the original publication."
+    },
+    {
+      "id": "may-2024-t10-r047-domain-067",
+      "source": "may-2024",
+      "table": 10,
+      "row": 47,
+      "kind": "domain",
+      "value": "protectionek.com",
+      "original_value": "protectionek[.]com",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Known Black Basta Cobalt Strike domain in the original publication."
+    },
+    {
+      "id": "may-2024-t11-r001-domain-068",
+      "source": "may-2024",
+      "table": 11,
+      "row": 1,
+      "kind": "domain",
+      "value": "airbusco.net",
+      "original_value": "airbusco[.]net",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Suspected Black Basta domain; suspicion is not certainty."
+    },
+    {
+      "id": "may-2024-t11-r002-domain-069",
+      "source": "may-2024",
+      "table": 11,
+      "row": 2,
+      "kind": "domain",
+      "value": "allcompanycenter.com",
+      "original_value": "allcompanycenter[.]com",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Suspected Black Basta domain; suspicion is not certainty."
+    },
+    {
+      "id": "may-2024-t11-r003-domain-070",
+      "source": "may-2024",
+      "table": 11,
+      "row": 3,
+      "kind": "domain",
+      "value": "animalsfast.net",
+      "original_value": "animalsfast[.]net",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Suspected Black Basta domain; suspicion is not certainty."
+    },
+    {
+      "id": "may-2024-t11-r004-domain-071",
+      "source": "may-2024",
+      "table": 11,
+      "row": 4,
+      "kind": "domain",
+      "value": "audsystemecll.net",
+      "original_value": "audsystemecll[.]net",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Suspected Black Basta domain; suspicion is not certainty."
+    },
+    {
+      "id": "may-2024-t11-r005-domain-072",
+      "source": "may-2024",
+      "table": 11,
+      "row": 5,
+      "kind": "domain",
+      "value": "auuditoe.com",
+      "original_value": "auuditoe[.]com",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Suspected Black Basta domain; suspicion is not certainty."
+    },
+    {
+      "id": "may-2024-t11-r006-domain-073",
+      "source": "may-2024",
+      "table": 11,
+      "row": 6,
+      "kind": "domain",
+      "value": "bluenetworking.net",
+      "original_value": "bluenetworking[.]net",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Suspected Black Basta domain; suspicion is not certainty."
+    },
+    {
+      "id": "may-2024-t11-r007-domain-074",
+      "source": "may-2024",
+      "table": 11,
+      "row": 7,
+      "kind": "domain",
+      "value": "brendonline.com",
+      "original_value": "brendonline[.]com",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Suspected Black Basta domain; suspicion is not certainty."
+    },
+    {
+      "id": "may-2024-t11-r008-domain-075",
+      "source": "may-2024",
+      "table": 11,
+      "row": 8,
+      "kind": "domain",
+      "value": "businesforhome.com",
+      "original_value": "businesforhome[.]com",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Suspected Black Basta domain; suspicion is not certainty."
+    },
+    {
+      "id": "may-2024-t11-r009-domain-076",
+      "source": "may-2024",
+      "table": 11,
+      "row": 9,
+      "kind": "domain",
+      "value": "caspercan.com",
+      "original_value": "caspercan[.]com",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Suspected Black Basta domain; suspicion is not certainty."
+    },
+    {
+      "id": "may-2024-t11-r010-domain-077",
+      "source": "may-2024",
+      "table": 11,
+      "row": 10,
+      "kind": "domain",
+      "value": "clearsystemwo.net",
+      "original_value": "clearsystemwo[.]net",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Suspected Black Basta domain; suspicion is not certainty."
+    },
+    {
+      "id": "may-2024-t11-r011-domain-078",
+      "source": "may-2024",
+      "table": 11,
+      "row": 11,
+      "kind": "domain",
+      "value": "cloudworldst.net",
+      "original_value": "cloudworldst[.]net",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Suspected Black Basta domain; suspicion is not certainty."
+    },
+    {
+      "id": "may-2024-t11-r012-domain-079",
+      "source": "may-2024",
+      "table": 11,
+      "row": 12,
+      "kind": "domain",
+      "value": "constrtionfirst.com",
+      "original_value": "constrtionfirst[.]com",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Suspected Black Basta domain; suspicion is not certainty."
+    },
+    {
+      "id": "may-2024-t11-r013-domain-080",
+      "source": "may-2024",
+      "table": 11,
+      "row": 13,
+      "kind": "domain",
+      "value": "erihudeg.com",
+      "original_value": "erihudeg[.]com",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Suspected Black Basta domain; suspicion is not certainty."
+    },
+    {
+      "id": "may-2024-t11-r014-domain-081",
+      "source": "may-2024",
+      "table": 11,
+      "row": 14,
+      "kind": "domain",
+      "value": "garbagemoval.com",
+      "original_value": "garbagemoval[.]com",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Suspected Black Basta domain; suspicion is not certainty."
+    },
+    {
+      "id": "may-2024-t11-r015-domain-082",
+      "source": "may-2024",
+      "table": 11,
+      "row": 15,
+      "kind": "domain",
+      "value": "gartenlofti.com",
+      "original_value": "gartenlofti[.]com",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Suspected Black Basta domain; suspicion is not certainty."
+    },
+    {
+      "id": "may-2024-t11-r016-domain-083",
+      "source": "may-2024",
+      "table": 11,
+      "row": 16,
+      "kind": "domain",
+      "value": "getfnewsolutions.com",
+      "original_value": "getfnewsolutions[.]com",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Suspected Black Basta domain; suspicion is not certainty."
+    },
+    {
+      "id": "may-2024-t11-r017-domain-084",
+      "source": "may-2024",
+      "table": 11,
+      "row": 17,
+      "kind": "domain",
+      "value": "getfnewssolutions.com",
+      "original_value": "getfnewssolutions[.]com",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Suspected Black Basta domain; suspicion is not certainty."
+    },
+    {
+      "id": "may-2024-t11-r018-domain-085",
+      "source": "may-2024",
+      "table": 11,
+      "row": 18,
+      "kind": "domain",
+      "value": "investmendvisor.net",
+      "original_value": "investmendvisor[.]net",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Suspected Black Basta domain; suspicion is not certainty."
+    },
+    {
+      "id": "may-2024-t11-r019-domain-086",
+      "source": "may-2024",
+      "table": 11,
+      "row": 19,
+      "kind": "domain",
+      "value": "investmentrealtyhp.net",
+      "original_value": "investmentrealtyhp[.]net",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Suspected Black Basta domain; suspicion is not certainty."
+    },
+    {
+      "id": "may-2024-t11-r020-domain-087",
+      "source": "may-2024",
+      "table": 11,
+      "row": 20,
+      "kind": "domain",
+      "value": "ionoslaba.com",
+      "original_value": "ionoslaba[.]com",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Suspected Black Basta domain; suspicion is not certainty."
+    },
+    {
+      "id": "may-2024-t11-r021-domain-088",
+      "source": "may-2024",
+      "table": 11,
+      "row": 21,
+      "kind": "domain",
+      "value": "jessvisser.com",
+      "original_value": "jessvisser[.]com",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Suspected Black Basta domain; suspicion is not certainty."
+    },
+    {
+      "id": "may-2024-t11-r022-domain-089",
+      "source": "may-2024",
+      "table": 11,
+      "row": 22,
+      "kind": "domain",
+      "value": "karmafisker.com",
+      "original_value": "karmafisker[.]com",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Suspected Black Basta domain; suspicion is not certainty."
+    },
+    {
+      "id": "may-2024-t11-r023-domain-090",
+      "source": "may-2024",
+      "table": 11,
+      "row": 23,
+      "kind": "domain",
+      "value": "kolinileas.com",
+      "original_value": "kolinileas[.]com",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Suspected Black Basta domain; suspicion is not certainty."
+    },
+    {
+      "id": "may-2024-t11-r024-domain-091",
+      "source": "may-2024",
+      "table": 11,
+      "row": 24,
+      "kind": "domain",
+      "value": "maluisepaul.com",
+      "original_value": "maluisepaul[.]com",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Suspected Black Basta domain; suspicion is not certainty."
+    },
+    {
+      "id": "may-2024-t11-r025-domain-092",
+      "source": "may-2024",
+      "table": 11,
+      "row": 25,
+      "kind": "domain",
+      "value": "masterunix.net",
+      "original_value": "masterunix[.]net",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Suspected Black Basta domain; suspicion is not certainty."
+    },
+    {
+      "id": "may-2024-t11-r026-domain-093",
+      "source": "may-2024",
+      "table": 11,
+      "row": 26,
+      "kind": "domain",
+      "value": "monitor-websystem.net",
+      "original_value": "monitor-websystem[.]net",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Suspected Black Basta domain; suspicion is not certainty."
+    },
+    {
+      "id": "may-2024-t11-r027-domain-094",
+      "source": "may-2024",
+      "table": 11,
+      "row": 27,
+      "kind": "domain",
+      "value": "monitorsystem.net",
+      "original_value": "monitorsystem[.]net",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Suspected Black Basta domain; suspicion is not certainty."
+    },
+    {
+      "id": "may-2024-t11-r028-domain-095",
+      "source": "may-2024",
+      "table": 11,
+      "row": 28,
+      "kind": "domain",
+      "value": "mytrailinvest.net",
+      "original_value": "mytrailinvest[.]net",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Suspected Black Basta domain; suspicion is not certainty."
+    },
+    {
+      "id": "may-2024-t11-r029-domain-096",
+      "source": "may-2024",
+      "table": 11,
+      "row": 29,
+      "kind": "domain",
+      "value": "prettyanimals.net",
+      "original_value": "prettyanimals[.]net",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Suspected Black Basta domain; suspicion is not certainty."
+    },
+    {
+      "id": "may-2024-t11-r030-domain-097",
+      "source": "may-2024",
+      "table": 11,
+      "row": 30,
+      "kind": "domain",
+      "value": "reelsysmoona.net",
+      "original_value": "reelsysmoona[.]net",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Suspected Black Basta domain; suspicion is not certainty."
+    },
+    {
+      "id": "may-2024-t11-r031-domain-098",
+      "source": "may-2024",
+      "table": 11,
+      "row": 31,
+      "kind": "domain",
+      "value": "seohomee.com",
+      "original_value": "seohomee[.]com",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Suspected Black Basta domain; suspicion is not certainty."
+    },
+    {
+      "id": "may-2024-t11-r032-domain-099",
+      "source": "may-2024",
+      "table": 11,
+      "row": 32,
+      "kind": "domain",
+      "value": "septcntr.com",
+      "original_value": "septcntr[.]com",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Suspected Black Basta domain; suspicion is not certainty."
+    },
+    {
+      "id": "may-2024-t11-r033-domain-100",
+      "source": "may-2024",
+      "table": 11,
+      "row": 33,
+      "kind": "domain",
+      "value": "softradar.net",
+      "original_value": "softradar[.]net",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Suspected Black Basta domain; suspicion is not certainty."
+    },
+    {
+      "id": "may-2024-t11-r034-domain-101",
+      "source": "may-2024",
+      "table": 11,
+      "row": 34,
+      "kind": "domain",
+      "value": "startupbizaud.net",
+      "original_value": "startupbizaud[.]net",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Suspected Black Basta domain; suspicion is not certainty."
+    },
+    {
+      "id": "may-2024-t11-r035-domain-102",
+      "source": "may-2024",
+      "table": 11,
+      "row": 35,
+      "kind": "domain",
+      "value": "startuptechnologyw.net",
+      "original_value": "startuptechnologyw[.]net",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Suspected Black Basta domain; suspicion is not certainty."
+    },
+    {
+      "id": "may-2024-t11-r036-domain-103",
+      "source": "may-2024",
+      "table": 11,
+      "row": 36,
+      "kind": "domain",
+      "value": "steamteamdev.net",
+      "original_value": "steamteamdev[.]net",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Suspected Black Basta domain; suspicion is not certainty."
+    },
+    {
+      "id": "may-2024-t11-r037-domain-104",
+      "source": "may-2024",
+      "table": 11,
+      "row": 37,
+      "kind": "domain",
+      "value": "stockinvestlab.net",
+      "original_value": "stockinvestlab[.]net",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Suspected Black Basta domain; suspicion is not certainty."
+    },
+    {
+      "id": "may-2024-t11-r038-domain-105",
+      "source": "may-2024",
+      "table": 11,
+      "row": 38,
+      "kind": "domain",
+      "value": "taskthebox.net",
+      "original_value": "taskthebox[.]net",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Suspected Black Basta domain; suspicion is not certainty."
+    },
+    {
+      "id": "may-2024-t11-r039-domain-106",
+      "source": "may-2024",
+      "table": 11,
+      "row": 39,
+      "kind": "domain",
+      "value": "trailgroupl.net",
+      "original_value": "trailgroupl[.]net",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Suspected Black Basta domain; suspicion is not certainty."
+    },
+    {
+      "id": "may-2024-t11-r040-domain-107",
+      "source": "may-2024",
+      "table": 11,
+      "row": 40,
+      "kind": "domain",
+      "value": "treeauwin.net",
+      "original_value": "treeauwin[.]net",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Suspected Black Basta domain; suspicion is not certainty."
+    },
+    {
+      "id": "may-2024-t11-r041-domain-108",
+      "source": "may-2024",
+      "table": 11,
+      "row": 41,
+      "kind": "domain",
+      "value": "unitedfrom.com",
+      "original_value": "unitedfrom[.]com",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Suspected Black Basta domain; suspicion is not certainty."
+    },
+    {
+      "id": "may-2024-t11-r042-domain-109",
+      "source": "may-2024",
+      "table": 11,
+      "row": 42,
+      "kind": "domain",
+      "value": "unougn.com",
+      "original_value": "unougn[.]com",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Suspected Black Basta domain; suspicion is not certainty."
+    },
+    {
+      "id": "may-2024-t11-r043-domain-110",
+      "source": "may-2024",
+      "table": 11,
+      "row": 43,
+      "kind": "domain",
+      "value": "wardeli.com",
+      "original_value": "wardeli[.]com",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Suspected Black Basta domain; suspicion is not certainty."
+    },
+    {
+      "id": "may-2024-t11-r044-domain-111",
+      "source": "may-2024",
+      "table": 11,
+      "row": 44,
+      "kind": "domain",
+      "value": "welausystem.net",
+      "original_value": "welausystem[.]net",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Suspected Black Basta domain; suspicion is not certainty."
+    },
+    {
+      "id": "may-2024-t11-r045-domain-112",
+      "source": "may-2024",
+      "table": 11,
+      "row": 45,
+      "kind": "domain",
+      "value": "wellsystemte.net",
+      "original_value": "wellsystemte[.]net",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Suspected Black Basta domain; suspicion is not certainty."
+    },
+    {
+      "id": "may-2024-t11-r046-domain-113",
+      "source": "may-2024",
+      "table": 11,
+      "row": 46,
+      "kind": "domain",
+      "value": "withclier.com",
+      "original_value": "withclier[.]com",
+      "field": "query",
+      "match": "exact",
+      "step_id": "may-publication-domain-coverage",
+      "qualification": "Suspected Black Basta domain; suspicion is not certainty."
+    },
+    {
+      "id": "may-2024-t8-r001-ipv4-114",
+      "source": "may-2024",
+      "table": 8,
+      "row": 1,
+      "kind": "ipv4",
+      "value": "66.249.66.18",
+      "original_value": "66.249.66[.]18",
+      "field": "dest",
+      "match": "exact",
+      "step_id": "may-publication-network-coverage",
+      "qualification": "0gpw.588027fa.dns.realbumblebee[.]net, dns.trailshop[.]net, dns.artspathgroupe[.]net"
+    },
+    {
+      "id": "may-2024-t8-r002-ipv4-115",
+      "source": "may-2024",
+      "table": 8,
+      "row": 2,
+      "kind": "ipv4",
+      "value": "66.249.66.18",
+      "original_value": "66.249.66[.]18",
+      "field": "dest",
+      "match": "exact",
+      "step_id": "may-publication-network-coverage",
+      "qualification": "my.2a91c002002.588027fa.dns.realbumblebee[.]net"
+    },
+    {
+      "id": "may-2024-t8-r003-ipv4-116",
+      "source": "may-2024",
+      "table": 8,
+      "row": 3,
+      "kind": "ipv4",
+      "value": "66.249.66.18",
+      "original_value": "66.249.66[.]18",
+      "field": "dest",
+      "match": "exact",
+      "step_id": "may-publication-network-coverage",
+      "qualification": "fy9.39d9030e5d3a8e2352daae2f4cd3c417b36f64c6644a783b9629147a1.afd8b8a4615358e0313bad8c544a1af0d8efcec0e8056c2c8eee96c7.b06d1825c0247387e38851b06be0272b0bd619b7c9636bc17b09aa70.a46890f27.588027fa.dns.realbumblebee[.]net"
+    },
+    {
+      "id": "may-2024-t8-r004-ipv4-117",
+      "source": "may-2024",
+      "table": 8,
+      "row": 4,
+      "kind": "ipv4",
+      "value": "95.181.173.227",
+      "original_value": "95.181.173[.]227",
+      "field": "dest",
+      "match": "exact",
+      "step_id": "may-publication-network-coverage",
+      "qualification": "adslsdfdsfmo[.]world"
+    },
+    {
+      "id": "may-2024-t8-r006-ipv4-118",
+      "source": "may-2024",
+      "table": 8,
+      "row": 6,
+      "kind": "ipv4",
+      "value": "207.126.152.242",
+      "original_value": "207.126.152[.]242",
+      "field": "dest",
+      "match": "exact",
+      "step_id": "may-publication-network-coverage",
+      "qualification": "xkpal.d6597fa.dns.blocktoday.net nuher.3577125d2a75f6a277fc5714ff536c5c6af5283d928a66daad6825b9a.7aaf8bba88534e88ec89251c57b01b322c7f52c7f1a5338930ae2a50.cbb47411f60fe58f76cf79d300c03bdecfb9e83379f59d80b8494951.e10c20f77.7fcc0eb6.dns.blocktoday[.]net"
+    },
+    {
+      "id": "may-2024-t8-r007-ipv4-119",
+      "source": "may-2024",
+      "table": 8,
+      "row": 7,
+      "kind": "ipv4",
+      "value": "72.14.196.50",
+      "original_value": "72.14.196[.]50",
+      "field": "dest",
+      "match": "exact",
+      "step_id": "may-publication-network-coverage",
+      "qualification": ".rasapool[.]net, dns.trailshop[.]net"
+    },
+    {
+      "id": "may-2024-t8-r008-ipv4-120",
+      "source": "may-2024",
+      "table": 8,
+      "row": 8,
+      "kind": "ipv4",
+      "value": "72.14.196.192",
+      "original_value": "72.14.196[.]192",
+      "field": "dest",
+      "match": "exact",
+      "step_id": "may-publication-network-coverage",
+      "qualification": ".rasapool[.]net"
+    },
+    {
+      "id": "may-2024-t8-r009-ipv4-121",
+      "source": "may-2024",
+      "table": 8,
+      "row": 9,
+      "kind": "ipv4",
+      "value": "72.14.196.2",
+      "original_value": "72.14.196[.]2",
+      "field": "dest",
+      "match": "exact",
+      "step_id": "may-publication-network-coverage",
+      "qualification": ".rasapool[.]net"
+    },
+    {
+      "id": "may-2024-t8-r010-ipv4-122",
+      "source": "may-2024",
+      "table": 8,
+      "row": 10,
+      "kind": "ipv4",
+      "value": "72.14.196.226",
+      "original_value": "72.14.196[.]226",
+      "field": "dest",
+      "match": "exact",
+      "step_id": "may-publication-network-coverage",
+      "qualification": ".rasapool[.]net"
+    },
+    {
+      "id": "may-2024-t8-r011-ipv4-123",
+      "source": "may-2024",
+      "table": 8,
+      "row": 11,
+      "kind": "ipv4",
+      "value": "46.161.27.151",
+      "original_value": "46.161.27[.]151",
+      "field": "dest",
+      "match": "exact",
+      "step_id": "may-publication-network-coverage",
+      "qualification": "No additional classification supplied."
+    },
+    {
+      "id": "may-2024-t8-r012-ipv4-124",
+      "source": "may-2024",
+      "table": 8,
+      "row": 12,
+      "kind": "ipv4",
+      "value": "207.126.152.242",
+      "original_value": "207.126.152[.]242",
+      "field": "dest",
+      "match": "exact",
+      "step_id": "may-publication-network-coverage",
+      "qualification": "nuher.1d67bbcf4.456d87aa6.2d84dfba.dns.specialdrills[.]com"
+    },
+    {
+      "id": "may-2024-t8-r013-ipv4-125",
+      "source": "may-2024",
+      "table": 8,
+      "row": 13,
+      "kind": "ipv4",
+      "value": "185.219.221.136",
+      "original_value": "185.219.221[.]136",
+      "field": "dest",
+      "match": "exact",
+      "step_id": "may-publication-network-coverage",
+      "qualification": "No additional classification supplied."
+    },
+    {
+      "id": "may-2024-t8-r014-ipv4-126",
+      "source": "may-2024",
+      "table": 8,
+      "row": 14,
+      "kind": "ipv4",
+      "value": "64.176.219.106",
+      "original_value": "64.176.219[.]106",
+      "field": "dest",
+      "match": "exact",
+      "step_id": "may-publication-network-coverage",
+      "qualification": "No additional classification supplied."
+    },
+    {
+      "id": "may-2024-t8-r015-ipv4-127",
+      "source": "may-2024",
+      "table": 8,
+      "row": 15,
+      "kind": "ipv4",
+      "value": "5.78.115.67",
+      "original_value": "5.78.115[.]67",
+      "field": "dest",
+      "match": "exact",
+      "step_id": "may-publication-network-coverage",
+      "qualification": "your-server[.]de"
+    },
+    {
+      "id": "may-2024-t8-r016-ipv4-128",
+      "source": "may-2024",
+      "table": 8,
+      "row": 16,
+      "kind": "ipv4",
+      "value": "207.126.152.242",
+      "original_value": "207.126.152[.]242",
+      "field": "dest",
+      "match": "exact",
+      "step_id": "may-publication-network-coverage",
+      "qualification": "xkpal.1a4a64b6.dns.blocktoday[.]net"
+    },
+    {
+      "id": "may-2024-t8-r017-ipv4-129",
+      "source": "may-2024",
+      "table": 8,
+      "row": 17,
+      "kind": "ipv4",
+      "value": "46.8.16.77",
+      "original_value": "46.8.16[.]77",
+      "field": "dest",
+      "match": "exact",
+      "step_id": "may-publication-network-coverage",
+      "qualification": "No additional classification supplied."
+    },
+    {
+      "id": "may-2024-t8-r018-ipv4-130",
+      "source": "may-2024",
+      "table": 8,
+      "row": 18,
+      "kind": "ipv4",
+      "value": "185.7.214.79",
+      "original_value": "185.7.214[.]79",
+      "field": "dest",
+      "match": "exact",
+      "step_id": "may-publication-network-coverage",
+      "qualification": "VPN Server"
+    },
+    {
+      "id": "may-2024-t8-r019-ipv4-131",
+      "source": "may-2024",
+      "table": 8,
+      "row": 19,
+      "kind": "ipv4",
+      "value": "185.220.100.240",
+      "original_value": "185.220.100[.]240",
+      "field": "dest",
+      "match": "exact",
+      "step_id": "may-publication-network-coverage",
+      "qualification": "Tor exit"
+    },
+    {
+      "id": "may-2024-t8-r020-ipv4-132",
+      "source": "may-2024",
+      "table": 8,
+      "row": 20,
+      "kind": "ipv4",
+      "value": "107.189.30.69",
+      "original_value": "107.189.30[.]69",
+      "field": "dest",
+      "match": "exact",
+      "step_id": "may-publication-network-coverage",
+      "qualification": "Tor exit"
+    },
+    {
+      "id": "may-2024-t8-r021-ipv4-133",
+      "source": "may-2024",
+      "table": 8,
+      "row": 21,
+      "kind": "ipv4",
+      "value": "5.183.130.92",
+      "original_value": "5.183.130[.]92",
+      "field": "dest",
+      "match": "exact",
+      "step_id": "may-publication-network-coverage",
+      "qualification": "No additional classification supplied."
+    },
+    {
+      "id": "may-2024-t8-r022-ipv4-134",
+      "source": "may-2024",
+      "table": 8,
+      "row": 22,
+      "kind": "ipv4",
+      "value": "185.220.101.149",
+      "original_value": "185.220.101[.]149",
+      "field": "dest",
+      "match": "exact",
+      "step_id": "may-publication-network-coverage",
+      "qualification": "Tor exit"
+    },
+    {
+      "id": "may-2024-t8-r023-ipv4-135",
+      "source": "may-2024",
+      "table": 8,
+      "row": 23,
+      "kind": "ipv4",
+      "value": "188.130.218.39",
+      "original_value": "188.130.218[.]39",
+      "field": "dest",
+      "match": "exact",
+      "step_id": "may-publication-network-coverage",
+      "qualification": "No additional classification supplied."
+    },
+    {
+      "id": "may-2024-t8-r024-ipv4-136",
+      "source": "may-2024",
+      "table": 8,
+      "row": 24,
+      "kind": "ipv4",
+      "value": "188.130.137.181",
+      "original_value": "188.130.137[.]181",
+      "field": "dest",
+      "match": "exact",
+      "step_id": "may-publication-network-coverage",
+      "qualification": "No additional classification supplied."
+    },
+    {
+      "id": "may-2024-t8-r025-ipv4-137",
+      "source": "may-2024",
+      "table": 8,
+      "row": 25,
+      "kind": "ipv4",
+      "value": "46.8.10.134",
+      "original_value": "46.8.10[.]134",
+      "field": "dest",
+      "match": "exact",
+      "step_id": "may-publication-network-coverage",
+      "qualification": "No additional classification supplied."
+    },
+    {
+      "id": "may-2024-t8-r026-ipv4-138",
+      "source": "may-2024",
+      "table": 8,
+      "row": 26,
+      "kind": "ipv4",
+      "value": "155.138.246.122",
+      "original_value": "155.138.246[.]122",
+      "field": "dest",
+      "match": "exact",
+      "step_id": "may-publication-network-coverage",
+      "qualification": "No additional classification supplied."
+    },
+    {
+      "id": "may-2024-t8-r027-ipv4-139",
+      "source": "may-2024",
+      "table": 8,
+      "row": 27,
+      "kind": "ipv4",
+      "value": "80.239.207.200",
+      "original_value": "80.239.207[.]200",
+      "field": "dest",
+      "match": "exact",
+      "step_id": "may-publication-network-coverage",
+      "qualification": "winklen[.]ch"
+    },
+    {
+      "id": "may-2024-t8-r028-ipv4-140",
+      "source": "may-2024",
+      "table": 8,
+      "row": 28,
+      "kind": "ipv4",
+      "value": "183.181.86.147",
+      "original_value": "183.181.86[.]147",
+      "field": "dest",
+      "match": "exact",
+      "step_id": "may-publication-network-coverage",
+      "qualification": "Xserver[.]jp"
+    },
+    {
+      "id": "may-2024-t8-r029-ipv4-141",
+      "source": "may-2024",
+      "table": 8,
+      "row": 29,
+      "kind": "ipv4",
+      "value": "34.149.120.3",
+      "original_value": "34.149.120[.]3",
+      "field": "dest",
+      "match": "exact",
+      "step_id": "may-publication-network-coverage",
+      "qualification": "No additional classification supplied."
+    },
+    {
+      "id": "may-2024-t8-r030-ipv4-142",
+      "source": "may-2024",
+      "table": 8,
+      "row": 30,
+      "kind": "ipv4",
+      "value": "104.21.40.72",
+      "original_value": "104.21.40[.]72",
+      "field": "dest",
+      "match": "exact",
+      "step_id": "may-publication-network-coverage",
+      "qualification": "No additional classification supplied."
+    },
+    {
+      "id": "may-2024-t8-r031-ipv4-143",
+      "source": "may-2024",
+      "table": 8,
+      "row": 31,
+      "kind": "ipv4",
+      "value": "34.250.161.149",
+      "original_value": "34.250.161[.]149",
+      "field": "dest",
+      "match": "exact",
+      "step_id": "may-publication-network-coverage",
+      "qualification": "No additional classification supplied."
+    },
+    {
+      "id": "may-2024-t8-r032-ipv4-144",
+      "source": "may-2024",
+      "table": 8,
+      "row": 32,
+      "kind": "ipv4",
+      "value": "88.198.198.90",
+      "original_value": "88.198.198[.]90",
+      "field": "dest",
+      "match": "exact",
+      "step_id": "may-publication-network-coverage",
+      "qualification": "your-server[.]de; literoved[.]ru"
+    },
+    {
+      "id": "may-2024-t8-r033-ipv4-145",
+      "source": "may-2024",
+      "table": 8,
+      "row": 33,
+      "kind": "ipv4",
+      "value": "151.101.130.159",
+      "original_value": "151.101.130[.]159",
+      "field": "dest",
+      "match": "exact",
+      "step_id": "may-publication-network-coverage",
+      "qualification": "No additional classification supplied."
+    },
+    {
+      "id": "may-2024-t8-r034-ipv4-146",
+      "source": "may-2024",
+      "table": 8,
+      "row": 34,
+      "kind": "ipv4",
+      "value": "35.244.153.44",
+      "original_value": "35.244.153[.]44",
+      "field": "dest",
+      "match": "exact",
+      "step_id": "may-publication-network-coverage",
+      "qualification": "No additional classification supplied."
+    },
+    {
+      "id": "may-2024-t8-r035-ipv4-147",
+      "source": "may-2024",
+      "table": 8,
+      "row": 35,
+      "kind": "ipv4",
+      "value": "35.212.86.55",
+      "original_value": "35.212.86[.]55",
+      "field": "dest",
+      "match": "exact",
+      "step_id": "may-publication-network-coverage",
+      "qualification": "No additional classification supplied."
+    },
+    {
+      "id": "may-2024-t8-r036-ipv4-148",
+      "source": "may-2024",
+      "table": 8,
+      "row": 36,
+      "kind": "ipv4",
+      "value": "34.251.163.236",
+      "original_value": "34.251.163[.]236",
+      "field": "dest",
+      "match": "exact",
+      "step_id": "may-publication-network-coverage",
+      "qualification": "No additional classification supplied."
+    },
+    {
+      "id": "may-2024-t8-r037-ipv4-149",
+      "source": "may-2024",
+      "table": 8,
+      "row": 37,
+      "kind": "ipv4",
+      "value": "34.160.81.203",
+      "original_value": "34.160.81[.]203",
+      "field": "dest",
+      "match": "exact",
+      "step_id": "may-publication-network-coverage",
+      "qualification": "No additional classification supplied."
+    },
+    {
+      "id": "may-2024-t8-r038-ipv4-150",
+      "source": "may-2024",
+      "table": 8,
+      "row": 38,
+      "kind": "ipv4",
+      "value": "34.149.36.179",
+      "original_value": "34.149.36[.]179",
+      "field": "dest",
+      "match": "exact",
+      "step_id": "may-publication-network-coverage",
+      "qualification": "No additional classification supplied."
+    },
+    {
+      "id": "may-2024-t8-r039-ipv4-151",
+      "source": "may-2024",
+      "table": 8,
+      "row": 39,
+      "kind": "ipv4",
+      "value": "104.21.26.145",
+      "original_value": "104.21.26[.]145",
+      "field": "dest",
+      "match": "exact",
+      "step_id": "may-publication-network-coverage",
+      "qualification": "No additional classification supplied."
+    },
+    {
+      "id": "may-2024-t8-r040-ipv4-152",
+      "source": "may-2024",
+      "table": 8,
+      "row": 40,
+      "kind": "ipv4",
+      "value": "83.243.40.10",
+      "original_value": "83.243.40[.]10",
+      "field": "dest",
+      "match": "exact",
+      "step_id": "may-publication-network-coverage",
+      "qualification": "No additional classification supplied."
+    },
+    {
+      "id": "may-2024-t8-r041-ipv4-153",
+      "source": "may-2024",
+      "table": 8,
+      "row": 41,
+      "kind": "ipv4",
+      "value": "35.227.194.51",
+      "original_value": "35.227.194[.]51",
+      "field": "dest",
+      "match": "exact",
+      "step_id": "may-publication-network-coverage",
+      "qualification": "No additional classification supplied."
+    },
+    {
+      "id": "may-2024-t8-r042-ipv4-154",
+      "source": "may-2024",
+      "table": 8,
+      "row": 42,
+      "kind": "ipv4",
+      "value": "35.190.31.54",
+      "original_value": "35.190.31[.]54",
+      "field": "dest",
+      "match": "exact",
+      "step_id": "may-publication-network-coverage",
+      "qualification": "No additional classification supplied."
+    },
+    {
+      "id": "may-2024-t8-r043-ipv4-155",
+      "source": "may-2024",
+      "table": 8,
+      "row": 43,
+      "kind": "ipv4",
+      "value": "34.120.190.48",
+      "original_value": "34.120.190[.]48",
+      "field": "dest",
+      "match": "exact",
+      "step_id": "may-publication-network-coverage",
+      "qualification": "No additional classification supplied."
+    },
+    {
+      "id": "may-2024-t8-r044-ipv4-156",
+      "source": "may-2024",
+      "table": 8,
+      "row": 44,
+      "kind": "ipv4",
+      "value": "116.203.186.178",
+      "original_value": "116.203.186[.]178",
+      "field": "dest",
+      "match": "exact",
+      "step_id": "may-publication-network-coverage",
+      "qualification": "No additional classification supplied."
+    },
+    {
+      "id": "may-2024-t8-r045-ipv4-157",
+      "source": "may-2024",
+      "table": 8,
+      "row": 45,
+      "kind": "ipv4",
+      "value": "34.160.17.71",
+      "original_value": "34.160.17[.]71",
+      "field": "dest",
+      "match": "exact",
+      "step_id": "may-publication-network-coverage",
+      "qualification": "No additional classification supplied."
+    },
+    {
+      "id": "may-2024-t7-r001-sha256-158",
+      "source": "may-2024",
+      "table": 7,
+      "row": 1,
+      "kind": "sha256",
+      "value": "0112e3b20872760dda5f658f6b546c85f126e803e27f0577b294f335ffa5a298",
+      "original_value": "0112e3b20872760dda5f658f6b546c85f126e803e27f0577b294f335ffa5a298",
+      "field": "file_hash",
+      "match": "exact",
+      "step_id": "may-publication-sample-hash-coverage",
+      "qualification": "rclone.exe"
+    },
+    {
+      "id": "may-2024-t7-r002-sha256-159",
+      "source": "may-2024",
+      "table": 7,
+      "row": 2,
+      "kind": "sha256",
+      "value": "d3683beca3a40574e5fd68d30451137e4a8bbaca8c428ebb781d565d6a70385e",
+      "original_value": "d3683beca3a40574e5fd68d30451137e4a8bbaca8c428ebb781d565d6a70385e",
+      "field": "file_hash",
+      "match": "exact",
+      "step_id": "may-publication-sample-hash-coverage",
+      "qualification": "Winscp.exe"
+    },
+    {
+      "id": "may-2024-t7-r003-sha256-160",
+      "source": "may-2024",
+      "table": 7,
+      "row": 3,
+      "kind": "sha256",
+      "value": "88c8b472108e0d79d16a1634499c1b45048a10a38ee799054414613cc9dccccc",
+      "original_value": "88c8b472108e0d79d16a1634499c1b45048a10a38ee799054414613cc9dccccc",
+      "field": "file_hash",
+      "match": "exact",
+      "step_id": "may-publication-sample-hash-coverage",
+      "qualification": "DLL"
+    },
+    {
+      "id": "may-2024-t7-r004-sha256-161",
+      "source": "may-2024",
+      "table": 7,
+      "row": 4,
+      "kind": "sha256",
+      "value": "58ddbea084ce18cfb3439219ebcf2fc5c1605d2f6271610b1c7af77b8d0484bd",
+      "original_value": "58ddbea084ce18cfb3439219ebcf2fc5c1605d2f6271610b1c7af77b8d0484bd",
+      "field": "file_hash",
+      "match": "exact",
+      "step_id": "may-publication-sample-hash-coverage",
+      "qualification": "DLL"
+    },
+    {
+      "id": "may-2024-t7-r005-sha256-162",
+      "source": "may-2024",
+      "table": 7,
+      "row": 5,
+      "kind": "sha256",
+      "value": "39939eacfbc20a2607064994497e3e886c90cd97b25926478434f46c95bd8ead",
+      "original_value": "39939eacfbc20a2607064994497e3e886c90cd97b25926478434f46c95bd8ead",
+      "field": "file_hash",
+      "match": "exact",
+      "step_id": "may-publication-sample-hash-coverage",
+      "qualification": "DLL"
+    },
+    {
+      "id": "may-2024-t7-r006-sha256-163",
+      "source": "may-2024",
+      "table": 7,
+      "row": 6,
+      "kind": "sha256",
+      "value": "5b2178c7a0fd69ab00cef041f446e04098bbb397946eda3f6755f9d94d53c221",
+      "original_value": "5b2178c7a0fd69ab00cef041f446e04098bbb397946eda3f6755f9d94d53c221",
+      "field": "file_hash",
+      "match": "exact",
+      "step_id": "may-publication-sample-hash-coverage",
+      "qualification": "DLL"
+    },
+    {
+      "id": "may-2024-t7-r007-sha256-164",
+      "source": "may-2024",
+      "table": 7,
+      "row": 7,
+      "kind": "sha256",
+      "value": "51eb749d6cbd08baf9d43c2f83abd9d4d86eb5206f62ba43b768251a98ce9d3e",
+      "original_value": "51eb749d6cbd08baf9d43c2f83abd9d4d86eb5206f62ba43b768251a98ce9d3e",
+      "field": "file_hash",
+      "match": "exact",
+      "step_id": "may-publication-sample-hash-coverage",
+      "qualification": "DLL"
+    },
+    {
+      "id": "may-2024-t7-r008-sha256-165",
+      "source": "may-2024",
+      "table": 7,
+      "row": 8,
+      "kind": "sha256",
+      "value": "d15bfbc181aac8ce9faa05c2063ef4695c09b718596f43edc81ca02ef03110d1",
+      "original_value": "d15bfbc181aac8ce9faa05c2063ef4695c09b718596f43edc81ca02ef03110d1",
+      "field": "file_hash",
+      "match": "exact",
+      "step_id": "may-publication-sample-hash-coverage",
+      "qualification": "DLL"
+    },
+    {
+      "id": "may-2024-t7-r009-sha256-166",
+      "source": "may-2024",
+      "table": 7,
+      "row": 9,
+      "kind": "sha256",
+      "value": "5942143614d8ed34567ea472c2b819777edd25c00b3e1b13b1ae98d7f9e28d43",
+      "original_value": "5942143614d8ed34567ea472c2b819777edd25c00b3e1b13b1ae98d7f9e28d43",
+      "field": "file_hash",
+      "match": "exact",
+      "step_id": "may-publication-sample-hash-coverage",
+      "qualification": "DLL"
+    },
+    {
+      "id": "may-2024-t7-r010-sha256-167",
+      "source": "may-2024",
+      "table": 7,
+      "row": 10,
+      "kind": "sha256",
+      "value": "05ebae760340fe44362ab7c8f70b2d89d6c9ba9b9ee8a9f747b2f19d326c3431",
+      "original_value": "05ebae760340fe44362ab7c8f70b2d89d6c9ba9b9ee8a9f747b2f19d326c3431",
+      "field": "file_hash",
+      "match": "exact",
+      "step_id": "may-publication-sample-hash-coverage",
+      "qualification": "DLL"
+    },
+    {
+      "id": "may-2024-t7-r011-sha256-168",
+      "source": "may-2024",
+      "table": 7,
+      "row": 11,
+      "kind": "sha256",
+      "value": "a7b36482ba5bca7a143a795074c432ed627d6afa5bc64de97fa660faa852f1a6",
+      "original_value": "a7b36482ba5bca7a143a795074c432ed627d6afa5bc64de97fa660faa852f1a6",
+      "field": "file_hash",
+      "match": "exact",
+      "step_id": "may-publication-sample-hash-coverage",
+      "qualification": "DLL"
+    },
+    {
+      "id": "may-2024-t7-r012-sha256-169",
+      "source": "may-2024",
+      "table": 7,
+      "row": 12,
+      "kind": "sha256",
+      "value": "86a4dd6be867846b251460d2a0874e6413589878d27f2c4482b54cec134cc737",
+      "original_value": "86a4dd6be867846b251460d2a0874e6413589878d27f2c4482b54cec134cc737",
+      "field": "file_hash",
+      "match": "exact",
+      "step_id": "may-publication-sample-hash-coverage",
+      "qualification": "DLL"
+    },
+    {
+      "id": "may-2024-t7-r013-sha256-170",
+      "source": "may-2024",
+      "table": 7,
+      "row": 13,
+      "kind": "sha256",
+      "value": "07117c02a09410f47a326b52c7f17407e63ba5e6ff97277446efc75b862d2799",
+      "original_value": "07117c02a09410f47a326b52c7f17407e63ba5e6ff97277446efc75b862d2799",
+      "field": "file_hash",
+      "match": "exact",
+      "step_id": "may-publication-sample-hash-coverage",
+      "qualification": "DLL"
+    },
+    {
+      "id": "may-2024-t7-r014-sha256-171",
+      "source": "may-2024",
+      "table": 7,
+      "row": 14,
+      "kind": "sha256",
+      "value": "96339a7e87ffce6ced247feb9b4cb7c05b83ca315976a9522155bad726b8e5be",
+      "original_value": "96339a7e87ffce6ced247feb9b4cb7c05b83ca315976a9522155bad726b8e5be",
+      "field": "file_hash",
+      "match": "exact",
+      "step_id": "may-publication-sample-hash-coverage",
+      "qualification": "ELF"
+    },
+    {
+      "id": "may-2024-t7-r015-sha256-172",
+      "source": "may-2024",
+      "table": 7,
+      "row": 15,
+      "kind": "sha256",
+      "value": "1c1b2d7f790750d60a14bd661dae5c5565f00c6ca7d03d062adcecda807e1779",
+      "original_value": "1c1b2d7f790750d60a14bd661dae5c5565f00c6ca7d03d062adcecda807e1779",
+      "field": "file_hash",
+      "match": "exact",
+      "step_id": "may-publication-sample-hash-coverage",
+      "qualification": "ELF"
+    },
+    {
+      "id": "may-2024-t7-r016-sha256-173",
+      "source": "may-2024",
+      "table": 7,
+      "row": 16,
+      "kind": "sha256",
+      "value": "360c9c8f0a62010d455f35588ef27817ad35c715a5f291e43449ce6cb1986b98",
+      "original_value": "360c9c8f0a62010d455f35588ef27817ad35c715a5f291e43449ce6cb1986b98",
+      "field": "file_hash",
+      "match": "exact",
+      "step_id": "may-publication-sample-hash-coverage",
+      "qualification": "ELF"
+    },
+    {
+      "id": "may-2024-t7-r017-sha256-174",
+      "source": "may-2024",
+      "table": 7,
+      "row": 17,
+      "kind": "sha256",
+      "value": "0554eb2ffa3582b000d558b6950ec60e876f1259c41acff2eac47ab78a53e94a",
+      "original_value": "0554eb2ffa3582b000d558b6950ec60e876f1259c41acff2eac47ab78a53e94a",
+      "field": "file_hash",
+      "match": "exact",
+      "step_id": "may-publication-sample-hash-coverage",
+      "qualification": "EXE"
+    },
+    {
+      "id": "may-2024-t7-r018-sha256-175",
+      "source": "may-2024",
+      "table": 7,
+      "row": 18,
+      "kind": "sha256",
+      "value": "9a55f55886285eef7ffabdd55c0232d1458175b1d868c03d3e304ce7d98980bc",
+      "original_value": "9a55f55886285eef7ffabdd55c0232d1458175b1d868c03d3e304ce7d98980bc",
+      "field": "file_hash",
+      "match": "exact",
+      "step_id": "may-publication-sample-hash-coverage",
+      "qualification": "EXE"
+    },
+    {
+      "id": "may-2024-t7-r019-sha256-176",
+      "source": "may-2024",
+      "table": 7,
+      "row": 19,
+      "kind": "sha256",
+      "value": "62e63388953bb30669b403867a3ac2c8130332cf78133f7fd4a7f23cdc939087",
+      "original_value": "62e63388953bb30669b403867a3ac2c8130332cf78133f7fd4a7f23cdc939087",
+      "field": "file_hash",
+      "match": "exact",
+      "step_id": "may-publication-sample-hash-coverage",
+      "qualification": "EXE"
+    },
+    {
+      "id": "may-2024-t7-r020-sha256-177",
+      "source": "may-2024",
+      "table": 7,
+      "row": 20,
+      "kind": "sha256",
+      "value": "7ad4324ea241782ea859af12094f89f9a182236542627e95b6416c8fb9757c59",
+      "original_value": "7ad4324ea241782ea859af12094f89f9a182236542627e95b6416c8fb9757c59",
+      "field": "file_hash",
+      "match": "exact",
+      "step_id": "may-publication-sample-hash-coverage",
+      "qualification": "EXE"
+    },
+    {
+      "id": "may-2024-t7-r021-sha256-178",
+      "source": "may-2024",
+      "table": 7,
+      "row": 21,
+      "kind": "sha256",
+      "value": "350ba7fca67721c74385faff083914ecdd66ef107a765dfb7ac08b38d5c9c0bd",
+      "original_value": "350ba7fca67721c74385faff083914ecdd66ef107a765dfb7ac08b38d5c9c0bd",
+      "field": "file_hash",
+      "match": "exact",
+      "step_id": "may-publication-sample-hash-coverage",
+      "qualification": "EXE"
+    },
+    {
+      "id": "may-2024-t7-r022-sha256-179",
+      "source": "may-2024",
+      "table": 7,
+      "row": 22,
+      "kind": "sha256",
+      "value": "90ba27750a04d1308115fa6a90f36503398a8f528c974c5adc07ae8a6cd630e7",
+      "original_value": "90ba27750a04d1308115fa6a90f36503398a8f528c974c5adc07ae8a6cd630e7",
+      "field": "file_hash",
+      "match": "exact",
+      "step_id": "may-publication-sample-hash-coverage",
+      "qualification": "EXE"
+    },
+    {
+      "id": "may-2024-t7-r023-sha256-180",
+      "source": "may-2024",
+      "table": 7,
+      "row": 23,
+      "kind": "sha256",
+      "value": "fafaff3d665b26b5c057e64b4238980589deb0dff0501497ac50be1bc91b3e08",
+      "original_value": "fafaff3d665b26b5c057e64b4238980589deb0dff0501497ac50be1bc91b3e08",
+      "field": "file_hash",
+      "match": "exact",
+      "step_id": "may-publication-sample-hash-coverage",
+      "qualification": "EXE"
+    },
+    {
+      "id": "may-2024-t7-r024-sha256-181",
+      "source": "may-2024",
+      "table": 7,
+      "row": 24,
+      "kind": "sha256",
+      "value": "acb60f0dd19a9a26aaaefd3326db8c28f546b6b0182ed2dcc23170bcb0af6d8f",
+      "original_value": "acb60f0dd19a9a26aaaefd3326db8c28f546b6b0182ed2dcc23170bcb0af6d8f",
+      "field": "file_hash",
+      "match": "exact",
+      "step_id": "may-publication-sample-hash-coverage",
+      "qualification": "EXE"
+    },
+    {
+      "id": "may-2024-t7-r025-sha256-182",
+      "source": "may-2024",
+      "table": 7,
+      "row": 25,
+      "kind": "sha256",
+      "value": "d73f6e240766ddd6c3c16eff8db50794ab8ab95c6a616d4ab2bc96780f13464d",
+      "original_value": "d73f6e240766ddd6c3c16eff8db50794ab8ab95c6a616d4ab2bc96780f13464d",
+      "field": "file_hash",
+      "match": "exact",
+      "step_id": "may-publication-sample-hash-coverage",
+      "qualification": "EXE"
+    },
+    {
+      "id": "may-2024-t7-r026-sha256-183",
+      "source": "may-2024",
+      "table": 7,
+      "row": 26,
+      "kind": "sha256",
+      "value": "f039eaaced72618eaba699d2985f9e10d252ac5fe85d609c217b45bc8c3614f4",
+      "original_value": "f039eaaced72618eaba699d2985f9e10d252ac5fe85d609c217b45bc8c3614f4",
+      "field": "file_hash",
+      "match": "exact",
+      "step_id": "may-publication-sample-hash-coverage",
+      "qualification": "EXE"
+    },
+    {
+      "id": "may-2024-t7-r027-sha256-184",
+      "source": "may-2024",
+      "table": 7,
+      "row": 27,
+      "kind": "sha256",
+      "value": "723d1cf3d74fb3ce95a77ed9dff257a78c8af8e67a82963230dd073781074224",
+      "original_value": "723d1cf3d74fb3ce95a77ed9dff257a78c8af8e67a82963230dd073781074224",
+      "field": "file_hash",
+      "match": "exact",
+      "step_id": "may-publication-sample-hash-coverage",
+      "qualification": "EXE"
+    },
+    {
+      "id": "may-2024-t7-r028-sha256-185",
+      "source": "may-2024",
+      "table": 7,
+      "row": 28,
+      "kind": "sha256",
+      "value": "ae7c868713e1d02b4db60128c651eb1e3f6a33c02544cc4cb57c3aa6c6581b6e",
+      "original_value": "ae7c868713e1d02b4db60128c651eb1e3f6a33c02544cc4cb57c3aa6c6581b6e",
+      "field": "file_hash",
+      "match": "exact",
+      "step_id": "may-publication-sample-hash-coverage",
+      "qualification": "EXE"
+    },
+    {
+      "id": "may-2024-t7-r029-sha256-186",
+      "source": "may-2024",
+      "table": 7,
+      "row": 29,
+      "kind": "sha256",
+      "value": "fff35c2da67eef6f1a10c585b427ac32e7f06f4e4460542207abcd62264e435f",
+      "original_value": "fff35c2da67eef6f1a10c585b427ac32e7f06f4e4460542207abcd62264e435f",
+      "field": "file_hash",
+      "match": "exact",
+      "step_id": "may-publication-sample-hash-coverage",
+      "qualification": "EXE"
+    },
+    {
+      "id": "may-2024-t7-r030-sha256-187",
+      "source": "may-2024",
+      "table": 7,
+      "row": 30,
+      "kind": "sha256",
+      "value": "df5b004be71717362e6b1ad22072f9ee4113b95b5d78c496a90857977a9fb415",
+      "original_value": "df5b004be71717362e6b1ad22072f9ee4113b95b5d78c496a90857977a9fb415",
+      "field": "file_hash",
+      "match": "exact",
+      "step_id": "may-publication-sample-hash-coverage",
+      "qualification": "EXE"
+    },
+    {
+      "id": "may-2024-t7-r031-sha256-188",
+      "source": "may-2024",
+      "table": 7,
+      "row": 31,
+      "kind": "sha256",
+      "value": "462bbb8fd7be98129aa73efa91e2d88fa9cafc7b47431b8227d1957f5d0c8ba7",
+      "original_value": "462bbb8fd7be98129aa73efa91e2d88fa9cafc7b47431b8227d1957f5d0c8ba7",
+      "field": "file_hash",
+      "match": "exact",
+      "step_id": "may-publication-sample-hash-coverage",
+      "qualification": "EXE"
+    },
+    {
+      "id": "may-2024-t7-r032-sha256-189",
+      "source": "may-2024",
+      "table": 7,
+      "row": 32,
+      "kind": "sha256",
+      "value": "3c50f6369f0938f42d47db29a1f398e754acb2a8d96fd4b366246ac2ccbe250a",
+      "original_value": "3c50f6369f0938f42d47db29a1f398e754acb2a8d96fd4b366246ac2ccbe250a",
+      "field": "file_hash",
+      "match": "exact",
+      "step_id": "may-publication-sample-hash-coverage",
+      "qualification": "EXE"
+    },
+    {
+      "id": "may-2024-t7-r033-sha256-190",
+      "source": "may-2024",
+      "table": 7,
+      "row": 33,
+      "kind": "sha256",
+      "value": "5d2204f3a20e163120f52a2e3595db19890050b2faa96c6cba6b094b0a52b0aa",
+      "original_value": "5d2204f3a20e163120f52a2e3595db19890050b2faa96c6cba6b094b0a52b0aa",
+      "field": "file_hash",
+      "match": "exact",
+      "step_id": "may-publication-sample-hash-coverage",
+      "qualification": "EXE"
+    },
+    {
+      "id": "may-2024-t7-r034-sha256-191",
+      "source": "may-2024",
+      "table": 7,
+      "row": 34,
+      "kind": "sha256",
+      "value": "37a5cd265f7f555f2fe320a68d70553b7aa9601981212921d1ac2c114e662004",
+      "original_value": "37a5cd265f7f555f2fe320a68d70553b7aa9601981212921d1ac2c114e662004",
+      "field": "file_hash",
+      "match": "exact",
+      "step_id": "may-publication-sample-hash-coverage",
+      "qualification": "EXE"
+    },
+    {
+      "id": "may-2024-t7-r035-sha256-192",
+      "source": "may-2024",
+      "table": 7,
+      "row": 35,
+      "kind": "sha256",
+      "value": "3090a37e591554d7406107df87b3dc21bda059df0bc66244e8abef6a5678af35",
+      "original_value": "3090a37e591554d7406107df87b3dc21bda059df0bc66244e8abef6a5678af35",
+      "field": "file_hash",
+      "match": "exact",
+      "step_id": "may-publication-sample-hash-coverage",
+      "qualification": "EXE"
+    },
+    {
+      "id": "may-2024-t7-r036-sha256-193",
+      "source": "may-2024",
+      "table": 7,
+      "row": 36,
+      "kind": "sha256",
+      "value": "17879ed48c2a2e324d4f5175112f51b75f4a8ab100b8833c82e6ddb7cd817f20",
+      "original_value": "17879ed48c2a2e324d4f5175112f51b75f4a8ab100b8833c82e6ddb7cd817f20",
+      "field": "file_hash",
+      "match": "exact",
+      "step_id": "may-publication-sample-hash-coverage",
+      "qualification": "EXE"
+    },
+    {
+      "id": "may-2024-t7-r037-sha256-194",
+      "source": "may-2024",
+      "table": 7,
+      "row": 37,
+      "kind": "sha256",
+      "value": "42f05f5d4a2617b7ae0bc601dd6c053bf974f9a337a8fcc51f9338b108811b78",
+      "original_value": "42f05f5d4a2617b7ae0bc601dd6c053bf974f9a337a8fcc51f9338b108811b78",
+      "field": "file_hash",
+      "match": "exact",
+      "step_id": "may-publication-sample-hash-coverage",
+      "qualification": "EXE"
+    },
+    {
+      "id": "may-2024-t7-r038-sha256-195",
+      "source": "may-2024",
+      "table": 7,
+      "row": 38,
+      "kind": "sha256",
+      "value": "882019d1024778e13841db975d5e60aaae1482fcf86ba669e819a68ce980d7d3",
+      "original_value": "882019d1024778e13841db975d5e60aaae1482fcf86ba669e819a68ce980d7d3",
+      "field": "file_hash",
+      "match": "exact",
+      "step_id": "may-publication-sample-hash-coverage",
+      "qualification": "EXE"
+    },
+    {
+      "id": "may-2024-t7-r039-sha256-196",
+      "source": "may-2024",
+      "table": 7,
+      "row": 39,
+      "kind": "sha256",
+      "value": "e28188e516db1bda9015c30de59a2e91996b67c2e2b44989a6b0f562577fd757",
+      "original_value": "e28188e516db1bda9015c30de59a2e91996b67c2e2b44989a6b0f562577fd757",
+      "field": "file_hash",
+      "match": "exact",
+      "step_id": "may-publication-sample-hash-coverage",
+      "qualification": "EXE"
+    },
+    {
+      "id": "may-2024-t7-r040-sha256-197",
+      "source": "may-2024",
+      "table": 7,
+      "row": 40,
+      "kind": "sha256",
+      "value": "0a8297b274aeab986d6336b395b39b3af1bb00464cf5735d1ecdb506fef9098e",
+      "original_value": "0a8297b274aeab986d6336b395b39b3af1bb00464cf5735d1ecdb506fef9098e",
+      "field": "file_hash",
+      "match": "exact",
+      "step_id": "may-publication-sample-hash-coverage",
+      "qualification": "EXE"
+    },
+    {
+      "id": "may-2024-t7-r041-sha256-198",
+      "source": "may-2024",
+      "table": 7,
+      "row": 41,
+      "kind": "sha256",
+      "value": "69192821f8ce4561cf9c9cb494a133584179116cb2e7409bea3e18901a1ca944",
+      "original_value": "69192821f8ce4561cf9c9cb494a133584179116cb2e7409bea3e18901a1ca944",
+      "field": "file_hash",
+      "match": "exact",
+      "step_id": "may-publication-sample-hash-coverage",
+      "qualification": "EXE"
+    },
+    {
+      "id": "may-2024-t7-r042-sha256-199",
+      "source": "may-2024",
+      "table": 7,
+      "row": 42,
+      "kind": "sha256",
+      "value": "3337a7a9ccdd06acdd6e3cf4af40d871172d0a0e96fc48787b574ac93689622a",
+      "original_value": "3337a7a9ccdd06acdd6e3cf4af40d871172d0a0e96fc48787b574ac93689622a",
+      "field": "file_hash",
+      "match": "exact",
+      "step_id": "may-publication-sample-hash-coverage",
+      "qualification": "EXE"
+    },
+    {
+      "id": "may-2024-t7-r043-sha256-200",
+      "source": "may-2024",
+      "table": 7,
+      "row": 43,
+      "kind": "sha256",
+      "value": "17205c43189c22dfcb278f5cc45c2562f622b0b6280dcd43cc1d3c274095eb90",
+      "original_value": "17205c43189c22dfcb278f5cc45c2562f622b0b6280dcd43cc1d3c274095eb90",
+      "field": "file_hash",
+      "match": "exact",
+      "step_id": "may-publication-sample-hash-coverage",
+      "qualification": "EXE"
+    },
+    {
+      "id": "may-2024-t7-r044-sha256-201",
+      "source": "may-2024",
+      "table": 7,
+      "row": 44,
+      "kind": "sha256",
+      "value": "b32daf27aa392d26bdf5faafbaae6b21cd6c918d461ff59f548a73d447a96dd9",
+      "original_value": "b32daf27aa392d26bdf5faafbaae6b21cd6c918d461ff59f548a73d447a96dd9",
+      "field": "file_hash",
+      "match": "exact",
+      "step_id": "may-publication-sample-hash-coverage",
+      "qualification": "EXE"
+    },
+    {
+      "id": "may-2024-t9-r001-path-202",
+      "source": "may-2024",
+      "table": 9,
+      "row": 1,
+      "kind": "path",
+      "value": "C:\\Users\\Public\\Audio\\Jun.exe",
+      "original_value": "C:\\Users\\Public\\Audio\\Jun.exe",
+      "field": "file_path",
+      "match": "exact",
+      "step_id": "may-publication-file-artifact-coverage",
+      "qualification": "Original filename/path."
+    },
+    {
+      "id": "may-2024-t9-r001-sha256-203",
+      "source": "may-2024",
+      "table": 9,
+      "row": 1,
+      "kind": "sha256",
+      "value": "b6a4f4097367d9c124f51154d8750ea036a812d5badde0baf9c5f183bb53dd24",
+      "original_value": "b6a4f4097367d9c124f51154d8750ea036a812d5b adde0baf9c5f183bb53dd24",
+      "field": "file_hash",
+      "match": "exact",
+      "step_id": "may-publication-file-artifact-coverage",
+      "qualification": "Hash paired with source path."
+    },
+    {
+      "id": "may-2024-t9-r002-path-204",
+      "source": "may-2024",
+      "table": 9,
+      "row": 2,
+      "kind": "path",
+      "value": "C:\\Users\\Public\\Audio\\esx.zip",
+      "original_value": "C:\\Users\\Public\\Audio\\esx.zip",
+      "field": "file_path",
+      "match": "exact",
+      "step_id": "may-publication-file-artifact-coverage",
+      "qualification": "Original filename/path."
+    },
+    {
+      "id": "may-2024-t9-r003-path-205",
+      "source": "may-2024",
+      "table": 9,
+      "row": 3,
+      "kind": "path",
+      "value": "C:\\Users\\Public\\Audio\\7zG.exe",
+      "original_value": "C:\\Users\\Public\\Audio\\7zG.exe",
+      "field": "file_path",
+      "match": "exact",
+      "step_id": "may-publication-file-artifact-coverage",
+      "qualification": "Original filename/path."
+    },
+    {
+      "id": "may-2024-t9-r003-sha256-206",
+      "source": "may-2024",
+      "table": 9,
+      "row": 3,
+      "kind": "sha256",
+      "value": "f21240e0bf9f0a391d514e34d4fa24ecb997d939379d2260ebce7c693e55f061",
+      "original_value": "f21240e0bf9f0a391d514e34d4fa24ecb997d93937 9d2260ebce7c693e55f061",
+      "field": "file_hash",
+      "match": "exact",
+      "step_id": "may-publication-file-artifact-coverage",
+      "qualification": "Hash paired with source path."
+    },
+    {
+      "id": "may-2024-t9-r004-path-207",
+      "source": "may-2024",
+      "table": 9,
+      "row": 4,
+      "kind": "path",
+      "value": "C:\\Users\\Public\\Audio\\Jun.exe",
+      "original_value": "C:\\Users\\Public\\Audio\\Jun.exe",
+      "field": "file_path",
+      "match": "exact",
+      "step_id": "may-publication-file-artifact-coverage",
+      "qualification": "Original filename/path."
+    },
+    {
+      "id": "may-2024-t9-r004-sha256-208",
+      "source": "may-2024",
+      "table": 9,
+      "row": 4,
+      "kind": "sha256",
+      "value": "b6a4f4097367d9c124f51154d8750ea036a812d5badde0baf9c5f183bb53dd24",
+      "original_value": "b6a4f4097367d9c124f51154d8750ea036a812d5b adde0baf9c5f183bb53dd24",
+      "field": "file_hash",
+      "match": "exact",
+      "step_id": "may-publication-file-artifact-coverage",
+      "qualification": "Hash paired with source path."
+    },
+    {
+      "id": "may-2024-t9-r005-path-209",
+      "source": "may-2024",
+      "table": 9,
+      "row": 5,
+      "kind": "path",
+      "value": "C:\\Users\\Public\\Audio\\7z.dll",
+      "original_value": "C:\\Users\\Public\\Audio\\7z.dll",
+      "field": "file_path",
+      "match": "exact",
+      "step_id": "may-publication-file-artifact-coverage",
+      "qualification": "Original filename/path."
+    },
+    {
+      "id": "may-2024-t9-r006-path-210",
+      "source": "may-2024",
+      "table": 9,
+      "row": 6,
+      "kind": "path",
+      "value": "C:\\Users\\Public\\db_Usr.sql",
+      "original_value": "C:\\Users\\Public\\db_Usr.sql",
+      "field": "file_path",
+      "match": "exact",
+      "step_id": "may-publication-file-artifact-coverage",
+      "qualification": "Original filename/path."
+    },
+    {
+      "id": "may-2024-t9-r006-sha256-211",
+      "source": "may-2024",
+      "table": 9,
+      "row": 6,
+      "kind": "sha256",
+      "value": "8501e14ee6ee142122746333b936c9ab0fc541328f37b5612b6804e6cdc2c2c6",
+      "original_value": "8501e14ee6ee142122746333b936c9ab0fc541328 f37b5612b6804e6cdc2c2c6",
+      "field": "file_hash",
+      "match": "exact",
+      "step_id": "may-publication-file-artifact-coverage",
+      "qualification": "Hash paired with source path."
+    },
+    {
+      "id": "may-2024-t9-r007-path-212",
+      "source": "may-2024",
+      "table": 9,
+      "row": 7,
+      "kind": "path",
+      "value": "C:\\Users\\Public\\Audio\\db_Usr.sql",
+      "original_value": "C:\\Users\\Public\\Audio\\db_Usr.sql",
+      "field": "file_path",
+      "match": "exact",
+      "step_id": "may-publication-file-artifact-coverage",
+      "qualification": "Original filename/path."
+    },
+    {
+      "id": "may-2024-t9-r008-path-213",
+      "source": "may-2024",
+      "table": 9,
+      "row": 8,
+      "kind": "path",
+      "value": "C:\\Users\\Public\\Audio\\hv2.ps1",
+      "original_value": "C:\\Users\\Public\\Audio\\hv2.ps1",
+      "field": "file_path",
+      "match": "exact",
+      "step_id": "may-publication-file-artifact-coverage",
+      "qualification": "Original filename/path."
+    },
+    {
+      "id": "may-2024-t9-r009-path-214",
+      "source": "may-2024",
+      "table": 9,
+      "row": 9,
+      "kind": "path",
+      "value": "C:\\Users\\Public\\7zG.exe",
+      "original_value": "C:\\Users\\Public\\7zG.exe",
+      "field": "file_path",
+      "match": "exact",
+      "step_id": "may-publication-file-artifact-coverage",
+      "qualification": "Original filename/path."
+    },
+    {
+      "id": "may-2024-t9-r010-path-215",
+      "source": "may-2024",
+      "table": 9,
+      "row": 10,
+      "kind": "path",
+      "value": "C:\\Users\\Public\\7z.dll",
+      "original_value": "C:\\Users\\Public\\7z.dll",
+      "field": "file_path",
+      "match": "exact",
+      "step_id": "may-publication-file-artifact-coverage",
+      "qualification": "Original filename/path."
+    },
+    {
+      "id": "may-2024-t9-r011-path-216",
+      "source": "may-2024",
+      "table": 9,
+      "row": 11,
+      "kind": "path",
+      "value": "C:\\Users\\Public\\BitLogic.dll",
+      "original_value": "C:\\Users\\Public\\BitLogic.dll",
+      "field": "file_path",
+      "match": "exact",
+      "step_id": "may-publication-file-artifact-coverage",
+      "qualification": "Original filename/path."
+    },
+    {
+      "id": "may-2024-t9-r012-path-217",
+      "source": "may-2024",
+      "table": 9,
+      "row": 12,
+      "kind": "path",
+      "value": "C:\\Users\\Public\\NetApp.exe",
+      "original_value": "C:\\Users\\Public\\NetApp.exe",
+      "field": "file_path",
+      "match": "exact",
+      "step_id": "may-publication-file-artifact-coverage",
+      "qualification": "Original filename/path."
+    },
+    {
+      "id": "may-2024-t9-r012-md5-218",
+      "source": "may-2024",
+      "table": 9,
+      "row": 12,
+      "kind": "md5",
+      "value": "4c897334e6391e7a2fa3cbcbf773d5a4",
+      "original_value": "4c897334e6391e7a2fa3cbcbf773d5a4",
+      "field": "file_hash",
+      "match": "exact",
+      "step_id": "may-publication-file-artifact-coverage",
+      "qualification": "Hash paired with source path."
+    },
+    {
+      "id": "may-2024-t9-r013-path-219",
+      "source": "may-2024",
+      "table": 9,
+      "row": 13,
+      "kind": "path",
+      "value": "C:\\Users\\Public\\DataSoft.exe",
+      "original_value": "C:\\Users\\Public\\DataSoft.exe",
+      "field": "file_path",
+      "match": "exact",
+      "step_id": "may-publication-file-artifact-coverage",
+      "qualification": "Original filename/path."
+    },
+    {
+      "id": "may-2024-t9-r013-md5-220",
+      "source": "may-2024",
+      "table": 9,
+      "row": 13,
+      "kind": "md5",
+      "value": "2642ec377c0cee3235571832cb472870",
+      "original_value": "2642ec377c0cee3235571832cb472870",
+      "field": "file_hash",
+      "match": "exact",
+      "step_id": "may-publication-file-artifact-coverage",
+      "qualification": "Hash paired with source path."
+    },
+    {
+      "id": "may-2024-t9-r014-path-221",
+      "source": "may-2024",
+      "table": 9,
+      "row": 14,
+      "kind": "path",
+      "value": "C:\\Users\\Public\\BitData.exe",
+      "original_value": "C:\\Users\\Public\\BitData.exe",
+      "field": "file_path",
+      "match": "exact",
+      "step_id": "may-publication-file-artifact-coverage",
+      "qualification": "Original filename/path."
+    },
+    {
+      "id": "may-2024-t9-r014-md5-222",
+      "source": "may-2024",
+      "table": 9,
+      "row": 14,
+      "kind": "md5",
+      "value": "b3fe23dd4701ed00d79c03043b0b952e",
+      "original_value": "b3fe23dd4701ed00d79c03043b0b952e",
+      "field": "file_hash",
+      "match": "exact",
+      "step_id": "may-publication-file-artifact-coverage",
+      "qualification": "Hash paired with source path."
+    },
+    {
+      "id": "may-2024-t9-r015-path-223",
+      "source": "may-2024",
+      "table": 9,
+      "row": 15,
+      "kind": "path",
+      "value": "C:\\Users\\Public\\DigitalText.dll",
+      "original_value": "C:\\Users\\Public\\DigitalText.dll",
+      "field": "file_path",
+      "match": "exact",
+      "step_id": "may-publication-file-artifact-coverage",
+      "qualification": "Original filename/path."
+    },
+    {
+      "id": "may-2024-t9-r016-path-224",
+      "source": "may-2024",
+      "table": 9,
+      "row": 16,
+      "kind": "path",
+      "value": "C:\\Users\\Public\\GeniusMesh.exe",
+      "original_value": "C:\\Users\\Public\\GeniusMesh.exe",
+      "field": "file_path",
+      "match": "exact",
+      "step_id": "may-publication-file-artifact-coverage",
+      "qualification": "Original filename/path."
+    },
+    {
+      "id": "may-2024-t9-r017-path-225",
+      "source": "may-2024",
+      "table": 9,
+      "row": 17,
+      "kind": "path",
+      "value": "\\Device\\Mup\\*\\C$\\Users\\Public\\Music\\PROCEXP.sys",
+      "original_value": "\\Device\\Mup\\{redacted}\\C$\\Users\\Public\\Musi c\\PROCEXP.sys",
+      "field": "file_path",
+      "match": "glob",
+      "step_id": "may-publication-file-artifact-coverage",
+      "qualification": "Source redaction/wildcard retained as a pattern."
+    },
+    {
+      "id": "may-2024-t9-r018-path-226",
+      "source": "may-2024",
+      "table": 9,
+      "row": 18,
+      "kind": "path",
+      "value": "\\Device\\Mup\\*\\C$\\Users\\Public\\Music\\DumpNParse86.exe",
+      "original_value": "\\Device\\Mup\\{redacted}\\C$\\Users\\Public\\Musi c\\DumpNParse86.exe",
+      "field": "file_path",
+      "match": "glob",
+      "step_id": "may-publication-file-artifact-coverage",
+      "qualification": "Source redaction/wildcard retained as a pattern."
+    },
+    {
+      "id": "may-2024-t9-r019-path-227",
+      "source": "may-2024",
+      "table": 9,
+      "row": 19,
+      "kind": "path",
+      "value": "\\Device\\Mup\\*\\C$\\Users\\Public\\Music\\POSTDump.exe",
+      "original_value": "\\Device\\Mup\\{redacted}\\C$\\Users\\Public\\Musi c\\POSTDump.exe",
+      "field": "file_path",
+      "match": "glob",
+      "step_id": "may-publication-file-artifact-coverage",
+      "qualification": "Source redaction/wildcard retained as a pattern."
+    },
+    {
+      "id": "may-2024-t9-r020-path-228",
+      "source": "may-2024",
+      "table": 9,
+      "row": 20,
+      "kind": "path",
+      "value": "\\Device\\Mup\\*\\C$\\Users\\Public\\Music\\DumpNParse.exe",
+      "original_value": "\\Device\\Mup\\{redacted}\\C$\\Users\\Public\\Musi c\\DumpNParse.exe",
+      "field": "file_path",
+      "match": "glob",
+      "step_id": "may-publication-file-artifact-coverage",
+      "qualification": "Source redaction/wildcard retained as a pattern."
+    },
+    {
+      "id": "may-2024-t9-r021-path-229",
+      "source": "may-2024",
+      "table": 9,
+      "row": 21,
+      "kind": "path",
+      "value": "C:\\Users\\Public\\socksps.ps1",
+      "original_value": "C:\\Users\\Public\\socksps.ps1",
+      "field": "file_path",
+      "match": "exact",
+      "step_id": "may-publication-file-artifact-coverage",
+      "qualification": "Original filename/path."
+    },
+    {
+      "id": "may-2024-t9-r022-path-230",
+      "source": "may-2024",
+      "table": 9,
+      "row": 22,
+      "kind": "path",
+      "value": "C:\\Users\\Public\\Thief.exe",
+      "original_value": "C:\\Users\\Public\\Thief.exe",
+      "field": "file_path",
+      "match": "exact",
+      "step_id": "may-publication-file-artifact-coverage",
+      "qualification": "Original filename/path."
+    },
+    {
+      "id": "may-2024-t9-r022-sha256-231",
+      "source": "may-2024",
+      "table": 9,
+      "row": 22,
+      "kind": "sha256",
+      "value": "034b5fe047920b2ae9493451623633b14a85176f5eea0c7aadc110ea1730ee79",
+      "original_value": "034b5fe047920b2ae9493451623633b14a85176f5 eea0c7aadc110ea1730ee79",
+      "field": "file_hash",
+      "match": "exact",
+      "step_id": "may-publication-file-artifact-coverage",
+      "qualification": "Hash paired with source path."
+    },
+    {
+      "id": "may-2024-t9-r023-path-232",
+      "source": "may-2024",
+      "table": 9,
+      "row": 23,
+      "kind": "path",
+      "value": "C:\\Users\\All Users\\*\\GWT.ps1",
+      "original_value": "C:\\Users\\All Users\\{redacted}\\GWT.ps1",
+      "field": "file_path",
+      "match": "glob",
+      "step_id": "may-publication-file-artifact-coverage",
+      "qualification": "Source redaction/wildcard retained as a pattern."
+    },
+    {
+      "id": "may-2024-t9-r023-sha256-233",
+      "source": "may-2024",
+      "table": 9,
+      "row": 23,
+      "kind": "sha256",
+      "value": "8c68b2a794ba3d148cae91bdf9c8d357289752a94118b5558418a36d95a5a45f",
+      "original_value": "8C68B2A794BA3D148CAE91BDF9C8D35728975 2A94118B5558418A36D95A5A45F",
+      "field": "file_hash",
+      "match": "exact",
+      "step_id": "may-publication-file-artifact-coverage",
+      "qualification": "Hash paired with source path."
+    },
+    {
+      "id": "may-2024-t9-r023-path-234",
+      "source": "may-2024",
+      "table": 9,
+      "row": 23,
+      "kind": "path",
+      "value": "C:\\Program Files\\MonitorIT\\GWT.ps1",
+      "original_value": "C:\\Program Files\\MonitorIT\\GWT.ps1",
+      "field": "file_path",
+      "match": "exact",
+      "step_id": "may-publication-file-artifact-coverage",
+      "qualification": "Original filename/path."
+    },
+    {
+      "id": "may-2024-t9-r023-sha256-235",
+      "source": "may-2024",
+      "table": 9,
+      "row": 23,
+      "kind": "sha256",
+      "value": "8c68b2a794ba3d148cae91bdf9c8d357289752a94118b5558418a36d95a5a45f",
+      "original_value": "8C68B2A794BA3D148CAE91BDF9C8D35728975 2A94118B5558418A36D95A5A45F",
+      "field": "file_hash",
+      "match": "exact",
+      "step_id": "may-publication-file-artifact-coverage",
+      "qualification": "Hash paired with source path."
+    },
+    {
+      "id": "may-2024-t9-r024-path-236",
+      "source": "may-2024",
+      "table": 9,
+      "row": 24,
+      "kind": "path",
+      "value": "Winx86.exe",
+      "original_value": "Winx86.exe",
+      "field": "file_path",
+      "match": "basename",
+      "step_id": "may-publication-file-artifact-coverage",
+      "qualification": "Original filename/path."
+    },
+    {
+      "id": "may-2024-t9-r024-path-237",
+      "source": "may-2024",
+      "table": 9,
+      "row": 24,
+      "kind": "path",
+      "value": "Comment: alias for cmd.exe",
+      "original_value": "Comment: alias for cmd.exe",
+      "field": "file_path",
+      "match": "basename",
+      "step_id": "may-publication-file-artifact-coverage",
+      "qualification": "Original filename/path."
+    },
+    {
+      "id": "may-2024-t9-r025-path-238",
+      "source": "may-2024",
+      "table": 9,
+      "row": 25,
+      "kind": "path",
+      "value": "C:\\Users\\Public\\Audio\\Jun.exe",
+      "original_value": "C:\\Users\\Public\\Audio\\Jun.exe",
+      "field": "file_path",
+      "match": "exact",
+      "step_id": "may-publication-file-artifact-coverage",
+      "qualification": "Original filename/path."
+    },
+    {
+      "id": "may-2024-t9-r025-sha256-239",
+      "source": "may-2024",
+      "table": 9,
+      "row": 25,
+      "kind": "sha256",
+      "value": "b6a4f4097367d9c124f51154d8750ea036a812d5badde0baf9c5f183bb53dd24",
+      "original_value": "b6a4f4097367d9c124f51154d8750ea036a812d5b adde0baf9c5f183bb53dd24",
+      "field": "file_hash",
+      "match": "exact",
+      "step_id": "may-publication-file-artifact-coverage",
+      "qualification": "Hash paired with source path."
+    },
+    {
+      "id": "may-2024-t9-r026-path-240",
+      "source": "may-2024",
+      "table": 9,
+      "row": 26,
+      "kind": "path",
+      "value": "C:\\Users\\Public\\eucr.exe",
+      "original_value": "C:\\Users\\Public\\eucr.exe",
+      "field": "file_path",
+      "match": "exact",
+      "step_id": "may-publication-file-artifact-coverage",
+      "qualification": "Original filename/path."
+    },
+    {
+      "id": "may-2024-t9-r026-sha256-241",
+      "source": "may-2024",
+      "table": 9,
+      "row": 26,
+      "kind": "sha256",
+      "value": "3c65da7f7bfdaf9acc6445abbedd9c4e927d37bb9e3629f34afc338058680407",
+      "original_value": "3c65da7f7bfdaf9acc6445abbedd9c4e927d37bb9e 3629f34afc338058680407",
+      "field": "file_hash",
+      "match": "exact",
+      "step_id": "may-publication-file-artifact-coverage",
+      "qualification": "Hash paired with source path."
+    },
+    {
+      "id": "may-2024-t9-r027-path-242",
+      "source": "may-2024",
+      "table": 9,
+      "row": 27,
+      "kind": "path",
+      "value": "C:\\Windows\\DS_c1.dll",
+      "original_value": "C:\\Windows\\DS_c1.dll",
+      "field": "file_path",
+      "match": "exact",
+      "step_id": "may-publication-file-artifact-coverage",
+      "qualification": "Original filename/path."
+    },
+    {
+      "id": "may-2024-t9-r027-sha256-243",
+      "source": "may-2024",
+      "table": 9,
+      "row": 27,
+      "kind": "sha256",
+      "value": "808c96cb90b7de7792a827c6946ff48123802959635a23bf9d98478ae6a259f9",
+      "original_value": "808c96cb90b7de7792a827c6946ff481238029596 35a23bf9d98478ae6a259f9",
+      "field": "file_hash",
+      "match": "exact",
+      "step_id": "may-publication-file-artifact-coverage",
+      "qualification": "Hash paired with source path."
+    },
+    {
+      "id": "may-2024-t9-r028-path-244",
+      "source": "may-2024",
+      "table": 9,
+      "row": 28,
+      "kind": "path",
+      "value": "C:\\Windows\\DS_c1.dll",
+      "original_value": "C:\\Windows\\DS_c1.dll",
+      "field": "file_path",
+      "match": "exact",
+      "step_id": "may-publication-file-artifact-coverage",
+      "qualification": "Original filename/path."
+    },
+    {
+      "id": "may-2024-t9-r028-sha256-245",
+      "source": "may-2024",
+      "table": 9,
+      "row": 28,
+      "kind": "sha256",
+      "value": "3a8fc07cadc08eeb8be342452636a754158403c3d4ebff379a4ae66f8298d9a6",
+      "original_value": "3a8fc07cadc08eeb8be342452636a754158403c3d 4ebff379a4ae66f8298d9a6",
+      "field": "file_hash",
+      "match": "exact",
+      "step_id": "may-publication-file-artifact-coverage",
+      "qualification": "Hash paired with source path."
+    },
+    {
+      "id": "may-2024-t9-r029-path-246",
+      "source": "may-2024",
+      "table": 9,
+      "row": 29,
+      "kind": "path",
+      "value": "C:\\Windows\\DS_c1.dll",
+      "original_value": "C:\\Windows\\DS_c1.dll",
+      "field": "file_path",
+      "match": "exact",
+      "step_id": "may-publication-file-artifact-coverage",
+      "qualification": "Original filename/path."
+    },
+    {
+      "id": "may-2024-t9-r029-sha256-247",
+      "source": "may-2024",
+      "table": 9,
+      "row": 29,
+      "kind": "sha256",
+      "value": "4ac69411ed124da06ad66ee8bfbcea2f593b5b199a2c38496e1ee24f9d04f34a",
+      "original_value": "4ac69411ed124da06ad66ee8bfbcea2f593b5b199 a2c38496e1ee24f9d04f34a",
+      "field": "file_hash",
+      "match": "exact",
+      "step_id": "may-publication-file-artifact-coverage",
+      "qualification": "Hash paired with source path."
+    },
+    {
+      "id": "may-2024-t9-r030-path-248",
+      "source": "may-2024",
+      "table": 9,
+      "row": 30,
+      "kind": "path",
+      "value": "C:\\Windows\\DS_c1.dll",
+      "original_value": "C:\\Windows\\DS_c1.dll",
+      "field": "file_path",
+      "match": "exact",
+      "step_id": "may-publication-file-artifact-coverage",
+      "qualification": "Original filename/path."
+    },
+    {
+      "id": "may-2024-t9-r030-sha256-249",
+      "source": "may-2024",
+      "table": 9,
+      "row": 30,
+      "kind": "sha256",
+      "value": "819cb9bcf62be7666db5666a693524070b0df589c58309b067191b30480b0c3a",
+      "original_value": "819cb9bcf62be7666db5666a693524070b0df589c 58309b067191b30480b0c3a",
+      "field": "file_hash",
+      "match": "exact",
+      "step_id": "may-publication-file-artifact-coverage",
+      "qualification": "Hash paired with source path."
+    },
+    {
+      "id": "may-2024-t9-r031-path-250",
+      "source": "may-2024",
+      "table": 9,
+      "row": 31,
+      "kind": "path",
+      "value": "C:\\Windows\\DS_c1.dll",
+      "original_value": "C:\\Windows\\DS_c1.dll",
+      "field": "file_path",
+      "match": "exact",
+      "step_id": "may-publication-file-artifact-coverage",
+      "qualification": "Original filename/path."
+    },
+    {
+      "id": "may-2024-t9-r031-sha256-251",
+      "source": "may-2024",
+      "table": 9,
+      "row": 31,
+      "kind": "sha256",
+      "value": "c26a5cb62a78c467cc6b6867c7093fbb7b1a96d92121d4d6c3f0557ef9c881e0",
+      "original_value": "c26a5cb62a78c467cc6b6867c7093fbb7b1a96d92 121d4d6c3f0557ef9c881e0",
+      "field": "file_hash",
+      "match": "exact",
+      "step_id": "may-publication-file-artifact-coverage",
+      "qualification": "Hash paired with source path."
+    },
+    {
+      "id": "may-2024-t9-r032-path-252",
+      "source": "may-2024",
+      "table": 9,
+      "row": 32,
+      "kind": "path",
+      "value": "C:\\Windows\\DS_c1.dll",
+      "original_value": "C:\\Windows\\DS_c1.dll",
+      "field": "file_path",
+      "match": "exact",
+      "step_id": "may-publication-file-artifact-coverage",
+      "qualification": "Original filename/path."
+    },
+    {
+      "id": "may-2024-t9-r032-sha256-253",
+      "source": "may-2024",
+      "table": 9,
+      "row": 32,
+      "kind": "sha256",
+      "value": "d503090431fdd99c9df3451d9b73c5737c79eda6eb80c148b8dc71e84623401f",
+      "original_value": "d503090431fdd99c9df3451d9b73c5737c79eda6e b80c148b8dc71e84623401f",
+      "field": "file_hash",
+      "match": "exact",
+      "step_id": "may-publication-file-artifact-coverage",
+      "qualification": "Hash paired with source path."
+    },
+    {
+      "id": "may-2024-t9-r033-path-254",
+      "source": "may-2024",
+      "table": 9,
+      "row": 33,
+      "kind": "path",
+      "value": "*\\instructions_read_me.txt",
+      "original_value": "*\\instructions_read_me.txt",
+      "field": "file_path",
+      "match": "glob",
+      "step_id": "may-publication-file-artifact-coverage",
+      "qualification": "Source redaction/wildcard retained as a pattern."
+    },
+    {
+      "id": "nov-2024-t7-r001-ipv4-255",
+      "source": "nov-2024",
+      "table": 7,
+      "row": 1,
+      "kind": "ipv4",
+      "value": "170.130.165.73",
+      "original_value": "170.130.165.73",
+      "field": "dest",
+      "match": "exact",
+      "step_id": "primary-c2-indicator-contact",
+      "qualification": "Historical November replacement indicator."
+    },
+    {
+      "id": "nov-2024-t7-r002-ipv4-256",
+      "source": "nov-2024",
+      "table": 7,
+      "row": 2,
+      "kind": "ipv4",
+      "value": "45.11.181.44",
+      "original_value": "45.11.181.44",
+      "field": "dest",
+      "match": "exact",
+      "step_id": "secondary-c2-indicator-contact",
+      "qualification": "Historical November replacement indicator."
+    },
+    {
+      "id": "nov-2024-t7-r003-ipv4-257",
+      "source": "nov-2024",
+      "table": 7,
+      "row": 3,
+      "kind": "ipv4",
+      "value": "66.42.118.54",
+      "original_value": "66.42.118.54",
+      "field": "dest",
+      "match": "exact",
+      "step_id": "historical-exfiltration-indicator-flow",
+      "qualification": "Historical November replacement indicator."
+    },
+    {
+      "id": "nov-2024-t7-r004-ipv4-258",
+      "source": "nov-2024",
+      "table": 7,
+      "row": 4,
+      "kind": "ipv4",
+      "value": "79.132.130.211",
+      "original_value": "79.132.130.211",
+      "field": "dest",
+      "match": "exact",
+      "step_id": "file-host-c2-indicator-contact",
+      "qualification": "Historical November replacement indicator."
+    },
+    {
+      "id": "nov-2024-t8-r001-domain-259",
+      "source": "nov-2024",
+      "table": 8,
+      "row": 1,
+      "kind": "domain",
+      "value": "moereng.com",
+      "original_value": "moereng.com",
+      "field": "query",
+      "match": "exact",
+      "step_id": "historical-domain-lookups",
+      "qualification": "Suspected November Cobalt Strike domain."
+    },
+    {
+      "id": "nov-2024-t8-r002-domain-260",
+      "source": "nov-2024",
+      "table": 8,
+      "row": 2,
+      "kind": "domain",
+      "value": "exckicks.com",
+      "original_value": "exckicks.com",
+      "field": "query",
+      "match": "exact",
+      "step_id": "historical-domain-lookups",
+      "qualification": "Suspected November Cobalt Strike domain."
+    }
+  ]
+}

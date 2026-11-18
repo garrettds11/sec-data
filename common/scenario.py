@@ -4,6 +4,7 @@ import hashlib
 import ipaddress
 import json
 import math
+import re
 from datetime import timedelta, timezone
 from pathlib import Path
 
@@ -22,6 +23,7 @@ SOURCE_DATASETS = {
     "vulnerability.jsonl": {"Vulnerabilities.Vulnerabilities"},
     "vulnerability-followup.jsonl": {"Vulnerabilities.Vulnerabilities"},
 }
+SOURCE_DATASETS["endpoint-lab.jsonl"] = {"Endpoint.Processes", "Endpoint.Filesystem"}
 SOURCE_DATASETS["sysmon.jsonl"] = {
     "Endpoint.Processes", "Endpoint.Filesystem", "Endpoint.Registry",
     "Network_Traffic.All_Traffic",
@@ -48,7 +50,7 @@ FORBIDDEN = {"attack", "attacker", "malicious", "compromised", "ground_truth",
 STRING_FIELDS = {
     "access_reason", "access_result", "action", "app", "asset_id", "category",
     "change_id", "connection_result", "connection_state", "cve", "description",
-    "dest", "dest_ip", "dvc", "file_path", "finding_id", "http_method",
+    "dest", "dest_ip", "dvc", "file_path", "file_hash", "process_hash", "finding_id", "http_method",
     "message_type", "object", "object_category", "object_path", "parent_process",
     "probe_type", "process", "process_cmdline", "process_guid", "query",
     "query_type", "reason", "record_type", "registry_path",
@@ -82,6 +84,13 @@ def _validate_fields(fields, dataset):
             raise ValueError(f"Unsupported scenario event field: {name}")
         if not valid:
             raise ValueError(f"Invalid value for scenario event field: {name}")
+    for field, allowed_dataset in (("file_hash", "Endpoint.Filesystem"),
+                                   ("process_hash", "Endpoint.Processes")):
+        if field in fields and (dataset != allowed_dataset or not re.fullmatch(
+                r"(?:[0-9a-fA-F]{32}|[0-9a-fA-F]{40}|[0-9a-fA-F]{64}|[0-9a-fA-F]{128})",
+                fields[field])):
+            raise ValueError(f"{field} requires a hexadecimal MD5/SHA-1/SHA-256/SHA-512 "
+                             f"digest in {allowed_dataset}")
     if all(key in fields for key in ("bytes", "bytes_in", "bytes_out")):
         if fields["bytes"] != fields["bytes_in"] + fields["bytes_out"]:
             raise ValueError("Network bytes must equal bytes_in + bytes_out")
