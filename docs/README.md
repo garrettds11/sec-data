@@ -4,6 +4,7 @@ Start with the repository [README](../README.md) to generate and ingest a CIM-sh
 
 | Guide | Use it for |
 | --- | --- |
+| [Start or return (Windows)](getting-started.md) | Complete checkout, Python, Black Basta v2 generation and coverage verification path |
 | [Dataset](dataset.md) | Output layout, event counts, source inventory, time span, and scaling limits |
 | [Story authoring](scenario-authoring.md) | Three story sources, manual editing, review, validation and generation |
 | [CISA authoring](cisa-scenario-authoring.md) | Shared human/machine source-based procedure |
