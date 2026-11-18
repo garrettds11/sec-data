@@ -1,5 +1,6 @@
 {
   "schema_version": 1,
+  "output_name": "file-collection",
   "id": "file-collection-example",
   "title": "Compromised operator collects and transfers a project file",
   "description": "Example machine-authored scenario. Narrative and causal links stay in truth, not analyst events.",

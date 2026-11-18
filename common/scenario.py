@@ -137,12 +137,18 @@ def load_scenario(path):
     """Read a strict, versioned JSON input suitable for machine authoring."""
     spec = json.loads(Path(path).read_text(encoding="utf-8"))
     _keys(spec, {"schema_version", "id", "title", "steps"},
-          {"description", "entities", "background_mix"}, "Scenario")
+          {"description", "entities", "background_mix", "output_name"}, "Scenario")
     if type(spec["schema_version"]) is not int or spec["schema_version"] != SCHEMA_VERSION:
         raise ValueError("Unsupported scenario schema_version")
     if not all(isinstance(spec[key], str) and spec[key].strip()
                for key in ("id", "title")):
         raise ValueError("Scenario id and title must be nonempty strings")
+    if "output_name" in spec:
+        name = spec["output_name"]
+        if (not isinstance(name, str) or not re.fullmatch(r"[a-z0-9][a-z0-9-]{0,47}", name)
+                or re.fullmatch(r"(?:con|prn|aux|nul|com[1-9]|lpt[1-9])", name)):
+            raise ValueError("output_name must be 1-48 lowercase letters/digits/hyphens, "
+                             "starting with a letter/digit, and not a Windows reserved name")
     if "description" in spec and not isinstance(spec["description"], str):
         raise ValueError("Scenario description must be a string")
     if not isinstance(spec["steps"], list) or not spec["steps"]:

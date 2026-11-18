@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Scenario files may declare a short `output_name`. Dataset CLI runs without `--output-dir` now allocate readable `<name>-runNNN` folders under `output/` (or `--output-root`), with atomic reservations for concurrent runs. Explicit new output paths retain their existing behavior. `--json` reports the allocated path for automation.
+- Black Basta v2 uses `black-basta-v2`; file collection uses `file-collection`. Update the README and walkthrough to capture the chosen path automatically for validation and Splunk ingestion.
+
 - Add Black Basta v2 with original May publication Tables 7–11 plus the explicitly retained November IOC set; keep v1 unchanged. Add typed filesystem/process hash fields, Linux filesystem observations, a source inventory, and event-ID-backed publication coverage checks that fail on missing IOCs.
 
 - Use Python 3.15 as the default for new environments, declare it in `.python-version`, document venv migration, and test Python 3.12/3.15 on Windows/Linux.
