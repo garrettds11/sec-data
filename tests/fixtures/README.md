@@ -6,18 +6,23 @@ inventory, separate generator truth, and a `run-manifest.json` with record count
 and SHA-256 hashes. The fixture is complete so cross-file references and the
 manifest can be checked without regenerating it.
 
-Reproduce it from the repository root with Python 3.12. The output directory
-must not already exist:
+Generate the current source bundle with the same exercise settings using Python 3.15.
+The output directory must not already exist:
 
 ```powershell
-py -3.12 .\create_story.py --seed 42 `
+py -3.15 .\create_story.py --seed 42 `
   --start-time 2026-10-22T12:00:00Z --duration-minutes 60 `
   --campaign-count 1 --output-dir .\output\story-seed42-check
-py -3.12 -m common.story_validation .\tests\fixtures\story-seed42
+py -3.15 -m common.story_validation .\tests\fixtures\story-seed42
 ```
 
-The generated files were independently reproduced with the same parameters;
-all 43 files matched byte for byte. The standalone bundle validator passed.
+The checked-in snapshot was independently reproduced when it was created; all
+43 files matched byte for byte and its standalone validator passed. The current
+world model has since added an external-monitor entity and changed run IDs, so
+regeneration from current code does not reproduce every historical snapshot
+hash. During the Python transition, current-code generation produced all 43
+files byte-identically on Python 3.12.14 and 3.15.2. The checked-in snapshot is
+retained as historical parser/validation evidence.
 
 `cim-story-42/` contains the 18 CIM-shaped event files projected from that
 story. It has 291 JSONL records (about 144 KiB) across twelve intended CIM

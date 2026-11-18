@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Use Python 3.15 as the default for new environments, declare it in `.python-version`, document venv migration, and test Python 3.12/3.15 on Windows/Linux.
+
 - Added manual and AI-assisted authoring paths for CISA-oriented, AI-generated and human-generated stories, with shared source fidelity and review instructions.
 - Added validation-only and contract/context inspection commands, a minimal manual template and the source-documented Black Basta example.
 - Shared scenario validation with compilation, including entity collision checks, finite numeric values and boolean authorization metadata.

@@ -35,5 +35,5 @@ Use the [README](README.md) for setup and commands, the [dataset guide](docs/dat
 
 ## Housekeeping
 
-- The [README](README.md) targets Python 3.12.
+- The [README](README.md) targets Python 3.15.
 - Preserve the repository's .gitattributes text normalization when editing Markdown; avoid unrelated line-ending churn.

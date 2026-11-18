@@ -8,7 +8,7 @@ The [dataset guide](dataset.md#time-scale-and-interpretation) records the curren
 
 ## Standalone finding volume
 
-The finding generators run locally with Python 3.12 and the standard library. The first 23 asset identities and default seeded behavior are preserved. Additional assets use unique `synthetic-*` names, locally administered MAC addresses, and private IPs starting at `10.100.0.1`. Both generators use the same inventory for the same seed and host count. Capacity is validated before generation.
+The finding generators use the Python standard library, with Python 3.15 as the default for new environments and CI coverage for 3.12 and 3.15. Historical measurements below retain the interpreter version actually used. The first 23 asset identities and default seeded behavior are preserved. Additional assets use unique `synthetic-*` names, locally administered MAC addresses, and private IPs starting at `10.100.0.1`. Both generators use the same inventory for the same seed and host count. Capacity is validated before generation.
 
 ```powershell
 python .\create_vuln_table.py --seed 42 --as-of 2026-10-15T12:00:00Z `

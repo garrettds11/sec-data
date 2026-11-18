@@ -39,13 +39,13 @@ A repository-aware agent should read AGENTS.md, propose steps/settings and wait 
 
 ## Quick start: generate a dataset
 
-The examples use Windows PowerShell. Install Python 3.12 and Git; see the [Windows setup guide](docs/windows-software-requirements.md). The generator itself uses the Python standard library and is also tested in Linux CI.
+The examples use Windows PowerShell. Install the latest patched Python 3.15 release and Git; see the [Windows setup guide](docs/windows-software-requirements.md). The generator itself uses the Python standard library. CI covers Python 3.12 and 3.15 on Windows and Linux; 3.15 is the default for new environments. See the [Python transition guide](docs/python-version.md) to migrate an existing virtual environment.
 
 ```powershell
 $repoDir = 'C:\GitHub\sec-data'
 git clone https://github.com/garrettds11/sec-data.git $repoDir
 Set-Location $repoDir
-py -3.12 -m venv .venv
+py -3.15 -m venv .venv
 
 $python = '.\.venv\Scripts\python.exe'
 $seed = 42
