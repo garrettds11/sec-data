@@ -17,7 +17,7 @@ This selects an AI-generated plausible fictional story unless you supply a diffe
 ### CISA-oriented story prompt
 
 ~~~text
-create a threat story and generate synthetic data using one scenario JSON file based on CISA advisory [ID]. Follow the repo’s current scenario contract. Preserve documented facts, identify fictional additions separately, and propose the ordered story steps before generating data. Explain any details the current generator cannot represent. Details from the CISA publication should be used, including the IOCs, tactics, techniques, software, and weaknesses.
+create a threat story and generate synthetic data using one scenario JSON file based on CISA advisory [ID]. Follow the repo’s current scenario contract and CISA authoring procedure. Retrieve and inspect the advisory’s published STIX JSON, inventory its CTI indicators, and reconcile them with the publication. If the attachment is inaccessible, request the original JSON and do not finalize a PDF-only substitute. Preserve documented facts, identify fictional additions separately, and propose the ordered story steps before generating data. Explain any details the current generator cannot represent. Details from the CISA publication should be used, including the IOCs, tactics, techniques, software, and weaknesses.
 ~~~
 
 Replace [ID] with an advisory identifier. The agent must retrieve the full selected revision; an ID or summary/catalog row alone is not its contents. Selected IOCs and behaviors should be represented where supported; explain omissions and alternatives instead of combining every reported attack path.
@@ -39,7 +39,7 @@ Cloning on your computer does not give a chat access to local files. A URL does 
 1. AGENTS.md, docs/scenario-authoring.md and docs/scenarios.md.
 2. scenarios/file-collection.json as the concrete shape example.
 3. The output of validate_scenario.py --describe-contract and --describe-context with your intended seed/host count. Save those outputs under output/ if attachments are needed.
-4. For CISA: docs/cisa-scenario-authoring.md and the full advisory/revision, including needed IOC tables. A catalog may help select it but cannot replace it.
+4. For CISA: docs/cisa-scenario-authoring.md and the full advisory/revision and its original STIX JSON attachment, including needed IOC tables. Attach the JSON itself if the chat cannot retrieve it. A catalog, converted CSV or unverified mirror cannot replace the required source attachment.
 5. For human-generated: your narrative and any evidence constraints. For AI-generated: your objective and any preferences, or ask for a proposal.
 
 Tell the chat it has no execution access. It should return a downloadable scenario JSON plus any source/assumption notes and proposed commands. Save the JSON in the checkout and run validation yourself. Give validation errors back to the chat for correction. Do not accept a claim that the data was generated unless an actual output package and manifest exist.
