@@ -1,5 +1,9 @@
 # AA24-131A Black Basta scenario proposal
 
+## Version scope
+
+This is the retained v1 November-revision adaptation. For original-publication hashes, paths, IPs and domains with explicit export coverage, use [v2](aa24-131a-black-basta-v2-notes.md). The v1 JSON itself is unchanged.
+
 ## Status
 
 One runtime input is supplied: aa24-131a-black-basta.json (schema version 1). The 23 ordered steps contain 43 prescribed observations. This is a proposal for review. The original proposal was authored without generating a dataset or performing network activity. Repository example checks subsequently export temporary test packages as described below.
@@ -152,7 +156,7 @@ The finding's high severity is an authored assessment value, not a quoted CISA C
 2. The schema can add external entities but not arbitrary internal hosts or identities. Existing server hosts/accounts are reused, and their OS/role constraints are retained.
 3. Process records do not prove installed versions, local privileges, successful secret recovery, AV/EDR disabling or shadow-copy deletion. The runtime does not execute any command strings.
 4. A CVE finding is not exploit evidence. No vulnerable protocol state machine, real exploit, automatic elevation or patch transition is modeled.
-5. The current field allow-list has no process_hash/file_hash fields. Historical file hashes are not inserted into unrelated fields or invented.
+5. At v1 authorship the field allow-list had no process_hash/file_hash fields, so v1 emits no hashes. V2 adds typed hash support without changing v1 observations. Historical file hashes are not inserted into unrelated fields or invented.
 6. session_id is assigned per step, not propagated as an authenticated session across steps. Host/user/time/process identifiers support correlation; depends_on is private story logic, not analyst evidence. Explicit parent PIDs refer to preceding same-host processes.
 7. Network flows do not identify Cobalt Strike protocol or prove callbacks. Published domain/IP relationships are not inferred. The NXDOMAIN answers, ports and byte counts are fictional.
 8. File reads, Rclone and a later TLS flow support a transfer hypothesis; they do not prove which bytes moved or the destination configured inside Rclone. The two network sensor records describe one flow and must not be summed as two transfers.

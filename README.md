@@ -98,6 +98,12 @@ The validator writes no event package and reports prescribed counts and minimum 
 
 The tailored mode builds the shared world directly and writes only its authored story plus ordinary traffic. Its title, causal links, and step descriptions appear in `truth/scenario-truth.json`, never in analyst events. The [scenario guide](docs/scenarios.md) defines supported sources, fields, references, and validation.
 
+## Black Basta publication indicator coverage
+
+For historical matching against the original May 2024 publication, use [Black Basta v2](scenarios/cisa/aa24-131a-black-basta-v2.json) and its [generation and coverage-check instructions](docs/examples/aa24-131a-black-basta-v2-notes.md). It retains v1's November story and six network IOCs, and explicitly adds the original publication's Tables 7–11, including hash and path fields. V1 remains available as the narrower November adaptation.
+
+V2 has 280 prescribed observations. Its companion catalog checks 261 source assertions (241 distinct type/value indicators) against exported analyst events, reporting event IDs and failures. It verifies publication-table coverage, **not exact parity with an unavailable STIX attachment or consumer CSV**. A normal structural-validation pass alone does not establish IOC coverage. Only the scenario JSON is a generation input; the catalog is used by `validate_ioc_coverage.py` after export.
+
 ## Use the events in Splunk
 
 Install the official [Splunk Common Information Model add-on](https://splunkbase.splunk.com/app/1621) separately. This project was tested with version 8.7.0. For a local Windows Splunk installation, copy this repository's [TA-sec-data-cim add-on](splunk/TA-sec-data-cim/) into Splunk's apps directory from an elevated PowerShell, then restart Splunk:

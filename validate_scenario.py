@@ -27,6 +27,8 @@ def describe_contract():
         "additional_rules": ["Authentication action: success or failure",
                              "Network action: allowed or blocked",
                              "When all byte fields are supplied, bytes = bytes_in + bytes_out",
+                             "file_hash: hexadecimal MD5/SHA-1/SHA-256/SHA-512 in Endpoint.Filesystem only",
+                             "process_hash: hexadecimal MD5/SHA-1/SHA-256/SHA-512 in Endpoint.Processes only",
                              "See docs/scenarios.md for JSON structure and timing rules"],
     }
 

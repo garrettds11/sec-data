@@ -35,10 +35,13 @@ The current compiler accepts these source and CIM dataset combinations. The exam
 | `endpoint-lab.jsonl`, `sysmon.jsonl` | `Endpoint.Processes` |
 | `windows-file.jsonl` | `Data_Access.Data_Access` |
 | `vulnerability.jsonl`, `vulnerability-followup.jsonl` | `Vulnerabilities.Vulnerabilities` |
+| `endpoint-lab.jsonl` | `Endpoint.Processes` or `Endpoint.Filesystem` |
 | `sysmon.jsonl` | `Endpoint.Filesystem`, `Endpoint.Registry`, or `Network_Traffic.All_Traffic` |
 | `windows-security.jsonl` | `Change.All_Changes` |
 
 The compiler checks each source/dataset pair, required fields, field types, time bounds, references, and byte totals when all three byte fields are supplied. It rejects an unsupported combination instead of emitting an arbitrary event shape. This contract produces CIM-shaped JSON; it does not claim to reproduce exact vendor raw records or prove that all supplied observations are causally possible. Authors should review sensor coverage, protocol plausibility, identity privileges, and detection outcomes for each new story.
+
+`file_hash` is allowed only in `Endpoint.Filesystem`, and `process_hash` only in `Endpoint.Processes`. Each is a plain hexadecimal MD5/SHA-1/SHA-256/SHA-512 digest (32/40/64/128 characters), without an algorithm prefix. The compiler rejects malformed digests and hashes on unrelated datasets. The generic `endpoint-lab.jsonl` filesystem source can model Linux samples without mislabeling them as Sysmon. These are synthetic metadata observations, not executable bytes.
 
 `background_mix` requires integer weights from 0 to 100 for `web`, `file`, `egress`, and `ingress`; at least one must be positive. The default is `{"web":5,"file":2,"egress":2,"ingress":1}`. Weights select whole linked sessions, then the generator distributes the requested event count across the time window. A final partial session is possible when the exact count is not divisible by session size. Scenario observations and ordinary records are merged by `time` into their respective source files. The run manifest reports both per-source counts and the planted/background split; the split is metadata, never an analyst event field.
 
