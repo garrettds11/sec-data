@@ -45,7 +45,7 @@ jobs:
           $blocks = [regex]::Matches($readme, '(?ms)^```powershell\r?\n(.*?)^```')
           $generation = @($blocks | Where-Object { $_.Groups[1].Value.Contains('$targetEvents =') })
           if ($generation.Count -ne 1) { throw 'Expected one complete README generation block.' }
-          & ([scriptblock]::Create($generation[0].Groups[1].Value))
+          . ([scriptblock]::Create($generation[0].Groups[1].Value))
           $coverage = @($blocks | Where-Object { $_.Groups[1].Value.Contains('$coverageFile =') })
           if ($coverage.Count -ne 1) { throw 'Expected one README coverage block.' }
-          & ([scriptblock]::Create($coverage[0].Groups[1].Value))
+          . ([scriptblock]::Create($coverage[0].Groups[1].Value))
