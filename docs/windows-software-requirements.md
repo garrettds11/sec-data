@@ -11,9 +11,9 @@ Use this guide to prepare a Windows workstation for the primary CIM-shaped datas
 | Windows | Windows 10 or Windows 11 | Required for the workstation instructions in this guide, not for the Python generator itself. |
 | Python | **Latest patched Python 3.15**, 64-bit recommended | Default for new environments. CI also covers Python 3.12; other releases are not included in the CI matrix. |
 | Shell | Windows PowerShell 5.1 or PowerShell 7+ | Use PowerShell syntax in the instructions. |
-| Source checkout | Git for Windows | Needed to clone/update source; not required after files are already present. |
+| Project files | Extracted repository folder | Git is not required to run the downloaded files. |
 | Disk | Enough free space for Python venv and JSON exports | Depends on installed Python and generated data volume. |
-| Internet | Needed for initial installation/cloning | **Not** required to generate data after dependencies/source are present. |
+| Internet | Needed for initial software installation and repository download | **Not** required to generate data after dependencies/source are present. |
 
 The generators rely on the Python **standard library** only. The Python `unittest` suite also runs without AWS access.
 
@@ -46,8 +46,7 @@ Create a virtual environment with `py -3.15 -m venv .venv` and select `.venv\Scr
 
 ```powershell
 py -3.15 --version
-git --version
-code --version
+code --version  # optional, for VS Code
 aws --version  # optional
 ```
 

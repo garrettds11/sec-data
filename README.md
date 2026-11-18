@@ -1,236 +1,211 @@
 # sec-data
 
-Generate synthetic security events for Splunk investigations and detection tests. The primary command combines a linked investigation with repeatable ordinary activity and publishes one CIM-shaped JSONL event package. Use the included reference story or supply a versioned scenario file for a tailored compromise. Generation runs locally and requires no Splunk instance, AWS account, or network scan.
+Generate synthetic security events from a scenario JSON file for Splunk investigations and detection testing. The generator writes analyst events, reference inventory, a private answer key, and a manifest with counts and file hashes.
 
-## Start here: get back to a working checkout
+These Windows PowerShell instructions assume the project files are already extracted to your chosen folder. Git is not required. Local generation uses the Python standard library and requires no AWS credentials, AI service, or Splunk connection.
 
-For a complete Windows path, follow **[Start or return to sec-data](docs/getting-started.md)**. It covers updating an existing clone without discarding work, checking/rebuilding Python, testing the checkout, and generating and verifying Black Basta v2 with every variable declared. No AI, AWS, or Splunk connection is required to generate the files.
+## Requirements
 
-Black Basta v2 and its IOC checker are on `main`. Use `scenarios/cisa/aa24-131a-black-basta-v2.json` for the publication coverage exercise. The unsuffixed Black Basta file is v1; omitting `--scenario-file` selects the unrelated reference story. The walkthrough uses seed `2`, November 12, 2024 at 08:00 UTC, 120 minutes and 10,000 events.
+- Windows PowerShell 5.1 or PowerShell 7+.
+- A patched Python 3.15 installation with the Windows `py` launcher; 64-bit is recommended.
+- The complete extracted project folder, including `common/`, `catalogs/`, and `scenarios/`.
 
-The sections below describe other workflows. You do not need to author another scenario to run the included Black Basta exercise.
+Python 3.15 is the repository default. CI also checks Python 3.12 compatibility on Windows and Linux. See [Windows requirements](docs/windows-software-requirements.md) for tooling details.
 
-| Task | Entry point | Result |
-| --- | --- | --- |
-| Generate events for Splunk | `create_dataset.py` | Source-specific `events/` for ingest, `context/` for reference, and `truth/` for validation |
-| Author a different investigation | `--scenario-file` with `scenarios/file-collection.json` as a model | The same event package with authored steps and ordinary activity |
-| Inspect the source story | `create_story.py` | Source-format observations, shared world data, timeline, and answer key |
-| Export standalone findings | `create_vuln_table.py`, `create_compliance_table.py` | JSON or JSONL for local analysis or the optional AWS uploader |
+## 1. Open the project folder
 
-The seed changes reproducible details, not the investigation plot. A scenario JSON file changes the plot without editing generator code. An LLM can author that file using the [scenario contract](docs/scenarios.md); the generator validates and compiles it. It does not accept free-form natural language as a direct CLI argument. See the [documentation index](docs/README.md) for the complete workflow.
-
-## Choose your workflow
-
-**Story source and authoring assistance are independent choices.** Choose CISA-oriented, AI-generated, or human-generated content, then author/customize its one scenario JSON manually or with AI help. The generator itself uses no AI service.
-
-| Story source | Without AI assistance | With AI assistance |
-| --- | --- | --- |
-| CISA-oriented | Read the full advisory, follow the [CISA authoring guide](docs/cisa-scenario-authoring.md), and edit the JSON yourself. | Use the CISA prompt below; the agent follows that same guide and identifies fictional additions. |
-| AI-generated | Manually review/edit a previously AI-proposed story or scenario; subsequent generation needs no AI. | Use the generic prompt below to request a plausible fictional story. |
-| Human-generated | Write your narrative and follow [manual authoring/customization](docs/scenario-authoring.md). | Supply your narrative and ask AI to translate it into the current contract. |
-
-To **run without AI**, follow the quick start below for the reference story or use the [manual workflow](docs/scenario-authoring.md) for a custom input. To **author with AI**, follow [AI authoring](docs/ai-authoring.md), including the attachment checklist for chats without checkout access. Both paths converge on validation, generation and the same Splunk ingest instructions.
-
-Generic AI prompt (defaults to an AI-generated plausible story):
-
-~~~text
-create a threat story and generate synthetic data using the capabilities provide by this repo, https://github.com/garrettds11/sec-data
-~~~
-
-CISA-focused AI prompt (replace [ID]):
-
-~~~text
-create a threat story and generate synthetic data using one scenario JSON file based on CISA advisory [ID]. Follow the repo’s current scenario contract. Preserve documented facts, identify fictional additions separately, and propose the ordered story steps before generating data. Explain any details the current generator cannot represent. Details from the CISA publication should be used, including the IOCs, tactics, techniques, software, and weaknesses.
-~~~
-
-A repository-aware agent should read AGENTS.md, propose steps/settings and wait for your approval before generating a dataset. An ordinary chat needs the contract, example and inventory/field references attached; a local clone is not automatically visible to it. A CISA catalog row helps select a publication but does not replace its full text and revision. See the [Black Basta worked example](docs/examples/aa24-131a-black-basta-notes.md).
-
-## Alternative: generate the reference investigation
-
-The examples use Windows PowerShell. Install the latest patched Python 3.15 release and Git; see the [Windows setup guide](docs/windows-software-requirements.md). The generator itself uses the Python standard library. CI covers Python 3.12 and 3.15 on Windows and Linux; 3.15 is the default for new environments. See the [Python transition guide](docs/python-version.md) to migrate an existing virtual environment.
+Open PowerShell in the folder containing `create_dataset.py` and `README.md`. Alternatively, replace the example path below with your actual project folder:
 
 ```powershell
-$repoDir = 'C:\GitHub\sec-data'
-git clone https://github.com/garrettds11/sec-data.git $repoDir
-Set-Location $repoDir
-py -3.15 -m venv .venv
+Set-Location -LiteralPath 'C:\code\sec-data-main'
+if (-not (Test-Path -LiteralPath '.\create_dataset.py' -PathType Leaf)) {
+    throw 'Select the project folder containing create_dataset.py.'
+}
+```
+
+Run all subsequent commands from this folder.
+
+## 2. Set up Python
+
+Create the local environment if it does not exist, then verify its interpreter:
+
+```powershell
+py -3.15 --version
+if ($LASTEXITCODE -ne 0) { throw 'Install Python 3.15 with the Windows py launcher.' }
+
+if (-not (Test-Path -LiteralPath '.venv')) {
+    py -3.15 -m venv .venv
+    if ($LASTEXITCODE -ne 0) { throw 'Could not create the Python environment.' }
+}
 
 $python = '.\.venv\Scripts\python.exe'
-$seed = 2
-$startTime = '2026-10-22T12:00:00Z'
-$durationMinutes = 60
-$targetEvents = 10000
-$outputDir = '.\output\reference-investigation'
+& $python -c "import sys; print(sys.version); raise SystemExit(0 if sys.version_info[:2] == (3, 15) else 1)"
+if ($LASTEXITCODE -ne 0) { throw 'The existing .venv is not usable with Python 3.15. Follow docs/python-version.md to rebuild it.' }
 
-& $python .\create_dataset.py --seed $seed --start-time $startTime `
-  --duration-minutes $durationMinutes --target-events $targetEvents `
-  --output-dir $outputDir
+& $python -m unittest discover -s tests -v
+if ($LASTEXITCODE -ne 0) { throw 'Project checks failed. Resolve the failure before generating data.' }
 ```
 
-Set `$seed` and `$startTime` for the run you want. Choose a descriptive `$outputDir` that does not already exist. Its name does not affect the generated events or manifest run ID, although Splunk will show the path as `source` after ingest. This command writes exactly `$targetEvents` events; see the [dataset guide](docs/dataset.md) for the reference run's planted count and source breakdown.
+The tests should finish with `OK`. No `pip install`, environment activation, or PowerShell execution-policy change is needed. For an older or broken environment, follow the [Python migration guide](docs/python-version.md).
 
-Inspect the result:
+## 3. Select a scenario and generate data
 
-```powershell
-Get-ChildItem -LiteralPath (Join-Path $outputDir 'events') -Filter '*.jsonl'
-Get-Content -LiteralPath (Join-Path $outputDir 'events\web-app.jsonl') -TotalCount 2
-Get-Content -LiteralPath (Join-Path $outputDir 'dataset-manifest.json')
-```
+Set `$scenarioFile` to the JSON file you want to run. Included examples:
 
-Generated runs under `output/` and the local `.venv/` are ignored by Git. After using a run, remove its directory to reclaim space. Keep `output/reference/` if you downloaded add-ons there for local inspection.
+| Scenario file | Purpose |
+| --- | --- |
+| `scenarios/file-collection.json` | Small authored file-collection investigation |
+| `scenarios/cisa/aa24-131a-black-basta-v2.json` | Black Basta exercise with historical publication indicator coverage |
+| `scenarios/cisa/aa24-131a-black-basta.json` | Earlier Black Basta v1 adaptation with six network indicators |
 
-| Path in the output directory | What it contains | Index as security events? |
-| --- | --- | --- |
-| `events/*.jsonl` | CIM-shaped DNS, authentication, network, web, endpoint, file-access, and vulnerability observations | Yes |
-| `context/` | Shared assets, external entities, identities, and relationships; reference-mode policies and assessments | No |
-| `truth/` | Private story steps and causal links; reference-mode expected alerts and case outcomes | No |
-| `dataset-manifest.json` | Run ID, exact counts, exclusions, byte sizes, and SHA-256 hashes | No |
+Use a generator-compatible scenario JSON, not a raw STIX bundle. To use your own scenario, follow the [scenario contract](docs/scenarios.md). Omitting `--scenario-file` selects a separate built-in reference story.
 
-The planted story and ordinary activity share inventory, time range, CIM field names, and value types. DNS, authentication, network, web, endpoint, and file observations form linked routine sessions. Story events are merged into the corresponding source files in event-time order; there is no separate background source. The fixed story is built and validated privately before publishing its CIM projection. Splunk searches can generate alerts or risk events; the generator's expected alerts and case actions remain in `truth/`.
-
-### Tailored scenario
-
-To author a tailored scenario, copy [the example](scenarios/file-collection.json), edit its ordered steps and inventory references, then run this complete block from the repository root after setting up Python:
+Run this complete block after choosing the settings at its top. The example selects Black Basta v2. Change `$scenarioFile` to select another scenario; change the remaining settings to fit that scenario's requirements.
 
 ```powershell
 $python = '.\.venv\Scripts\python.exe'
+$scenarioFile = '.\scenarios\cisa\aa24-131a-black-basta-v2.json'
 $seed = 2
 $startTime = '2024-11-12T08:00:00Z'
 $durationMinutes = 120
 $targetEvents = 10000
-$scenarioFile = '.\scenarios\file-collection.json'
-$outputDir = Join-Path '.\output' ('file-collection-' + [guid]::NewGuid().ToString('N'))
+$hostCount = 23
+$outputDir = Join-Path '.\output' ('scenario-run-' + [guid]::NewGuid().ToString('N'))
+
+if (-not (Test-Path -LiteralPath $scenarioFile -PathType Leaf)) {
+    throw "Scenario file does not exist: $scenarioFile"
+}
+
 & $python .\validate_scenario.py --scenario-file $scenarioFile `
-  --seed $seed --duration-minutes $durationMinutes --target-events $targetEvents
-if ($LASTEXITCODE -ne 0) { throw 'Scenario validation failed.' }
-& $python .\create_dataset.py --seed $seed --start-time $startTime `
-  --duration-minutes $durationMinutes --target-events $targetEvents `
-  --scenario-file $scenarioFile --output-dir $outputDir
+    --seed $seed --host-count $hostCount `
+    --duration-minutes $durationMinutes --target-events $targetEvents
+if ($LASTEXITCODE -ne 0) { throw 'Scenario validation failed. Review the reported requirements.' }
+
+& $python .\create_dataset.py --scenario-file $scenarioFile `
+    --seed $seed --host-count $hostCount --start-time $startTime `
+    --duration-minutes $durationMinutes --target-events $targetEvents `
+    --output-dir $outputDir
+if ($LASTEXITCODE -ne 0) { throw 'Dataset generation failed.' }
+
+$manifest = Get-Content -LiteralPath (Join-Path $outputDir 'dataset-manifest.json') -Raw | ConvertFrom-Json
+if ($manifest.event_records -ne $targetEvents) { throw 'Unexpected event count.' }
+Write-Host "Generated $($manifest.event_records) events in $outputDir"
+Get-ChildItem -LiteralPath (Join-Path $outputDir 'events') -Filter '*.jsonl' -File
 ```
 
-The validator writes no event package and reports prescribed counts and minimum duration. A valid result establishes structural compatibility, not source fidelity or causal plausibility. For supported fields and seeded assets, use `validate_scenario.py --describe-contract` and `--describe-context --seed 2 --host-count 23`.
+| Setting | Meaning |
+| --- | --- |
+| `$scenarioFile` | Selects the story and its prescribed observations |
+| `$seed` | Makes generated details repeatable; does not change the plot or literal scenario IOCs |
+| `$startTime` | UTC start time for the synthetic event timeline |
+| `$durationMinutes` | Generation window; must meet the scenario's minimum duration |
+| `$targetEvents` | Exact total count, including prescribed observations and routine activity |
+| `$hostCount` | Inventory size; must support the scenario's asset references |
+| `$outputDir` | New output directory; generation rejects an existing directory |
 
-The tailored mode builds the shared world directly and writes only its authored story plus ordinary traffic. Its title, causal links, and step descriptions appear in `truth/scenario-truth.json`, never in analyst events. The [scenario guide](docs/scenarios.md) defines supported sources, fields, references, and validation.
+Validation checks structural compatibility and reports minimum duration and prescribed counts. It does not establish source fidelity, causal plausibility, or indicator coverage. Increasing the event count adds routine activity; it does not add publication indicators. Keep the same seed, host count, duration and target count in validation and generation.
 
-## Black Basta publication indicator coverage
+The example settings produce 10,000 events for Black Basta v2: 280 prescribed observations and 9,720 routine observations, dated November 12, 2024 from 08:00 to before 10:00 UTC. Other scenarios have different prescribed counts. Publication dates and the current date do not replace the configured synthetic event window.
 
-For historical matching against the original May 2024 publication, use [Black Basta v2](scenarios/cisa/aa24-131a-black-basta-v2.json) and its [generation and coverage-check instructions](docs/examples/aa24-131a-black-basta-v2-notes.md). It retains v1's November story and six network IOCs, and explicitly adds the original publication's Tables 7–11, including hash and path fields. V1 remains available as the narrower November adaptation.
+Keep the printed output path. Unique directory names prevent overwriting earlier runs; they do not randomize the data. Preserve the source version, scenario and manifest to reproduce a run.
 
-V2 has 280 prescribed observations. Its companion catalog checks 261 source assertions (241 distinct type/value indicators) against exported analyst events, reporting event IDs and failures. It verifies publication-table coverage, **not exact parity with an unavailable STIX attachment or consumer CSV**. A normal structural-validation pass alone does not establish IOC coverage. Only the scenario JSON is a generation input; the catalog is used by `validate_ioc_coverage.py` after export.
+## 4. Check publication indicators when applicable
 
-## Use the events in Splunk
+For Black Basta v2, run this additional check against the output from step 3:
 
-Install the official [Splunk Common Information Model add-on](https://splunkbase.splunk.com/app/1621) separately. This project was tested with version 8.7.0. For a local Windows Splunk installation, copy this repository's [TA-sec-data-cim add-on](splunk/TA-sec-data-cim/) into Splunk's apps directory from an elevated PowerShell, then restart Splunk:
+```powershell
+$python = '.\.venv\Scripts\python.exe'
+$coverageFile = '.\catalogs\intelligence\aa24-131a-publication-coverage-v2.json'
+& $python .\validate_ioc_coverage.py --dataset-dir $outputDir `
+    --coverage-file $coverageFile `
+    --output (Join-Path $outputDir 'ioc-coverage-report.json')
+if ($LASTEXITCODE -ne 0) { throw 'Publication indicator coverage failed.' }
+```
+
+If you opened a new PowerShell window, return to the project folder and set `$outputDir` to the exact run directory first. The report path must be new; omit `--output` to print the report again without overwriting it.
+
+Black Basta v2 should report **261 assertions present, 0 missing**, covering 241 distinct typed values. These are indicator assertions, not event counts. The catalog verifies actual exported event fields and is not a second generation input. For another scenario, use its matching coverage catalog if one exists; skip this step if it has none.
+
+V2 deliberately combines historical May publication tables with the retained November set. It is a broad matching exercise, not one documented victim timeline. Coverage of those publication tables does not establish exact parity with a STIX attachment or a converted CSV. See the [Black Basta v2 notes](docs/examples/aa24-131a-black-basta-v2-notes.md) for sources and limits.
+
+## 5. Use the output in Splunk
+
+| Output | Purpose | Index as security events? |
+| --- | --- | --- |
+| `events/*.jsonl` | Analyst-facing synthetic observations | Yes |
+| `context/` | Assets, identities and other reference inventory | No |
+| `truth/` | Private story descriptions and answer key | No |
+| `dataset-manifest.json` | Generation parameters, counts and file hashes | No |
+| `ioc-coverage-report.json`, when generated | Indicator verification and supporting event IDs | No |
+
+Install [TA-sec-data-cim](splunk/TA-sec-data-cim/) at the Splunk parsing tier before ingestion so the JSON `time` field becomes event time. Install the [Splunk Common Information Model add-on](https://splunkbase.splunk.com/app/1621) for CIM use. For a local Windows Splunk installation, copy the project add-on from an elevated PowerShell, then restart Splunk:
 
 ```powershell
 Copy-Item .\splunk\TA-sec-data-cim 'C:\Program Files\Splunk\etc\apps' -Recurse -Force
 splunk restart
 ```
 
-Create the `sec_data` index before ingesting: in Splunk Web, select **Settings → Indexes → New Index**, or run `splunk add index sec_data` once from the CLI. Splunk can report that `add oneshot` queued a file even when it later drops the events because the index does not exist. Ingest **only** `events/*.jsonl` with sourcetype `secdata:cim:json`. The following uses the current `$outputDir` from the generation block; set it to the run you want if you opened a new PowerShell session. With `splunk` on your PATH:
+Create the destination index first, using **Settings → Indexes → New Index** in Splunk Web. Use a fresh index to compare counts for a single run. With the Splunk CLI on your PATH, ingest only the event files:
 
 ```powershell
+# Set this to the index you created.
 $indexName = 'sec_data'
 Get-ChildItem -LiteralPath (Join-Path $outputDir 'events') -Filter '*.jsonl' -File | ForEach-Object {
     splunk add oneshot $_.FullName -index $indexName -sourcetype secdata:cim:json
+    if ($LASTEXITCODE -ne 0) { throw "Ingestion command failed for $($_.FullName)" }
 }
 ```
 
-Confirm the ingest before investigating. In PowerShell, read the expected count from this run's manifest:
+This uses `$outputDir` from step 3. If Splunk is on another machine, transfer the verified output there and set the path accordingly. Do not ingest the same run twice.
+
+Select **All Time** in Splunk and search, replacing the index name if needed:
+
+```spl
+index=sec_data sourcetype=secdata:cim:json earliest=0
+| stats count
+```
+
+Compare that count with the manifest:
 
 ```powershell
 (Get-Content -LiteralPath (Join-Path $outputDir 'dataset-manifest.json') -Raw | ConvertFrom-Json).event_records
 ```
 
-In Splunk, select **All Time** and run:
+For an isolated run, the counts must match. A successful `add oneshot` response means the file was queued; confirm that Splunk actually indexed it. Event timestamps follow the generation settings, regardless of upload date.
+
+Inspect the source distribution with:
 
 ```spl
-index=sec_data earliest=0
-| stats count
-```
-
-The two counts must match when the index contains only this run. If you have indexed earlier runs into `sec_data`, use a fresh index for an exact comparison and update the index name in both the ingest command and search. A successful `add oneshot` message alone does not confirm that Splunk indexed the events.
-
-To inspect a run by CIM dataset, search **All Time**. Black Basta uses the November 2024 window from the walkthrough; the alternative reference example uses October 2026:
-
-```spl
-index=sec_data sourcetype=secdata:cim:json
+index=sec_data sourcetype=secdata:cim:json earliest=0
 | stats count by sec_data_cim_dataset
 ```
 
-Splunk assigns `host`, `source`, `sourcetype`, `index`, and `splunk_server` at ingest; the JSON supplies the modeled observation fields and UTC `time`. The project add-on handles event boundaries, field extraction, event types, tags, and DNS arrays. The [lab report](docs/splunk-validation.md) records checks on the planted fixture in Splunk Enterprise 10.4.0 with CIM 8.7.0. The high-volume background stream has not undergone that live validation.
+The [Splunk validation report](docs/splunk-validation.md) records the measured lab scope. Publication coverage checks do not validate your Splunk lookup normalization, field extraction, or detection rules.
 
-For the index, sourcetype, and source values to expect after upload, see the [post-ingest source inventory](docs/dataset.md#expected-source-inventory-in-splunk).
+## Troubleshooting
 
-## Choose a volume
+| Problem | Action |
+| --- | --- |
+| `create_dataset.py` cannot be found | Open the project folder itself, not its parent |
+| `py -3.15` is unavailable | Install/repair Python 3.15 and its launcher, then reopen PowerShell |
+| Existing `.venv` uses older or removed Python | Follow the [migration guide](docs/python-version.md) |
+| Scenario validation fails | Review its minimum duration, event count, inventory references and supported fields |
+| Output directory exists | Rerun the complete generation block to choose a new directory |
+| Coverage fails | Confirm that the scenario and coverage catalog match; inspect the report before ingesting |
+| Splunk count is missing or wrong | Confirm the index exists, search All Time, check parsing and compare this run's manifest |
 
-`--target-events` sets an exact published count. The manifest lists counts by source and by planted or ordinary origin; the [dataset guide](docs/dataset.md) records the reference run's measured distribution. To make a million-event run, set a new directory and rerun the generation command above:
+## Additional documentation
 
-```powershell
-$targetEvents = 1000000
-$outputDir = '.\output\reference-volume-1m'
-& $python .\create_dataset.py --seed $seed --start-time $startTime `
-  --duration-minutes $durationMinutes --target-events $targetEvents `
-  --output-dir $outputDir
-```
+- [Scenario authoring](docs/scenario-authoring.md): write or customize a scenario.
+- [CISA authoring](docs/cisa-scenario-authoring.md): preserve source facts and identify fictional additions.
+- [AI assistance](docs/ai-authoring.md): use AI to author a compatible scenario file.
+- [Dataset guide](docs/dataset.md): output layout, fields, counts and time interpretation.
+- [Scale guide](docs/scale.md): larger runs and standalone finding exports.
+- [Windows work instructions](docs/work-instructions-windows-vscode.md): VS Code and optional AWS upload.
+- [Documentation index](docs/README.md): all guides.
 
-A million-event package may approach a 500 MB/day Splunk license limit; read the actual `events/` byte totals in its manifest before ingest. A full million-event export and live Splunk ingest have not yet been measured for this design. See the [scale guide](docs/scale.md) for measurement details.
-
-### Time coverage
-
-`$startTime` and `$durationMinutes` define the routine-event window. The reference story also includes a baseline assessment before that window. Increasing `$targetEvents` makes events denser within the same interval; set `$durationMinutes = 240` for a four-hour window that also spaces the planted operations farther apart. Each JSON event includes its own UTC timestamp for Splunk event-time extraction. The [dataset guide](docs/dataset.md#time-scale-and-interpretation) records the measured time span of the reference run.
-
-### Reproduce a released run
-
-To reproduce the v0.1.0 release later, check out its tag before generating data:
-
-```powershell
-git fetch --tags
-git checkout v0.1.0
-```
-
-Record the tag, seed, UTC start time, duration, campaign count, host count, and target event count with the output. The `dataset-manifest.json` file records run parameters and hashes for every published file. Use those hashes to verify a regenerated package. Standalone finding exports also need an explicit `--as-of` or `--snapshots` value for repeatable assessment dates.
-
-## Other commands
-
-The standalone vulnerability and compliance commands retain their JSON and JSONL outputs for the optional AWS uploader. They are separate from the CIM event package. Specify `--as-of` when you need repeatable assessment dates; `--target-records` requests an exact applicable finding count or fails if the selected inventory and catalogs cannot supply it.
-
-```powershell
-$findingHostCount = 3000
-$findingTarget = 10000
-$vulnOutput = '.\output\vuln-10k.jsonl'
-$complianceOutput = '.\output\compliance.jsonl'
-& $python .\create_vuln_table.py --seed $seed --as-of $startTime `
-  --host-count $findingHostCount --target-records $findingTarget `
-  --format jsonl --output $vulnOutput
-& $python .\create_compliance_table.py --seed $seed --as-of $startTime `
-  --host-count $findingHostCount --format jsonl --output $complianceOutput
-```
-
-`create_story.py` builds the fixed source story used internally and in the checked-in [reference fixture](tests/fixtures/README.md). `create_recon_events.py` and `create_cim_events.py` remain available for source-format experiments and projection of existing bundles. Use `create_dataset.py` for the single CIM-shaped analyst event package.
-
-Run the checks locally:
-
-```powershell
-.\.venv\Scripts\python.exe -m unittest discover -s tests -v
-```
-
-For field decisions, output layout, and investigation limits, read the [dataset guide](docs/dataset.md), [CIM guide](docs/cim.md), and [story guide](docs/story.md).
-
-## Limits and optional upload
-
-All records are synthetic. The generated Zeek-shaped and Windows-shaped reference files are not exact vendor raw events, and the project does not scan systems or provide official CIS Benchmark content. Five source observations and one TLS metadata observation lack a sound CIM mapping in the current dataset. The planted read and later upload support a correlation exercise; they do not prove which file bytes were transferred.
-
-Only the separate [AWS uploader](upload_to_aws.py) contacts AWS. It accepts the standalone vulnerability and compliance outputs, requires `boto3` and configured credentials, and may create or upsert DynamoDB items with associated cost. For example, after generating `$vulnOutput`:
-
-```powershell
-& $python -m pip install boto3
-$awsRegion = 'us-east-1'
-& $python .\upload_to_aws.py --dataset vuln --input $vulnOutput --region $awsRegion
-```
-
-The uploader prompts for a profile when one is not supplied and requires an explicit `UPLOAD` confirmation before writing. See the [Windows work instructions](docs/work-instructions-windows-vscode.md) for credentials and table details.
+All records are synthetic. The generator does not execute malware or scan systems; its source-shaped events are not exact vendor raw telemetry. The optional [AWS uploader](upload_to_aws.py) is separate from local event generation, requires `boto3` and AWS permissions, and can incur AWS costs.
 
 ## License
 
-See [LICENSE](LICENSE) and the [release notes](CHANGELOG.md).
+See [LICENSE](LICENSE) and [CHANGELOG.md](CHANGELOG.md).

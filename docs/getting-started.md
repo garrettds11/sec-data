@@ -1,57 +1,38 @@
 # Start or return to sec-data (Windows PowerShell)
 
-Follow these steps in order. This is the complete path for the included **Black Basta v2 publication-coverage exercise**, already available on `main`. It generates local synthetic files; it needs no AWS credentials, AI service, live malware, or Splunk connection.
+Follow these steps in order. This is the complete path for the included **Black Basta v2 publication-coverage exercise**, included in the current repository version. It generates local synthetic files; it needs no AWS credentials, AI service, live malware, or Splunk connection.
 
-## 1. Open and update the checkout
+## 1. Open PowerShell in the extracted project folder
 
-Open a new PowerShell window. If you already have a clone, use its actual path in the first line:
-
-```powershell
-Set-Location 'C:\code\GitHub\sec-data'
-git status
-if ($LASTEXITCODE -ne 0) { throw 'This is not a usable Git checkout. Check the directory.' }
-```
-
-Read the status before continuing. If it lists modified files, an unfinished merge, or local commits you need to preserve, keep that checkout intact. Use a fresh clone below to resume immediately without resolving old work. Untracked files are local work too; preserve them. Do not reset or clean the old directory to follow this guide.
-
-For a checkout with a clean working tree and no unfinished operation:
+The repository files are already downloaded and extracted wherever you want to keep them. Git is not required. Open that folder in File Explorer, type `powershell` in the address bar and press Enter. You can also open PowerShell normally and change to your actual folder:
 
 ```powershell
-git fetch origin
-if ($LASTEXITCODE -ne 0) { throw 'Fetch failed. Check GitHub access.' }
-git switch main
-if ($LASTEXITCODE -ne 0) { throw 'Could not switch to main. Preserve local work and review git status.' }
-git pull --ff-only origin main
-if ($LASTEXITCODE -ne 0) { throw 'Main could not fast-forward. Preserve this checkout; use a fresh clone below.' }
-git log -1 --oneline
+# Replace this example path with your extracted project folder.
+Set-Location -LiteralPath 'C:\code\sec-data-main'
+if (-not (Test-Path -LiteralPath '.\create_dataset.py' -PathType Leaf)) {
+    throw 'Open the folder containing create_dataset.py, README.md, and the scenarios directory.'
+}
 ```
 
-**Fresh clone alternative:** if the existing checkout is confusing or you do not have one, use an empty destination. This creates a separate checkout and leaves the old one untouched. Skip this block if the update above succeeded.
+Use the project folder itself, not its parent. Keep the extracted files and subfolders together. All commands below run from this folder.
 
-```powershell
-$repoDir = Join-Path $env:USERPROFILE ('source\sec-data-' + [guid]::NewGuid().ToString('N'))
-git clone https://github.com/garrettds11/sec-data.git $repoDir
-if ($LASTEXITCODE -ne 0) { throw 'Clone failed. Check Git installation and GitHub access.' }
-Set-Location -LiteralPath $repoDir
-```
-
-Confirm the three files needed for this exercise:
+Confirm that this copy contains Black Basta v2 and its checker:
 
 ```powershell
 @(
-    '.\create_dataset.py',
     '.\validate_ioc_coverage.py',
-    '.\scenarios\cisa\aa24-131a-black-basta-v2.json'
+    '.\scenarios\cisa\aa24-131a-black-basta-v2.json',
+    '.\catalogs\intelligence\aa24-131a-publication-coverage-v2.json'
 ) | ForEach-Object {
     if (-not (Test-Path -LiteralPath $_ -PathType Leaf)) {
-        throw "Required file missing: $_. Check the directory and update main."
+        throw "Required file missing: $_. Check the project folder and repository version."
     }
 }
 ```
 
 ## 2. Prepare Python and check the repo
 
-The default is **Python 3.15**. Install an approved, patched 64-bit build if needed, then reopen PowerShell and return to the checkout. Git and Python are the only required installations for this path. The core generator and tests use the standard library; no `pip install` is needed.
+The default is **Python 3.15**. Install an approved, patched 64-bit build if needed, then reopen PowerShell and return to the extracted project folder. Python is the only additional installation required for local generation; Windows already supplies PowerShell. The core generator and tests use the standard library; no `pip install` is needed.
 
 ```powershell
 py -3.15 --version
@@ -91,7 +72,7 @@ The suite should finish with `OK`. A renamed old venv is a backup for restoring 
 
 ## 3. Generate and verify Black Basta v2
 
-Run this entire block from the repo root. Every run variable is defined here, so it also works in a new PowerShell window after setup. A unique output directory prevents accidental reuse of an existing run.
+Run this entire block from the extracted project folder. Every run variable is defined here, so it also works in a new PowerShell window after setup. A unique output directory prevents accidental reuse of an existing run.
 
 ```powershell
 $python = '.\.venv\Scripts\python.exe'
@@ -161,10 +142,9 @@ No S3 transfer is necessary for a local run. If Splunk is on another machine, tr
 
 | Symptom | Next action |
 | --- | --- |
-| Git reports local changes, merge conflicts or divergence | Preserve the old directory and use the fresh-clone alternative |
 | `py -3.15` is unavailable | Install/repair the approved Python build and launcher, then open a new shell |
 | `.venv` points at older or removed Python | Run step 2 to preserve and rebuild the environment |
-| New scenario or checker is missing | Confirm the checkout directory and update `main` |
+| New scenario or checker is missing | Confirm you opened the folder containing `create_dataset.py`; if files are absent, obtain a current repository copy in a separate folder and preserve your old files |
 | Output directory already exists | Rerun the complete step 3 block to choose a new directory |
 | Coverage fails | Stop before ingest; inspect the report and confirm v2 scenario/catalog paths |
 | Splunk has no events or an unexpected count | Confirm the index exists, search All Time, check parsing and compare with this run's manifest |
