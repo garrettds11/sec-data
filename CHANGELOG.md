@@ -3,6 +3,7 @@
 ## Unreleased
 
 - Add SafePay AA26-293A v1 with the user-supplied original STIX snapshot, source reconciliation, 14 steps/85 observations and 62 typed coverage assertions. Support SHA-1/hostname coverage and case-sensitive SSDEEP filesystem metadata; document independent historical fixtures and fictional exercise settings.
+- Require actual published STIX JSON review for CISA scenario authoring, with source hashes/object provenance, publication reconciliation, explicit omissions and exported-evidence coverage. Block source-dependent finalization when an attachment is inaccessible instead of silently substituting publication tables.
 
 - Scenario files may declare a short `output_name`. Dataset CLI runs without `--output-dir` now allocate readable `<name>-runNNN` folders under `output/` (or `--output-root`), with atomic reservations for concurrent runs. Explicit new output paths retain their existing behavior. `--json` reports the allocated path for automation.
 - Black Basta v2 uses `black-basta-v2`; file collection uses `file-collection`. Update the README and walkthrough to capture the chosen path automatically for validation and Splunk ingestion.

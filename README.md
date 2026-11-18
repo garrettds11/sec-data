@@ -199,7 +199,7 @@ The [Splunk validation report](docs/splunk-validation.md) records the measured l
 ## Additional documentation
 
 - [Scenario authoring](docs/scenario-authoring.md): write or customize a scenario.
-- [CISA authoring](docs/cisa-scenario-authoring.md): preserve source facts and identify fictional additions.
+- [CISA authoring](docs/cisa-scenario-authoring.md): retrieve the published STIX JSON, reconcile its indicators with the advisory, preserve source facts and identify fictional additions.
 - [AI assistance](docs/ai-authoring.md): use AI to author a compatible scenario file.
 - [Dataset guide](docs/dataset.md): output layout, fields, counts and time interpretation.
 - [Scale guide](docs/scale.md): larger runs and standalone finding exports.
