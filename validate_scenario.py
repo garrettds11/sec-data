@@ -16,6 +16,7 @@ from common.world import iter_assets, iter_entities, iter_relationships
 def describe_contract():
     return {
         "schema_version": SCHEMA_VERSION,
+        "output_name": "Optional 1-48 lowercase letters/digits/hyphens; short run folder label",
         "source_datasets": {key: sorted(value) for key, value in sorted(SOURCE_DATASETS.items())},
         "required_fields": {key: sorted(value) for key, value in sorted(REQUIRED.items())},
         "field_types": {"nonempty_string": sorted(STRING_FIELDS),

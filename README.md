@@ -70,7 +70,7 @@ $startTime = '2024-11-12T08:00:00Z'
 $durationMinutes = 120
 $targetEvents = 10000
 $hostCount = 23
-$outputDir = Join-Path '.\output' ('scenario-run-' + [guid]::NewGuid().ToString('N'))
+$outputRoot = '.\output'
 
 if (-not (Test-Path -LiteralPath $scenarioFile -PathType Leaf)) {
     throw "Scenario file does not exist: $scenarioFile"
@@ -81,11 +81,12 @@ if (-not (Test-Path -LiteralPath $scenarioFile -PathType Leaf)) {
     --duration-minutes $durationMinutes --target-events $targetEvents
 if ($LASTEXITCODE -ne 0) { throw 'Scenario validation failed. Review the reported requirements.' }
 
-& $python .\create_dataset.py --scenario-file $scenarioFile `
+$runJson = & $python .\create_dataset.py --scenario-file $scenarioFile `
     --seed $seed --host-count $hostCount --start-time $startTime `
     --duration-minutes $durationMinutes --target-events $targetEvents `
-    --output-dir $outputDir
+    --output-root $outputRoot --json
 if ($LASTEXITCODE -ne 0) { throw 'Dataset generation failed.' }
+$outputDir = ($runJson | ConvertFrom-Json).output_dir
 
 $manifest = Get-Content -LiteralPath (Join-Path $outputDir 'dataset-manifest.json') -Raw | ConvertFrom-Json
 if ($manifest.event_records -ne $targetEvents) { throw 'Unexpected event count.' }
@@ -101,13 +102,13 @@ Get-ChildItem -LiteralPath (Join-Path $outputDir 'events') -Filter '*.jsonl' -Fi
 | `$durationMinutes` | Generation window; must meet the scenario's minimum duration |
 | `$targetEvents` | Exact total count, including prescribed observations and routine activity |
 | `$hostCount` | Inventory size; must support the scenario's asset references |
-| `$outputDir` | New output directory; generation rejects an existing directory |
+| `$outputRoot` | Parent folder for automatically named runs; defaults to `output/` |
 
 Validation checks structural compatibility and reports minimum duration and prescribed counts. It does not establish source fidelity, causal plausibility, or indicator coverage. Increasing the event count adds routine activity; it does not add publication indicators. Keep the same seed, host count, duration and target count in validation and generation.
 
 The example settings produce 10,000 events for Black Basta v2: 280 prescribed observations and 9,720 routine observations, dated November 12, 2024 from 08:00 to before 10:00 UTC. Other scenarios have different prescribed counts. Publication dates and the current date do not replace the configured synthetic event window.
 
-Keep the printed output path. Unique directory names prevent overwriting earlier runs; they do not randomize the data. Preserve the source version, scenario and manifest to reproduce a run.
+Keep the printed output path. Run folders use the scenario’s optional `output_name`, such as `black-basta-v2-run001`, then `run002`. Without that field, a safe form of the scenario ID is used. Numbered folders are unique within the output root while existing runs are retained; deleted names may be reused. Concurrent generators reserve separate names atomically. Folder names do not randomize the data. Use `--output-dir PATH` instead of `--output-root` to choose an explicit new directory. Preserve the source version, scenario and manifest to reproduce a run.
 
 ## 4. Check publication indicators when applicable
 

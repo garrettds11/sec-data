@@ -72,7 +72,7 @@ The suite should finish with `OK`. A renamed old venv is a backup for restoring 
 
 ## 3. Generate and verify Black Basta v2
 
-Run this entire block from the extracted project folder. Every run variable is defined here, so it also works in a new PowerShell window after setup. A unique output directory prevents accidental reuse of an existing run.
+Run this entire block from the extracted project folder. Every run variable is defined here, so it also works in a new PowerShell window after setup. The generator allocates a readable, unused run directory automatically.
 
 ```powershell
 $python = '.\.venv\Scripts\python.exe'
@@ -83,18 +83,19 @@ $targetEvents = 10000
 $hostCount = 23
 $scenarioFile = '.\scenarios\cisa\aa24-131a-black-basta-v2.json'
 $coverageFile = '.\catalogs\intelligence\aa24-131a-publication-coverage-v2.json'
-$outputDir = Join-Path '.\output' ('aa24-131a-black-basta-v2-' + [guid]::NewGuid().ToString('N'))
+$outputRoot = '.\output'
 
 & $python .\validate_scenario.py --scenario-file $scenarioFile `
     --seed $seed --host-count $hostCount `
     --duration-minutes $durationMinutes --target-events $targetEvents
 if ($LASTEXITCODE -ne 0) { throw 'Scenario validation failed.' }
 
-& $python .\create_dataset.py --scenario-file $scenarioFile `
+$runJson = & $python .\create_dataset.py --scenario-file $scenarioFile `
     --seed $seed --host-count $hostCount --start-time $startTime `
     --duration-minutes $durationMinutes --target-events $targetEvents `
-    --output-dir $outputDir
+    --output-root $outputRoot --json
 if ($LASTEXITCODE -ne 0) { throw 'Dataset generation failed.' }
+$outputDir = ($runJson | ConvertFrom-Json).output_dir
 
 & $python .\validate_ioc_coverage.py --dataset-dir $outputDir `
     --coverage-file $coverageFile `
@@ -119,13 +120,13 @@ Expected results for these settings:
 | Event-time window | November 12, 2024, 08:00 to before 10:00 UTC |
 | Output | A new directory under `output/`, printed by the block |
 
-Seed `2` selects repeatable details. It does not select the plot or alter literal publication IOCs. The scenario file selects the plot. The catalog checks exported event fields after generation; it is not a second generation input. Unique output-directory names do not randomize the generated data.
+Seed `2` selects repeatable details. It does not select the plot or alter literal publication IOCs. The scenario file selects the plot. The catalog checks exported event fields after generation; it is not a second generation input. The scenario declares `output_name: black-basta-v2`, producing readable folders such as `black-basta-v2-run001`. Existing runs are skipped; concurrent runs reserve different names. Names may be reused if old run folders are deleted. Folder names do not randomize the generated data.
 
 This exercise covers the selected May publication tables plus the retained November set. It is a deliberately broad historical matching fixture, not one documented victim timeline. **Exact agreement with your converted STIX CSV has not been established.** See the [v2 source and coverage notes](examples/aa24-131a-black-basta-v2-notes.md).
 
 ## 4. Use only the event files in Splunk
 
-Your local generation is complete once the count and coverage checks pass. Keep the printed output path. If you reopen PowerShell, set `$outputDir` to that exact path before using the [README Splunk instructions](../README.md#use-the-events-in-splunk).
+Your local generation is complete once the count and coverage checks pass. Keep the printed output path. If you reopen PowerShell, set `$outputDir` to that exact path before using the [README Splunk instructions](../README.md#5-use-the-output-in-splunk).
 
 | Output | Use |
 | --- | --- |

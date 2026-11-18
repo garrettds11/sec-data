@@ -5,9 +5,11 @@ import argparse
 import hashlib
 import json
 import os
+import re
 import shutil
 import tempfile
 import time
+from contextlib import contextmanager, nullcontext
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -218,6 +220,50 @@ def export_dataset(seed, start, duration_minutes, campaign_count, host_count, ou
         return manifest
 
 
+def scenario_output_name(spec):
+    """Use the author's short label, or a safe bounded slug of the scenario ID."""
+    if not spec:
+        return "reference"
+    if "output_name" in spec:
+        return spec["output_name"]
+    name = re.sub(r"[^a-z0-9-]+", "-", spec["id"].lower()).strip("-")[:48].rstrip("-")
+    if not name or re.fullmatch(r"(?:con|prn|aux|nul|com[1-9]|lpt[1-9])", name):
+        name = "scenario-" + (name or "unnamed")
+    return name
+
+
+@contextmanager
+def reserve_run_directory(output_root, name):
+    """Reserve a numbered name atomically without exposing an unfinished dataset.
+
+    Keep completed runs to retain numbering history. A reservation left by a killed
+    process is skipped, so a later process cannot reuse a potentially active name.
+    """
+    root = Path(output_root).resolve()
+    root.mkdir(parents=True, exist_ok=True)
+    number = 1
+    while True:
+        target = root / f"{name}-run{number:03d}"
+        lock = root / f".{target.name}.reserved"
+        if os.path.lexists(target):
+            number += 1
+            continue
+        try:
+            lock.mkdir()
+        except FileExistsError:
+            number += 1
+            continue
+        if os.path.lexists(target):
+            lock.rmdir()
+            number += 1
+            continue
+        break
+    try:
+        yield target
+    finally:
+        lock.rmdir()
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--seed", type=int, default=42,
@@ -234,18 +280,31 @@ def main():
                         help="Exact published event count, at least the planted count (default: 10000)")
     parser.add_argument("--scenario-file",
                         help="Versioned JSON story; replaces the fixed planted investigation")
-    parser.add_argument("--output-dir", required=True,
-                        help="New directory for events, context, truth, and manifest")
+    destinations = parser.add_mutually_exclusive_group()
+    destinations.add_argument("--output-dir",
+                              help="Explicit new run directory; overrides automatic naming")
+    destinations.add_argument("--output-root", default="output",
+                              help="Parent for automatic <scenario>-runNNN folders (default: output)")
+    parser.add_argument("--json", action="store_true",
+                        help="Print a JSON result with output_dir and event_records")
     args = parser.parse_args()
     try:
         start = datetime.fromisoformat(parse_times([args.start_time])[0].replace("Z", "+00:00"))
-        result = export_dataset(args.seed, start, args.duration_minutes,
-                                args.campaign_count, args.host_count, args.output_dir,
-                                args.target_events, args.scenario_file)
+        spec = load_scenario(args.scenario_file) if args.scenario_file else None
+        destination = (nullcontext(Path(args.output_dir).resolve()) if args.output_dir else
+                       reserve_run_directory(args.output_root, scenario_output_name(spec)))
+        with destination as output_dir:
+            result = export_dataset(args.seed, start, args.duration_minutes,
+                                    args.campaign_count, args.host_count, output_dir,
+                                    args.target_events, args.scenario_file)
     except (OSError, ValueError, KeyError) as exc:
         parser.error(str(exc))
-    print(f"Wrote {result['event_records']} CIM-shaped events to "
-          f"{Path(args.output_dir).resolve() / 'events'}")
+    if args.json:
+        print(json.dumps({"output_dir": str(output_dir),
+                          "event_records": result["event_records"],
+                          "run_id": result["run_id"]}, sort_keys=True))
+    else:
+        print(f"Wrote {result['event_records']} CIM-shaped events to {output_dir / 'events'}")
 
 
 if __name__ == "__main__":

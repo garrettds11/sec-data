@@ -4,13 +4,19 @@
 
 Choose a CISA-oriented, AI-generated or human-generated source using [general authoring](scenario-authoring.md). Human and machine authors follow the same procedure; see [AI assistance](ai-authoring.md) and [CISA authoring](cisa-scenario-authoring.md).
 
-Start with [`scenarios/file-collection.json`](../scenarios/file-collection.json). It models an inbound request, use of an operator account, process execution, a file read, an outbound connection, and a later block. The file describes seven planted observations in six ordered steps; `--target-events` fills the rest of the requested count with ordinary activity. The [README tailored-scenario command](../README.md#tailored-scenario) shows the named PowerShell variables and generator invocation. Choose a new `$outputDir` for each run.
+Start with [`scenarios/file-collection.json`](../scenarios/file-collection.json). It models an inbound request, use of an operator account, process execution, a file read, an outbound connection, and a later block. The file describes seven planted observations in six ordered steps; `--target-events` fills the rest of the requested count with ordinary activity. The [README tailored-scenario command](../README.md#3-select-a-scenario-and-generate-data) shows the named PowerShell variables and generator invocation. Choose a new `$outputDir` for each run.
 
 Index only `events/*.jsonl`. Use `context/` to look up assets, identities, and external entities. Keep `truth/scenario-truth.json` out of the analyst index: it contains the story title, causal links, step descriptions, and event IDs.
 
+## Output folder names
+
+An optional top-level `"output_name": "black-basta-v2"` gives runs a short label. Use 1–48 lowercase ASCII letters, digits or hyphens, beginning with a letter/digit; Windows reserved names are rejected. Without it, the generator sanitizes the scenario ID. With no `--output-dir`, generation atomically allocates `output/black-basta-v2-run001`, then `run002`, skipping existing paths and in-progress reservations. `--output-root` changes the parent; `--output-dir` selects an explicit new path. Numbering is local to the output root, and deleted names may be reused. Keep the manifest for full scenario identity and generation settings. `--json` returns the actual allocated `output_dir` for scripts.
+
+For a Universal Forwarder, monitor only each run’s `events/*.jsonl`. A source path such as `C:\sec-data\output\black-basta-v2-run001\events\sysmon.jsonl` exposes scenario, run and event source. Avoid recursively monitoring the entire output tree: it contains private truth, context, and temporary staging files.
+
 ## Contract
 
-The top-level JSON object requires `schema_version: 1`, a nonempty `id`, a `title`, and a nonempty `steps` array. It may include `description`, `entities`, and `background_mix`. Each step requires a unique `id`, `offset_seconds` from the run's `--start-time`, and one or more `observations`. Steps must appear in time order and stay inside `--duration-minutes`. Optional `depends_on` IDs must name earlier steps; optional step `description` appears only in truth.
+The top-level JSON object requires `schema_version: 1`, a nonempty `id`, a `title`, and a nonempty `steps` array. It may include `description`, `entities`, `background_mix`, and `output_name`. Each step requires a unique `id`, `offset_seconds` from the run's `--start-time`, and one or more `observations`. Steps must appear in time order and stay inside `--duration-minutes`. Optional `depends_on` IDs must name earlier steps; optional step `description` appears only in truth.
 
 Each observation requires `source`, `dataset`, and a `fields` object. An optional nonnegative `delay_ms` orders observations within a step. The generator adds `time`, `event_id`, `session_id`, `synthetic`, `sec_data_source`, and `sec_data_cim_dataset`. Those keys cannot be supplied in `fields`. Narrative or ground-truth flags are also rejected from analyst events.
 
