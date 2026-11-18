@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Require actual published STIX JSON review for CISA scenario authoring, with source hashes/object provenance, publication reconciliation, explicit omissions and exported-evidence coverage. Block source-dependent finalization when an attachment is inaccessible instead of silently substituting publication tables.
+
 - Scenario files may declare a short `output_name`. Dataset CLI runs without `--output-dir` now allocate readable `<name>-runNNN` folders under `output/` (or `--output-root`), with atomic reservations for concurrent runs. Explicit new output paths retain their existing behavior. `--json` reports the allocated path for automation.
 - Black Basta v2 uses `black-basta-v2`; file collection uses `file-collection`. Update the README and walkthrough to capture the chosen path automatically for validation and Splunk ingestion.
 

@@ -6,7 +6,7 @@ This guide is for human authors and AI/machine authors. Both produce **one scena
 
 | Source | Starting point | Required review |
 | --- | --- | --- |
-| CISA-oriented | A complete advisory and its revision, optionally selected from a catalog | Follow [CISA authoring](cisa-scenario-authoring.md); preserve documented facts and identify fictional additions. |
+| CISA-oriented | A complete advisory and its revision, plus its published STIX JSON attachment; a catalog can help locate them | Follow [CISA authoring](cisa-scenario-authoring.md); retrieve and inventory the actual STIX JSON, reconcile CTI with publication text, preserve documented facts and identify fictional additions. |
 | AI-generated | Ask AI to propose a plausible scenario for an investigation objective | Label it fictional; review prerequisites, privileges, sensor visibility and evidence limits. |
 | Human-generated | Supply your own narrative, observations or ordered actions | Preserve the author's intent; clarify missing links and convert it to supported observations. |
 
