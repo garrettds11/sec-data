@@ -9,6 +9,7 @@ Start with the repository [README](../README.md) to generate and ingest a CIM-sh
 | [Story authoring](scenario-authoring.md) | Three story sources, manual editing, review, validation and generation |
 | [CISA authoring](cisa-scenario-authoring.md) | Shared human/machine source-based procedure |
 | [AI assistance](ai-authoring.md) | Consumer prompts, repository-aware agents and ordinary chat attachment checklist |
+| [Gunra AA26-222A](examples/aa26-222a-gunra-v1-notes.md) | STIX-backed scenario, compound filename/hash checks, contact artifacts and proposed settings |
 | [SafePay AA26-293A](examples/aa26-293a-safepay-v1-notes.md) | STIX-backed scenario, complete value inventory, proposed settings and coverage checks |
 | [Black Basta example](examples/aa24-131a-black-basta-notes.md) | Source facts versus a runnable fictional adaptation |
 | [Tailored scenarios](scenarios.md) | Versioned JSON contract for LLM-authored story steps and source observations |

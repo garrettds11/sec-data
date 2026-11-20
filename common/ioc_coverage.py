@@ -13,21 +13,34 @@ def load_coverage(path):
     if not isinstance(entries, list) or not entries:
         raise ValueError("Coverage catalog needs indicator assertions")
     ids = set()
-    allowed = {"domain": {"query"}, "ipv4": {"src", "dest", "src_ip", "dest_ip"},
+    allowed = {"domain": {"query", "file_domain"}, "email": {"file_email"},
+               "contact": {"file_contact_id"}, "account": {"file_account"},
+               "ipv4": {"src", "dest", "src_ip", "dest_ip"},
                "sha256": {"file_hash", "process_hash"},
                "sha1": {"file_hash", "process_hash"},
                "ssdeep": {"file_hash_ssdeep"},
                "hostname": {"src", "dest"},
                "md5": {"file_hash", "process_hash"}, "path": {"file_path", "process"}}
+
+    def valid_term(term):
+        return (isinstance(term, dict)
+                and term.keys() == {"kind", "value", "field", "match"}
+                and all(isinstance(term.get(key), str) and term[key]
+                        for key in ("kind", "value", "field", "match"))
+                and term["kind"] in allowed and term["field"] in allowed[term["kind"]]
+                and term["match"] in {"exact", "glob", "basename"}
+                and (term["match"] == "exact" or term["kind"] == "path"))
+
     for entry in entries:
         if not isinstance(entry, dict) or not all(isinstance(entry.get(key), str) and entry[key]
                 for key in ("id", "source", "kind", "value", "field", "match", "step_id")):
             raise ValueError("Malformed coverage assertion")
-        if (entry["id"] in ids or entry["kind"] not in allowed
-                or entry["field"] not in allowed[entry["kind"]]
-                or entry["match"] not in {"exact", "glob", "basename"}
-                or (entry["match"] != "exact" and entry["kind"] != "path")):
+        primary = {key: entry[key] for key in ("kind", "value", "field", "match")}
+        if entry["id"] in ids or not valid_term(primary):
             raise ValueError("Invalid/duplicate coverage assertion")
+        if "conditions" in entry and (not isinstance(entry["conditions"], list)
+                or not entry["conditions"] or not all(valid_term(t) for t in entry["conditions"])):
+            raise ValueError("Invalid coverage conditions")
         ids.add(entry["id"])
     return catalog
 
@@ -35,7 +48,7 @@ def load_coverage(path):
 def _matches(actual, entry):
     if not isinstance(actual, str):
         return False
-    if entry["kind"] == "ssdeep":
+    if entry["kind"] in {"ssdeep", "contact"}:
         return actual == entry["value"]
     actual, expected = actual.casefold(), entry["value"].casefold()
     if entry["match"] == "glob":
@@ -58,13 +71,16 @@ def check_coverage(catalog, events):
             if field not in event:
                 continue
             for entry in candidates:
-                if _matches(event[field], entry):
+                if (_matches(event[field], entry) and all(
+                        _matches(event.get(term["field"]), term)
+                        for term in entry.get("conditions", []))):
                     hits[entry["id"]].append({"event_id": event.get("event_id", ""),
                                              "source": event.get("sec_data_source", ""),
                                              "time": event.get("time", ""), "field": field})
     assertions = [{"id": entry["id"], "source": entry["source"],
                    "table": entry.get("table"), "row": entry.get("row"),
                    "kind": entry["kind"], "value": entry["value"],
+                   **({"conditions": entry["conditions"]} if "conditions" in entry else {}),
                    "field": entry["field"], "status": "present" if hits[entry["id"]] else "missing",
                    "event_ids": sorted({hit["event_id"] for hit in hits[entry["id"]]}),
                    "evidence": hits[entry["id"]]} for entry in entries]
@@ -72,7 +88,7 @@ def check_coverage(catalog, events):
     return {"scenario_id": catalog["scenario_id"], "status": "complete" if missing == 0 else "incomplete",
             "assertion_count": len(entries), "present": len(entries) - missing,
             "missing": missing,
-            "unique_indicators": len({(e["kind"], e["value"] if e["kind"] == "ssdeep" else e["value"].casefold()) for e in entries}),
+            "unique_indicators": len({(e["kind"], e["value"] if e["kind"] in {"ssdeep", "contact"} else e["value"].casefold()) for e in entries}),
             "scope": catalog.get("scope", "Published-table assertions only; STIX attachment/CSV parity and detection efficacy are not established."),
             "assertions": assertions}
 
