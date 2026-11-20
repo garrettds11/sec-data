@@ -32,7 +32,7 @@ Create a virtual environment with `py -3.15 -m venv .venv` and select `.venv\Scr
 
 ## Optional for AWS upload **only**
 
-- Python package `boto3`: install into the chosen venv with `python -m pip install boto3`.
+- Python package `boto3`: install into the chosen venv with `python -m pip install -r requirements-aws.txt`.
 - AWS CLI v2: recommended to configure and list named profiles (e.g., `aws configure list-profiles`). The uploader itself uses boto3, not subprocess calls to the AWS CLI.
 - Valid credentials in a shared AWS profile; IAM permissions to call `sts:GetCallerIdentity` and perform DynamoDB table description, creation (when needed), item batch writing and related access in the target region. Permissions vary according to whether the table already exists.
 - AWS network connectivity and an intended AWS region. DynamoDB **on-demand capacity costs money**.

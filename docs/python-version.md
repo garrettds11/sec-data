@@ -58,7 +58,7 @@ if ($LASTEXITCODE -ne 0) { throw 'Tests failed. Review before generating data.' 
 if ($LASTEXITCODE -ne 0) { throw 'Scenario validation failed.' }
 ```
 
-Select `.venv\Scripts\python.exe` again in VS Code. If you use the optional uploader, install its dependency separately into this new environment with `& $python -m pip install boto3`; core generation needs no pip packages. Review any other packages from the old environment instead of copying its `site-packages` directory.
+Select `.venv\Scripts\python.exe` again in VS Code. If you use the optional uploader, install its dependency separately into this new environment with `& $python -m pip install -r requirements-aws.txt`; core generation needs no pip packages. Review any other packages from the old environment instead of copying its `site-packages` directory.
 
 The old Python installation is not patched or removed by this process. Remove an obsolete interpreter only after checking other applications and applying your organization's software lifecycle process.
 

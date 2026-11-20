@@ -141,7 +141,7 @@ In VS Code, open `create_recon_events.py` and break in `Operation.build()`, `Ope
 Do not run this step until you intend to write to DynamoDB and have confirmed authorization, region, IAM rights and costs. From `C:\code`:
 
 ```powershell
-C:\GitHub\sec-data\.venv\Scripts\python.exe -m pip install boto3
+C:\GitHub\sec-data\.venv\Scripts\python.exe -m pip install -r C:\GitHub\sec-data\requirements-aws.txt
 aws configure list-profiles
 
 C:\GitHub\sec-data\.venv\Scripts\python.exe `
