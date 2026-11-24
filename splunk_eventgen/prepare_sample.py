@@ -14,6 +14,7 @@ EVENT_TIME = re.compile(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z")
 def read_events(path, expected_count):
     previous = "", ""
     count = 0
+    fallback_host = f"unknown-{path.stem}"
     with path.open(encoding="utf-8") as stream:
         for count, line in enumerate(stream, 1):
             raw = line.rstrip("\r\n")
@@ -24,8 +25,10 @@ def read_events(path, expected_count):
                 raise ValueError(f"{path.name}:{count}: expected sorted UTC millisecond timestamps")
             if event["sec_data_source"] != path.name or event["synthetic"] is not True:
                 raise ValueError(f"{path.name}:{count}: expected a synthetic event from this source")
+            device = event.get("dvc")
+            host = device if isinstance(device, str) and device.strip() else fallback_host
             previous = key
-            yield key, event["dvc"], path.name, raw
+            yield key, host, path.name, raw
     if count != expected_count:
         raise ValueError(f"{path.name}: expected {expected_count} events, read {count}")
 
