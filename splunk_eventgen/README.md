@@ -22,7 +22,7 @@ if (-not $outputDir -or -not (Test-Path -LiteralPath (Join-Path $outputDir 'data
 if ($LASTEXITCODE -ne 0) { throw 'Eventgen sample preparation failed.' }
 ~~~
 
-`$outputDir` is the input. `$samplePath` is the new CSV. The script merges the event files into a single chronological stream, preserving each event's source and reporting device. It refuses to overwrite a CSV. Reuse the CSV for repeated runs, or choose a fresh output directory with the same CSV filename to prepare a different run.
+`$outputDir` is the input. `$samplePath` is the new CSV. The script merges the event files into a single chronological stream. It keeps the source filename and uses the reporting device (`dvc`) as Splunk `host`. If `dvc` is missing or blank, it uses a source-specific label such as `unknown-sysmon` in the CSV's `host` column. The original JSON payload stays intact. It refuses to overwrite a CSV. Reuse the CSV for repeated runs, or choose a fresh output directory with the same CSV filename to prepare a different run.
 
 ## 2. Deploy the replay to Splunk
 

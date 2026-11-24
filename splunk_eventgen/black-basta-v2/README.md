@@ -17,7 +17,7 @@ From the repository root, in the same PowerShell session that generated the run:
 if ($LASTEXITCODE -ne 0) { throw 'Eventgen sample preparation failed.' }
 ~~~
 
-The helper reads the manifest and the run's `events/` streams. It merges them by UTC time and event ID, keeping each JSON event intact. Each CSV row carries the original filename as Splunk `source` and the reporting device (`dvc`) as `host`. Keep one CSV for the whole scenario so the firewalls, DNS, endpoint, and authentication logs share the same replay clock. The default sample path is under `output/`. For another run, choose a new sample directory and update `sampleDir` in a copy of the config.
+The helper reads the manifest and the run's `events/` streams. It merges them by UTC time and event ID, keeping each JSON event intact. Each CSV row carries the original filename as Splunk `source` and the reporting device (`dvc`) as `host`, with a source-specific label when the device is unavailable. Keep one CSV for the whole scenario so the firewalls, DNS, endpoint, and authentication logs share the same replay clock. The default sample path is under `output/`. For another run, choose a new sample directory and update `sampleDir` in a copy of the config.
 
 ## Run Eventgen
 
