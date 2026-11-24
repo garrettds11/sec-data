@@ -1,5 +1,7 @@
 # Black Basta v2 replay
 
+For recurring replay inside Splunk Enterprise, follow the [SA-Eventgen setup guide](../README.md).
+
 This configuration replays the repository's [Black Basta v2 scenario](../../scenarios/cisa/aa24-131a-black-basta-v2.json). The [scenario notes](../../docs/examples/aa24-131a-black-basta-v2-notes.md) explain the fictional investigation and the independent historical indicator observations. Copy the [top-level template](../eventgen.conf) when adding another scenario.
 
 ## Prepare the sample
